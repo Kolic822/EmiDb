@@ -152,6 +152,47 @@ test('a large photo is shrunk before upload and storage usage is shown in settin
   await expect(page.getByText(/\d+ files/)).toBeVisible();
 });
 
+test('a tall photo opens inside its preview dialog with the close button in reach', async ({ page }) => {
+  await page.goto('/manufacturers');
+  await page.getByRole('button', { name: 'New manufacturer' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Name', { exact: true }).fill('Tall Photo Maker');
+  const tall = await page.evaluate(async () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 900;
+    canvas.height = 2400;
+    const context = canvas.getContext('2d')!;
+    const gradient = context.createLinearGradient(0, 0, 0, 2400);
+    gradient.addColorStop(0, '#c0392b');
+    gradient.addColorStop(1, '#2980b9');
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 900, 2400);
+    const blob = await new Promise<Blob>((resolve) => canvas.toBlob((b) => resolve(b!), 'image/png'));
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    let binary = '';
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary);
+  });
+  await dialog.locator('app-attachments-panel input[type=file][multiple]').setInputFiles({
+    name: 'tall.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(tall, 'base64'),
+  });
+  await expect(dialog.locator('app-attachments-panel .tile', { hasText: 'tall.png' })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Create' }).click();
+  await page.locator('tbody tr', { hasText: 'Tall Photo Maker' }).getByRole('button', { name: 'Open tall.png' }).click();
+
+  const preview = page.locator('app-attachment-preview');
+  const image = preview.getByRole('img');
+  await expect(image).toBeVisible();
+  await page.waitForTimeout(600); // let the dialog's opening animation finish before measuring
+  const frame = (await page.locator('.mat-mdc-dialog-surface').boundingBox())!;
+  const box = (await image.boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(frame.y);
+  expect(box.y + box.height).toBeLessThanOrEqual(frame.y + frame.height + 1);
+  await expect(preview.getByRole('button', { name: 'Close' })).toBeInViewport();
+});
+
 test('settings switch dark mode and accent, and define default columns', async ({ page }) => {
   await page.goto('/settings');
   await page.getByRole('radio', { name: 'Dark' }).click();

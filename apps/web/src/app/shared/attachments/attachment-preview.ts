@@ -30,6 +30,7 @@ import { PdfViewer } from './pdf-viewer';
       display: flex;
       flex-direction: column;
       height: 100%;
+      min-height: 0;
     }
 
     header {
@@ -48,17 +49,25 @@ import { PdfViewer } from './pdf-viewer';
       white-space: nowrap;
     }
 
+    // The picture fills an absolutely positioned box instead of using percentage max-sizes:
+    // iOS Safari does not resolve those inside a flex layout and lets the image overflow the dialog.
     .body {
+      position: relative;
       flex: 1;
       min-height: 0;
-      display: grid;
-      place-items: center;
+      overflow: hidden;
       background: var(--mat-sys-surface-container);
     }
 
+    .body > img,
+    .body > app-pdf-viewer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
     img {
-      max-width: 100%;
-      max-height: 100%;
       object-fit: contain;
     }
   `,
