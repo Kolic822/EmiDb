@@ -22,6 +22,8 @@ export abstract class EntityFormBase<T extends { id: number; name: string }, TIn
   protected abstract readonly noun: string;
   /** English title for the create page, e.g. "New pickup". */
   protected abstract readonly createLabel: string;
+  /** English label of the create button, e.g. "Create pickup". */
+  protected abstract readonly submitLabel: string;
   protected abstract readonly basePath: string;
   /** Set when the entity can have files attached. */
   protected readonly attachmentOwner: AttachmentOwner | null = null;

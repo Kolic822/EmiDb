@@ -16,7 +16,7 @@
       </span>
       <button mat-button type="button" (click)="cancel()">{{ 'Cancel' | t }}</button>
       <button mat-flat-button type="button" (click)="save()" [disabled]="saving()">
-        {{ (isEdit() ? 'Save changes' : 'Create') | t }}
+        {{ (isEdit() ? 'Save changes' : submitLabel) | t }}
       </button>
     </div>
   } @else if (missing()) {

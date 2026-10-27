@@ -21,6 +21,7 @@ export class PickupForm extends EntityFormBase<Pickup, PickupInput> {
   protected readonly groups = PICKUP_GROUPS;
   protected readonly noun = 'pickup';
   protected readonly createLabel = 'New pickup';
+  protected readonly submitLabel = 'Create pickup';
   protected override readonly attachmentOwner = 'pickup' as const;
   protected readonly basePath = '/pickups';
   private readonly destroyRef = inject(DestroyRef);

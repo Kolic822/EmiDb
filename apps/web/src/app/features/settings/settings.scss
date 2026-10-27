@@ -81,20 +81,22 @@ mat-button-toggle-group {
   }
 }
 
-.table-block {
-  border-top: 1px solid var(--mat-sys-surface-container-high);
-  padding: 12px 0 6px;
+.table-panel {
+  box-shadow: none !important;
+  border: var(--app-border);
+  border-radius: var(--app-radius) !important;
+  margin-bottom: 8px;
+  background: var(--mat-sys-surface-container-lowest);
+
+  &::before {
+    display: none;
+  }
 }
 
-.table-head {
+.panel-actions {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 4px;
-
-  button {
-    margin-left: auto;
-  }
+  justify-content: flex-end;
+  margin: -6px 0 4px;
 }
 
 .groups {

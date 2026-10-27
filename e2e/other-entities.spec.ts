@@ -70,7 +70,8 @@ test('settings switch dark mode and accent, and define default columns', async (
   await page.getByRole('radio', { name: 'Sky' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-accent', 'sky');
 
-  const pickups = page.locator('.table-block').filter({ has: page.getByRole('heading', { name: 'Pickups' }) });
+  const pickups = page.locator('mat-expansion-panel').filter({ hasText: 'Pickups' }).first();
+  await pickups.getByRole('button', { name: /Pickups/ }).click();
   await pickups.getByRole('checkbox', { name: 'Gauss' }).check();
   await pickups.getByRole('checkbox', { name: 'Position' }).uncheck();
 
@@ -80,11 +81,9 @@ test('settings switch dark mode and accent, and define default columns', async (
   await expect(page.locator('app-data-table thead')).not.toContainText('Position');
 
   await page.goto('/settings');
-  await page
-    .locator('.table-block')
-    .filter({ has: page.getByRole('heading', { name: 'Pickups' }) })
-    .getByRole('button', { name: 'Use built-in defaults' })
-    .click();
+  const panel = page.locator('mat-expansion-panel').filter({ hasText: 'Pickups' }).first();
+  await panel.getByRole('button', { name: /Pickups/ }).click();
+  await panel.getByRole('button', { name: 'Use built-in defaults' }).click();
   await page.goto('/pickups');
   await expect(page.locator('app-data-table thead')).toContainText('Position');
 });

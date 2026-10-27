@@ -21,6 +21,7 @@ import { ListState } from '../list-state/list-state';
         <div class="picker-header">
           <span>{{ '{visible} of {total} columns' | t: { visible: visible().size, total: state().columnFields.length } }}</span>
           <span class="picker-actions">
+            <button type="button" class="link-btn" (click)="showAll()">{{ 'Show all' | t }}</button>
             <button type="button" class="link-btn" (click)="state().saveColumnsAsDefault()">{{ 'Save as default' | t }}</button>
             <button type="button" class="link-btn" (click)="state().resetColumns()">{{ 'Reset to default' | t }}</button>
           </span>
@@ -113,6 +114,10 @@ export class ColumnPicker<T extends { id: number }> {
 
   protected groupName(group: FieldGroup): string {
     return groupLabel(group);
+  }
+
+  protected showAll(): void {
+    this.state().visibleKeys.set(this.state().columnFields.map((field) => field.key));
   }
 
   protected toggle(key: string): void {

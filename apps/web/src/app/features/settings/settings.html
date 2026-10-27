@@ -62,13 +62,15 @@
         {{ 'Which columns each table shows by default. Changes apply immediately; the Columns menu on a table can still show or hide columns for the moment and go back to these defaults.' | t }}
       </p>
       @for (table of tables; track table.label) {
-        <div class="table-block">
-          <div class="table-head">
-            <h3>{{ table.label | t }}</h3>
-            <span class="muted">{{ '{count} columns' | t: { count: selected()[table.state.storageKey].size } }}</span>
-            @if (isCustom(table)) {
-              <button mat-button (click)="useBuiltIn(table)">{{ 'Use built-in defaults' | t }}</button>
-            }
+        <mat-expansion-panel class="table-panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title>{{ table.label | t }}</mat-panel-title>
+            <mat-panel-description>
+              {{ '{count} columns' | t: { count: selected()[table.state.storageKey].size } }}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <div class="panel-actions">
+            <button mat-button (click)="useBuiltIn(table)" [disabled]="!isCustom(table)">{{ 'Use built-in defaults' | t }}</button>
           </div>
           <div class="groups">
             @for (section of sections(table); track section.id) {
@@ -85,7 +87,7 @@
               </div>
             }
           </div>
-        </div>
+        </mat-expansion-panel>
       }
     </section>
   </div>

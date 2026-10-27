@@ -15,7 +15,7 @@ import { TranslatePipe } from '../../core/i18n';
       <a mat-icon-button [href]="data.url + '?download'" target="_blank" rel="noopener" [attr.aria-label]="'Download' | t">
         <mat-icon>download</mat-icon>
       </a>
-      <button mat-icon-button mat-dialog-close [attr.aria-label]="'Close' | t"><mat-icon>close</mat-icon></button>
+      <button mat-icon-button mat-dialog-close [aria-label]="'Close' | t"><mat-icon>close</mat-icon></button>
     </header>
     <div class="body">
       @if (data.mimeType === 'application/pdf') {
