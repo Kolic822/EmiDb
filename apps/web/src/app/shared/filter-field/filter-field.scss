@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.number-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .value {
+    flex: 1 1 auto;
+  }
+
+  .tolerance {
+    flex: 0 0 104px;
+  }
+}
+
+.pm {
+  color: var(--mat-sys-on-surface-variant);
+  padding: 0 2px 0 4px;
+}
+
+.unit {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 12px;
+  padding-right: 4px;
+}
+

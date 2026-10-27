@@ -1,0 +1,10 @@
+.split {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.filters {
+  overflow: auto;
+  padding: 16px 16px 24px;
+}

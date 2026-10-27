@@ -1,0 +1,48 @@
+<div class="toolbar">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
+    <mat-icon matPrefix>search</mat-icon>
+    <input
+      matInput
+      type="search"
+      [placeholder]="'Search ' + noun() + 's…'"
+      [ngModel]="state().query()"
+      (ngModelChange)="state().query.set($event)"
+      autocomplete="off"
+    />
+    @if (state().query()) {
+      <button matSuffix mat-icon-button aria-label="Clear search" (click)="state().query.set('')">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
+  </mat-form-field>
+
+  @if (chips().length) {
+    <mat-chip-set aria-label="Active filters">
+      @for (chip of chips(); track chip.field.key) {
+        <mat-chip (removed)="state().setCriterion(chip.field.key, undefined)">
+          {{ chip.label }}
+          <button matChipRemove [attr.aria-label]="'Remove ' + chip.field.label + ' filter'">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+      }
+    </mat-chip-set>
+    <button type="button" class="link-btn" (click)="state().clearCriteria()">Clear all</button>
+  }
+
+  <span class="spacer"></span>
+
+  @if (selectionCount()) {
+    <div class="selection">
+      <span class="count">{{ selectionCount() }} selected</span>
+      <ng-content />
+      <button mat-stroked-button class="danger" (click)="delete.emit()">
+        <mat-icon>delete</mat-icon>
+        Delete
+      </button>
+      <button mat-icon-button (click)="state().clearSelection()" matTooltip="Clear selection" aria-label="Clear selection">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  }
+</div>

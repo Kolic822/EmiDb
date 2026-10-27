@@ -1,0 +1,78 @@
+<section class="card">
+  <div class="head">
+    <h2>
+      Files
+      @if (tiles().length) {
+        <span class="muted">{{ tiles().length }}</span>
+      }
+    </h2>
+    @if (isPending() && tiles().length) {
+      <span class="hint muted">Uploaded when you save</span>
+    }
+    <button mat-stroked-button type="button" (click)="picker.click()" [disabled]="busy()">
+      <mat-icon>upload</mat-icon>
+      {{ isPending() ? 'Add files' : 'Upload' }}
+    </button>
+    <input #picker type="file" multiple hidden (change)="onFilesPicked($event)" />
+  </div>
+  @if (busy()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  @if (tiles().length) {
+    <div class="grid">
+      @for (tile of tiles(); track tile.key) {
+        <div class="tile">
+          <button type="button" class="thumb" (click)="open(tile)" [matTooltip]="tile.name" [disabled]="!tile.attachment">
+            @if (tile.src) {
+              <img [src]="tile.src" [alt]="tile.caption || tile.name" loading="lazy" />
+            } @else {
+              <mat-icon>{{ icon(tile) }}</mat-icon>
+              <span class="ext">{{ tile.name.split('.').pop()?.toUpperCase() }}</span>
+            }
+          </button>
+          <div class="meta">
+            @if (tile.attachment; as item) {
+              @if (editingId() === item.id) {
+                <input
+                  class="caption-input"
+                  [(ngModel)]="captionDraft"
+                  (keydown.enter)="saveCaption(item)"
+                  (keydown.escape)="editingId.set(null)"
+                  (blur)="saveCaption(item)"
+                  placeholder="Caption"
+                  autofocus
+                />
+              } @else {
+                <button type="button" class="caption" (click)="startEdit(item)" [class.placeholder]="!item.caption">
+                  {{ item.caption || 'Add caption' }}
+                </button>
+              }
+            } @else {
+              <span class="caption placeholder">Not uploaded yet</span>
+            }
+            <div class="sub">
+              <span class="name" [title]="tile.name">{{ tile.name }}</span>
+              <span>{{ tile.size | fileSize }}</span>
+            </div>
+          </div>
+          <div class="tile-actions">
+            @if (tile.attachment; as item) {
+              <a mat-icon-button [href]="item.url + '?download'" target="_blank" rel="noopener" matTooltip="Download" aria-label="Download">
+                <mat-icon>download</mat-icon>
+              </a>
+            }
+            <button mat-icon-button type="button" (click)="remove(tile)" matTooltip="Remove" aria-label="Remove">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <button type="button" class="dropzone" (click)="picker.click()">
+      <mat-icon>cloud_upload</mat-icon>
+      <span>Drop images, PDFs or documents here, or click to choose</span>
+    </button>
+  }
+</section>

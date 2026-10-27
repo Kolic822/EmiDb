@@ -1,0 +1,146 @@
+:host {
+  display: block;
+  height: 100%;
+  width: var(--app-sidebar-width);
+  transition: width 160ms ease;
+}
+
+@mixin rail {
+  width: var(--app-sidebar-rail-width);
+
+  .logo-text,
+  .label,
+  .section-title {
+    display: none;
+  }
+
+  .brand {
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 0 8px;
+  }
+
+  .nav-item {
+    justify-content: center;
+    padding: 0;
+    width: 44px;
+    margin: 2px auto;
+  }
+}
+
+:host.collapsed {
+  @include rail;
+}
+
+// Tablets in portrait: always use the rail to leave room for the table.
+@media (max-width: 1024px) {
+  :host {
+    @include rail;
+  }
+
+  .collapse {
+    display: none;
+  }
+}
+
+.sidebar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--mat-sys-surface-container-low);
+  border-right: var(--app-border);
+  padding: 0 10px 12px;
+  overflow: hidden;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 4px 10px 8px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mat-sys-on-surface);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.logo-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.collapse {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.section {
+  margin-top: 14px;
+}
+
+.section-title {
+  font: var(--mat-sys-label-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+  padding: 0 12px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 0 12px;
+  margin: 2px 0;
+  border-radius: 9px;
+  border: 0;
+  background: transparent;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-large);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  width: 100%;
+  text-align: left;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-high);
+    text-decoration: none;
+    color: var(--mat-sys-on-surface);
+  }
+
+  &.active {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+
+    mat-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 400;
+    }
+  }
+
+  mat-icon {
+    flex: none;
+  }
+}
+
+.footer {
+  margin-top: auto;
+}

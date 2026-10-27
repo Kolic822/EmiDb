@@ -1,0 +1,39 @@
+<div class="page">
+  <app-page-header [title]="title" [subtitle]="subtitle()">
+    @if (supportsFilter) {
+      <a mat-stroked-button routerLink="filter">
+        <mat-icon>filter_alt</mat-icon>
+        Filter
+        @if (state.activeCriteriaCount()) {
+          <span class="badge">{{ state.activeCriteriaCount() }}</span>
+        }
+      </a>
+    }
+    <app-column-picker [state]="state" [groups]="groups" />
+    <button mat-flat-button (click)="create()">
+      <mat-icon>add</mat-icon>
+      New {{ noun }}
+    </button>
+
+    <app-list-toolbar toolbar [state]="state" [noun]="noun" (delete)="deleteSelected()">
+      @if (supportsCompare) {
+        <button mat-flat-button (click)="compare()" [disabled]="!canCompare()">
+          <mat-icon>compare_arrows</mat-icon>
+          Compare
+        </button>
+      }
+    </app-list-toolbar>
+  </app-page-header>
+
+  <div class="page-body">
+    <app-data-table
+      [state]="state"
+      [rows]="rows()"
+      [totalCount]="store.rows().length"
+      [loading]="store.loading() && !store.loaded()"
+      [emptyTitle]="store.rows().length ? 'No ' + noun + 's match' : 'No ' + noun + 's yet'"
+      [emptyMessage]="store.rows().length ? 'Try clearing a filter or the search.' : 'Add your first ' + noun + ' to get started.'"
+      (rowClick)="open($event)"
+    />
+  </div>
+</div>

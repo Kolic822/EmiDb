@@ -1,0 +1,80 @@
+<div class="page">
+  <app-page-header title="Settings" subtitle="Saved in this browser" />
+  <div class="page-scroll">
+    <section class="card">
+      <h2>Appearance</h2>
+      <div class="row">
+        <div class="row-label">Mode</div>
+        <mat-button-toggle-group
+          hideSingleSelectionIndicator
+          [value]="theme.mode()"
+          (change)="theme.mode.set($event.value)"
+          aria-label="Colour mode"
+        >
+          @for (mode of modes; track mode.id) {
+            <mat-button-toggle [value]="mode.id">
+              <mat-icon>{{ mode.icon }}</mat-icon>
+              {{ mode.label }}
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
+      </div>
+      <div class="row">
+        <div class="row-label">Accent</div>
+        <div class="swatches" role="radiogroup" aria-label="Accent colour">
+          @for (accent of accents; track accent.id) {
+            <button
+              type="button"
+              class="swatch"
+              role="radio"
+              [attr.aria-checked]="theme.accent() === accent.id"
+              [attr.aria-label]="accent.label"
+              [class.active]="theme.accent() === accent.id"
+              [style.--swatch]="accent.color"
+              [matTooltip]="accent.label"
+              (click)="theme.accent.set(accent.id)"
+            >
+              @if (theme.accent() === accent.id) {
+                <mat-icon>check</mat-icon>
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Default columns</h2>
+      <p class="muted">
+        Which columns each table shows by default. Changes apply immediately; the Columns menu on a table
+        can still show or hide columns for the moment and go back to these defaults.
+      </p>
+      @for (table of tables; track table.label) {
+        <div class="table-block">
+          <div class="table-head">
+            <h3>{{ table.label }}</h3>
+            <span class="muted">{{ selected()[table.state.storageKey].size }} columns</span>
+            @if (isCustom(table)) {
+              <button mat-button (click)="useBuiltIn(table)">Use built-in defaults</button>
+            }
+          </div>
+          <div class="groups">
+            @for (section of sections(table); track section.id) {
+              <div class="group">
+                <div class="group-title">{{ section.label }}</div>
+                @for (field of section.fields; track field.key) {
+                  <mat-checkbox
+                    [checked]="selected()[table.state.storageKey].has(field.key)"
+                    (change)="toggle(table, field.key)"
+                  >
+                    {{ field.label }}
+                  </mat-checkbox>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </section>
+  </div>
+</div>

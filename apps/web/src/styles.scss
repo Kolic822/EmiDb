@@ -1,0 +1,266 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+@use './theme/coral' as coral-theme;
+@use './theme/mint' as mint-theme;
+@use './theme/sky' as sky-theme;
+@use './theme/lavender' as lavender-theme;
+@use './theme/rose' as rose-theme;
+
+// ---------------------------------------------------------------------------
+// Material 3 theme. `theme-type: color-scheme` emits light-dark() values, so
+// switching theme is just flipping `color-scheme` on <html>.
+// ---------------------------------------------------------------------------
+
+// Cool, airy neutrals instead of the tinted M3 defaults. Primary/tertiary
+// tones come from the selected accent palette.
+$surfaces: (
+  surface: light-dark(#f7f8fa, #101216),
+  surface-dim: light-dark(#e9ebef, #101216),
+  surface-bright: light-dark(#ffffff, #2a2e35),
+  surface-container-lowest: light-dark(#ffffff, #0b0d10),
+  surface-container-low: light-dark(#f1f3f6, #161a1f),
+  surface-container: light-dark(#eaedf1, #1c2026),
+  surface-container-high: light-dark(#e2e6eb, #242930),
+  surface-container-highest: light-dark(#d9dee4, #2d333b),
+  on-surface: light-dark(#1b1f24, #e6e9ee),
+  on-surface-variant: light-dark(#5f6672, #a9b0bb),
+  outline: light-dark(#8a919c, #7d8591),
+  outline-variant: light-dark(#dde1e7, #2f353e),
+  surface-variant: light-dark(#e2e6eb, #2d333b),
+);
+
+@mixin accent($primary, $tertiary) {
+  @include mat.theme(
+    (
+      color: (
+        primary: $primary,
+        tertiary: $tertiary,
+        theme-type: color-scheme,
+      ),
+    )
+  );
+}
+
+html {
+  color-scheme: light;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: coral-theme.$primary-palette,
+        tertiary: coral-theme.$tertiary-palette,
+        theme-type: color-scheme,
+      ),
+      typography: (
+        plain-family: 'Inter',
+        brand-family: 'Inter',
+        bold-weight: 600,
+        medium-weight: 500,
+        regular-weight: 400,
+      ),
+      density: -1,
+    )
+  );
+
+  @include mat.theme-overrides(
+    map.merge(
+      $surfaces,
+      (
+        corner-extra-small: 6px,
+        corner-small: 8px,
+        corner-medium: 10px,
+        corner-large: 14px,
+      )
+    )
+  );
+
+  &[data-theme='dark'] {
+    color-scheme: dark;
+  }
+
+  // Selectable accent palettes: only colour tokens change.
+  @each $name, $primary, $tertiary in (
+    'mint' mint-theme.$primary-palette mint-theme.$tertiary-palette,
+    'sky' sky-theme.$primary-palette sky-theme.$tertiary-palette,
+    'lavender' lavender-theme.$primary-palette lavender-theme.$tertiary-palette,
+    'rose' rose-theme.$primary-palette rose-theme.$tertiary-palette
+  ) {
+    &[data-accent='#{$name}'] {
+      @include accent($primary, $tertiary);
+      @include mat.theme-overrides($surfaces);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// App design tokens (on top of --mat-sys-*)
+// ---------------------------------------------------------------------------
+:root {
+  --app-sidebar-width: 232px;
+  --app-sidebar-rail-width: 68px;
+  --app-page-padding: 24px;
+  --app-border: 1px solid var(--mat-sys-outline-variant);
+  --app-radius: 10px;
+  --app-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --app-positive: light-dark(#1b7f4c, #5fd08f);
+  --app-positive-bg: light-dark(#e3f5ea, #11362a);
+  --app-negative: light-dark(#b3261e, #ff8f85);
+  --app-negative-bg: light-dark(#fbe7e5, #4a1d1a);
+  --app-row-hover: light-dark(rgba(0, 0, 0, 0.035), rgba(255, 255, 255, 0.05));
+  --app-row-selected: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
+  --app-tint: color-mix(in srgb, var(--mat-sys-primary) 8%, transparent);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Material Symbols icon font configuration.
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+mat-icon.material-symbols-outlined {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+}
+
+// Shared page layout primitives.
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.page-body {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--app-page-padding) var(--app-page-padding);
+  display: flex;
+  flex-direction: column;
+}
+
+.page-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 var(--app-page-padding) var(--app-page-padding);
+}
+
+.card {
+  background: var(--mat-sys-surface-container-lowest);
+  border: var(--app-border);
+  border-radius: var(--app-radius);
+}
+
+.mono {
+  font-family: var(--app-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.text-positive {
+  color: var(--app-positive);
+}
+
+.text-negative {
+  color: var(--app-negative);
+}
+
+// Slightly tighter form fields everywhere.
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-form-field-subscript-wrapper:empty {
+  display: none;
+}
+
+.cdk-overlay-pane .mat-mdc-menu-panel {
+  border: var(--app-border);
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  border-radius: var(--app-radius);
+}
+
+// Column filter popover (overlay).
+.column-filter-menu {
+  .mat-mdc-menu-content {
+    padding: 0;
+  }
+
+  .column-filter {
+    padding: 12px 14px 10px;
+    min-width: 280px;
+  }
+
+  .column-filter-title {
+    font: var(--mat-sys-label-large);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .clear {
+    margin-top: 8px;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--mat-sys-primary);
+    font: var(--mat-sys-label-large);
+    cursor: pointer;
+  }
+}
+
+.column-picker-menu {
+  max-width: none !important;
+
+  .mat-mdc-menu-content {
+    padding: 0;
+  }
+}
+
+// Small count badge inside buttons.
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 6px;
+  border-radius: 9px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  font: var(--mat-sys-label-small);
+  font-weight: 600;
+}

@@ -1,0 +1,27 @@
+<div class="page">
+  <app-page-header [title]="title()" [backLink]="isEdit() ? [basePath, numericId()] : basePath" />
+  @if (form(); as form) {
+    <form class="page-scroll form-body" (ngSubmit)="save()">
+      <app-entity-form [fields]="fields" [groups]="groups" [form]="form" />
+      @if (attachmentOwner; as owner) {
+        <app-attachments-panel class="files" [owner]="owner" [ownerId]="numericId()" [(pending)]="pendingFiles" />
+      }
+      <ng-content />
+    </form>
+    <div class="form-actions">
+      <span class="muted">
+        @if (form.dirty) {
+          Unsaved changes
+        }
+      </span>
+      <button mat-button type="button" (click)="cancel()">Cancel</button>
+      <button mat-flat-button type="button" (click)="save()" [disabled]="saving()">
+        {{ isEdit() ? 'Save changes' : 'Create ' + noun }}
+      </button>
+    </div>
+  } @else if (missing()) {
+    <app-empty-state icon="error" [title]="'This ' + noun + ' does not exist'">
+      <a mat-stroked-button [routerLink]="basePath">Back</a>
+    </app-empty-state>
+  }
+</div>

@@ -1,0 +1,54 @@
+<div class="page">
+  @if (set(); as set) {
+    <app-page-header [title]="set.name" [subtitle]="manufacturer()" backLink="/sets">
+      @if (compareIds().length >= 2) {
+        <a mat-stroked-button [routerLink]="['/pickups/compare']" [queryParams]="{ ids: compareIds().join(',') }">
+          <mat-icon>compare_arrows</mat-icon>
+          Compare pickups
+        </a>
+      }
+      <a mat-flat-button routerLink="edit">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </a>
+      <button mat-icon-button (click)="remove()" matTooltip="Delete set" aria-label="Delete set">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </app-page-header>
+
+    <div class="page-scroll">
+      <div class="slots">
+        @for (slot of slots(); track slot.position) {
+          <section class="card slot" [class.empty]="!slot.pickup">
+            <div class="position">{{ slot.position }}</div>
+            @if (slot.pickup; as pickup) {
+              <a class="name" [routerLink]="['/pickups', pickup.id]">{{ pickup.name }}</a>
+              <dl>
+                @for (field of specFields; track field.key) {
+                  <dt>{{ field.label }}</dt>
+                  <dd>{{ spec(pickup, field.key) }}</dd>
+                }
+              </dl>
+            } @else {
+              <div class="none muted">No pickup</div>
+            }
+          </section>
+        }
+      </div>
+
+      <div class="below">
+        @if (set.description) {
+          <section class="card description">
+            <h2>Description</h2>
+            <p>{{ set.description }}</p>
+          </section>
+        }
+        <app-attachments-panel owner="pickupSet" [ownerId]="set.id" />
+      </div>
+    </div>
+  } @else if (missing()) {
+    <app-empty-state icon="error" title="Set not found">
+      <a mat-stroked-button routerLink="/sets">Back to sets</a>
+    </app-empty-state>
+  }
+</div>

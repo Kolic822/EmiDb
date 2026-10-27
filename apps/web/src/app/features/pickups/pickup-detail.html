@@ -1,0 +1,50 @@
+<div class="page">
+  @if (pickup(); as pickup) {
+    <app-page-header [title]="pickup.name" [subtitle]="subtitle()" backLink="/pickups">
+      <a mat-stroked-button [routerLink]="['/pickups/compare']" [queryParams]="{ ids: pickup.id }">
+        <mat-icon>compare_arrows</mat-icon>
+        Compare
+      </a>
+      <a mat-flat-button routerLink="edit">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </a>
+      <button mat-icon-button (click)="remove()" matTooltip="Delete pickup" aria-label="Delete pickup">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </app-page-header>
+
+    <div class="page-scroll">
+      <div class="layout">
+        <app-entity-details class="details" [fields]="fields" [groups]="groups" [row]="pickup" />
+        <aside>
+          <app-attachments-panel owner="pickup" [ownerId]="pickup.id" />
+          <section class="card sets">
+            <h2>Part of sets</h2>
+            @if (memberOf().length) {
+              <ul>
+                @for (set of memberOf(); track set.id) {
+                  <li>
+                    <a [routerLink]="['/sets', set.id]">{{ set.name }}</a>
+                    <span class="muted">
+                      {{ set.neckId === pickup.id ? 'neck' : set.middleId === pickup.id ? 'middle' : 'bridge' }}
+                    </span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="muted">Not used in any set.</p>
+            }
+          </section>
+          <p class="meta muted">
+            Created {{ pickup.createdAt.slice(0, 10) }} · Updated {{ pickup.updatedAt.slice(0, 10) }}
+          </p>
+        </aside>
+      </div>
+    </div>
+  } @else if (missing()) {
+    <app-empty-state icon="error" title="Pickup not found">
+      <a mat-stroked-button routerLink="/pickups">Back to pickups</a>
+    </app-empty-state>
+  }
+</div>

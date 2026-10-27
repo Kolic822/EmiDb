@@ -1,0 +1,30 @@
+<div class="page">
+  <app-page-header title="Filter pickups" [subtitle]="subtitle()" backLink="/pickups">
+    @if (state.activeCriteriaCount() || state.query()) {
+      <button mat-button (click)="state.clearCriteria()">Clear all</button>
+    }
+    <button mat-stroked-button (click)="compare()" [disabled]="rows().length < 2 || rows().length > 8">
+      <mat-icon>compare_arrows</mat-icon>
+      Compare {{ selectedIds().length >= 2 ? 'selected' : 'results' }}
+    </button>
+    <a mat-flat-button routerLink="/pickups">
+      <mat-icon>table_rows</mat-icon>
+      Show in table
+    </a>
+  </app-page-header>
+
+  <div class="page-body split">
+    <aside class="card filters">
+      <app-filter-panel [state]="state" [groups]="groups" />
+    </aside>
+    <app-data-table
+      [state]="state"
+      [rows]="rows()"
+      [totalCount]="store.rows().length"
+      [loading]="store.loading() && !store.loaded()"
+      emptyTitle="No pickups match"
+      emptyMessage="Loosen a tolerance or clear a field."
+      (rowClick)="open($event)"
+    />
+  </div>
+</div>

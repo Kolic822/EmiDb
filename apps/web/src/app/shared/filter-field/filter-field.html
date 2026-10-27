@@ -1,0 +1,81 @@
+@switch (kind()) {
+  @case ('text') {
+    <mat-form-field [appearance]="compact() ? 'outline' : 'outline'" [subscriptSizing]="'dynamic'">
+      @if (!compact()) {
+        <mat-label>{{ field().label }}</mat-label>
+      }
+      <input
+        matInput
+        type="text"
+        [placeholder]="compact() ? 'Contains…' : ''"
+        [ngModel]="text()"
+        (ngModelChange)="setText($event)"
+        autocomplete="off"
+      />
+    </mat-form-field>
+  }
+  @case ('in') {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      @if (!compact()) {
+        <mat-label>{{ field().label }}</mat-label>
+      }
+      <mat-select
+        multiple
+        [placeholder]="compact() ? 'Any of…' : ''"
+        [ngModel]="selected()"
+        (ngModelChange)="setSelected($event)"
+      >
+        @for (option of options(); track option.value) {
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
+  @case ('number') {
+    <div class="number-row">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="value">
+        @if (!compact()) {
+          <mat-label>{{ field().label }}</mat-label>
+        }
+        <input
+          matInput
+          type="number"
+          [step]="field().step ?? 'any'"
+          [placeholder]="compact() ? 'Value' : ''"
+          [ngModel]="near()"
+          (ngModelChange)="setNear($event, tolerance())"
+        />
+        @if (field().unit) {
+          <span matTextSuffix class="unit">{{ field().unit }}</span>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="tolerance">
+        @if (!compact()) {
+          <mat-label>± tol.</mat-label>
+        }
+        <span matTextPrefix class="pm">±</span>
+        <input
+          matInput
+          type="number"
+          min="0"
+          [step]="field().step ?? 'any'"
+          [placeholder]="compact() ? '0' : ''"
+          [ngModel]="tolerance()"
+          (ngModelChange)="setNear(near(), $event)"
+        />
+      </mat-form-field>
+    </div>
+  }
+  @case ('boolean') {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      @if (!compact()) {
+        <mat-label>{{ field().label }}</mat-label>
+      }
+      <mat-select [placeholder]="compact() ? 'Any' : ''" [ngModel]="bool()" (ngModelChange)="setBool($event)">
+        <mat-option [value]="null">Any</mat-option>
+        <mat-option [value]="true">Yes</mat-option>
+        <mat-option [value]="false">No</mat-option>
+      </mat-select>
+    </mat-form-field>
+  }
+}

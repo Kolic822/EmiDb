@@ -1,0 +1,24 @@
+<div class="page">
+  @if (diagram(); as diagram) {
+    <app-page-header [title]="diagram.name" [subtitle]="subtitle()" backLink="/wiring-diagrams">
+      <a mat-flat-button routerLink="edit">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </a>
+      <button mat-icon-button (click)="remove()" matTooltip="Delete diagram" aria-label="Delete diagram">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </app-page-header>
+
+    <div class="page-scroll">
+      <div class="layout">
+        <app-attachments-panel class="files" owner="wiringDiagram" [ownerId]="diagram.id" />
+        <app-entity-details [fields]="fields" [groups]="groups" [row]="diagram" />
+      </div>
+    </div>
+  } @else if (missing()) {
+    <app-empty-state icon="error" title="Wiring diagram not found">
+      <a mat-stroked-button routerLink="/wiring-diagrams">Back to diagrams</a>
+    </app-empty-state>
+  }
+</div>

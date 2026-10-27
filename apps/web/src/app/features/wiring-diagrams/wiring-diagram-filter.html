@@ -1,0 +1,27 @@
+<div class="page">
+  <app-page-header title="Filter wiring diagrams" [subtitle]="subtitle()" backLink="/wiring-diagrams">
+    @if (state.activeCriteriaCount() || state.query()) {
+      <button mat-button (click)="state.clearCriteria()">Clear all</button>
+    }
+    <a mat-flat-button routerLink="/wiring-diagrams">
+      <mat-icon>table_rows</mat-icon>
+      Show in table
+    </a>
+  </app-page-header>
+
+  <div class="page-body split">
+    <aside class="card filters">
+      <app-filter-panel [state]="state" [groups]="groups" />
+    </aside>
+    <app-data-table
+      [state]="state"
+      [rows]="rows()"
+      [totalCount]="store.rows().length"
+      [loading]="store.loading() && !store.loaded()"
+      [selectable]="false"
+      emptyTitle="No diagrams match"
+      emptyMessage="Clear a field to widen the search."
+      (rowClick)="open($event)"
+    />
+  </div>
+</div>

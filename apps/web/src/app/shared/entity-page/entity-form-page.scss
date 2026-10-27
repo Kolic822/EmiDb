@@ -1,0 +1,23 @@
+.form-body {
+  padding-bottom: 24px;
+}
+
+.files {
+  display: block;
+  margin-top: 16px;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px var(--app-page-padding);
+  border-top: var(--app-border);
+  background: var(--mat-sys-surface-container-low);
+
+  .muted {
+    margin-right: auto;
+    font: var(--mat-sys-label-medium);
+  }
+}

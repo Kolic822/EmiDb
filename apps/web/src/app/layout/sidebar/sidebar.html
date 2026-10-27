@@ -1,0 +1,49 @@
+<nav class="sidebar" aria-label="Main">
+  <div class="brand">
+    <a routerLink="/pickups" class="logo" aria-label="emidb home">
+      <span class="logo-mark"><mat-icon>graphic_eq</mat-icon></span>
+      <span class="logo-text">emidb</span>
+    </a>
+    <button
+      mat-icon-button
+      class="collapse"
+      (click)="layout.toggleSidebar()"
+      [matTooltip]="layout.collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+      matTooltipPosition="right"
+      aria-label="Toggle sidebar"
+    >
+      <mat-icon>{{ layout.collapsed() ? 'left_panel_open' : 'left_panel_close' }}</mat-icon>
+    </button>
+  </div>
+
+  @for (section of sections; track section.title) {
+    <div class="section">
+      <div class="section-title">{{ section.title }}</div>
+      @for (item of section.items; track item.link) {
+        <a
+          class="nav-item"
+          [routerLink]="item.link"
+          routerLinkActive="active"
+          [matTooltip]="layout.collapsed() ? item.label : ''"
+          matTooltipPosition="right"
+        >
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span class="label">{{ item.label }}</span>
+        </a>
+      }
+    </div>
+  }
+
+  <div class="footer">
+    <a
+      class="nav-item"
+      [routerLink]="settings.link"
+      routerLinkActive="active"
+      [matTooltip]="layout.collapsed() ? settings.label : ''"
+      matTooltipPosition="right"
+    >
+      <mat-icon>{{ settings.icon }}</mat-icon>
+      <span class="label">{{ settings.label }}</span>
+    </a>
+  </div>
+</nav>

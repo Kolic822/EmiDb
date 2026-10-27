@@ -1,0 +1,127 @@
+<div class="table-wrap card">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" class="progress" />
+  }
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          @if (selectable()) {
+            <th class="select">
+              <mat-checkbox
+                [checked]="allSelected()"
+                [indeterminate]="someSelected()"
+                (change)="toggleAll()"
+                aria-label="Select all"
+              />
+            </th>
+          }
+          @for (field of fields(); track field.key) {
+            <th [class.num]="isNumeric(field)" [class.sorted]="sort()?.key === field.key" [class.filtered]="hasFilter(field)">
+              <div class="th">
+                <button type="button" class="sort" (click)="state().toggleSort(field.key)">
+                  <span class="label">{{ field.label }}</span>
+                  @if (field.unit) {
+                    <span class="unit">{{ field.unit }}</span>
+                  }
+                  <mat-icon class="sort-icon">
+                    {{ sort()?.key === field.key ? (sort()?.direction === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more' }}
+                  </mat-icon>
+                </button>
+                @if (field.filterable !== false) {
+                  <button
+                    mat-icon-button
+                    class="filter-btn"
+                    [matMenuTriggerFor]="filterMenu"
+                    [matMenuTriggerData]="{ field: field }"
+                    [matTooltip]="'Filter ' + field.label.toLowerCase()"
+                    [attr.aria-label]="'Filter ' + field.label.toLowerCase()"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <mat-icon>{{ hasFilter(field) ? 'filter_alt' : 'filter_list' }}</mat-icon>
+                  </button>
+                }
+              </div>
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.id) {
+          <tr [class.selected]="selection().has(row.id)" (click)="rowClick.emit(row)">
+            @if (selectable()) {
+              <td class="select" (click)="$event.stopPropagation()">
+                <mat-checkbox [checked]="selection().has(row.id)" (change)="state().toggleSelected(row.id)" />
+              </td>
+            }
+            @for (field of fields(); track field.key) {
+              @let value = row[field.key];
+              <td [class]="cellClass(field, value)">
+                @switch (field.kind) {
+                  @case ('boolean') {
+                    @if (value === true) {
+                      <mat-icon class="yes">check</mat-icon>
+                    } @else if (value === false) {
+                      <mat-icon class="no">close</mat-icon>
+                    } @else {
+                      <span class="empty">—</span>
+                    }
+                  }
+                  @case ('url') {
+                    @if (value) {
+                      <a [href]="value" target="_blank" rel="noopener" (click)="$event.stopPropagation()">
+                        <mat-icon class="link">open_in_new</mat-icon>
+                      </a>
+                    } @else {
+                      <span class="empty">—</span>
+                    }
+                  }
+                  @default {
+                    @let text = value | fieldValue: field : resolver();
+                    @if (text) {
+                      <span class="text" [class.primary]="field.key === 'name'">{{ text }}</span>
+                    } @else {
+                      <span class="empty">—</span>
+                    }
+                  }
+                }
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr class="empty-row">
+            <td [attr.colspan]="fields().length + (selectable() ? 1 : 0)">
+              @if (!loading()) {
+                <app-empty-state icon="search_off" [title]="emptyTitle()" [message]="emptyMessage()" />
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <span>
+      {{ rows().length }}
+      @if (totalCount() != null && totalCount() !== rows().length) {
+        of {{ totalCount() }}
+      }
+      {{ rows().length === 1 ? 'entry' : 'entries' }}
+    </span>
+    @if (selection().size) {
+      <span>· {{ selection().size }} selected</span>
+    }
+  </div>
+</div>
+
+<mat-menu #filterMenu="matMenu" class="column-filter-menu">
+  <ng-template matMenuContent let-field="field">
+    <div class="column-filter" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+      <div class="column-filter-title">{{ field.label }}</div>
+      <app-filter-field [field]="field" [criterion]="criterionFor(field)" (criterionChange)="setCriterion(field, $event)" [compact]="true" />
+      @if (hasFilter(field)) {
+        <button type="button" class="clear" (click)="setCriterion(field, undefined)">Clear</button>
+      }
+    </div>
+  </ng-template>
+</mat-menu>

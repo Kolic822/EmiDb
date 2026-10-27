@@ -1,0 +1,15 @@
+<div class="head">
+  <app-list-toolbar [state]="state" [noun]="noun" (delete)="deleteSelected()" />
+  <button mat-flat-button (click)="create()">
+    <mat-icon>add</mat-icon>
+    New {{ noun }}
+  </button>
+</div>
+<app-data-table
+  [state]="state"
+  [rows]="rows()"
+  [totalCount]="store.rows().length"
+  [loading]="store.loading() && !store.loaded()"
+  [emptyTitle]="'No ' + noun + 's yet'"
+  (rowClick)="open($event)"
+/>

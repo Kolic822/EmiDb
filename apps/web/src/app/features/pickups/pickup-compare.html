@@ -1,0 +1,104 @@
+<div class="page">
+  <app-page-header
+    title="Compare pickups"
+    [subtitle]="pickups().length + ' of up to ' + maxCompared + ' pickups'"
+    backLink="/pickups"
+  >
+    <mat-slide-toggle [checked]="onlyDifferences()" (change)="onlyDifferences.set($event.checked)">
+      Only differences
+    </mat-slide-toggle>
+    @if (pickups().length < maxCompared) {
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="adder">
+        <mat-icon matPrefix>add</mat-icon>
+        <input
+          matInput
+          type="text"
+          placeholder="Add pickup…"
+          [ngModel]="addQuery()"
+          (ngModelChange)="addQuery.set($event)"
+          [matAutocomplete]="auto"
+          autocomplete="off"
+        />
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayNothing" (optionSelected)="add($event.option.value)">
+          @for (p of addable(); track p.id) {
+            <mat-option [value]="p.id">{{ p.name }} <span class="muted">{{ manufacturer(p) }}</span></mat-option>
+          } @empty {
+            <mat-option disabled>No matching pickups</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+    }
+  </app-page-header>
+
+  <div class="page-body">
+    @if (pickups().length) {
+      <div class="card table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="label"></th>
+              @for (pickup of pickups(); track pickup.id) {
+                <th>
+                  <div class="head">
+                    <a [routerLink]="['/pickups', pickup.id]" class="name">{{ pickup.name }}</a>
+                    <span class="muted">{{ manufacturer(pickup) || '—' }}</span>
+                    <button mat-icon-button class="remove" (click)="remove(pickup.id)" matTooltip="Remove from comparison">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (section of sections(); track section.id) {
+              <tr class="section">
+                <td [attr.colspan]="pickups().length + 1">{{ section.label }}</td>
+              </tr>
+              @for (row of section.rows; track row.field.key) {
+                <tr [class.same]="!row.differs">
+                  <td class="label">
+                    {{ row.field.label }}
+                    @if (row.field.unit) {
+                      <span class="muted">{{ row.field.unit }}</span>
+                    }
+                  </td>
+                  @for (cell of row.cells; track $index) {
+                    <td
+                      [class.num]="cell.extreme !== undefined && (row.field.kind === 'number' || row.field.kind === 'integer')"
+                      [class.high]="cell.extreme === 'high'"
+                      [class.low]="cell.extreme === 'low'"
+                    >
+                      @if (cell.text) {
+                        {{ cell.text }}
+                        @if (cell.extreme === 'high') {
+                          <mat-icon>arrow_upward</mat-icon>
+                        } @else if (cell.extreme === 'low') {
+                          <mat-icon>arrow_downward</mat-icon>
+                        }
+                      } @else {
+                        <span class="empty">—</span>
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            } @empty {
+              <tr>
+                <td [attr.colspan]="pickups().length + 1" class="none">These pickups have identical values.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="legend muted">
+        <span class="swatch high"></span> highest value in the row
+        <span class="swatch low"></span> lowest value in the row
+      </p>
+    } @else {
+      <app-empty-state icon="compare_arrows" title="Nothing to compare" message="Select two or more pickups in the table, or add them here.">
+        <a mat-stroked-button routerLink="/pickups">Go to pickups</a>
+      </app-empty-state>
+    }
+  </div>
+</div>

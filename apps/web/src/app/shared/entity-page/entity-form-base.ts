@@ -1,0 +1,112 @@
+import { Location } from '@angular/common';
+import { computed, Directive, effect, inject, input, signal, untracked } from '@angular/core';
+import { Router } from '@angular/router';
+import type { AttachmentOwner, FieldDef, FieldGroup } from '@emidb/shared';
+import { AttachmentsApi } from '../../core/http/attachments-api';
+import { LookupService } from '../../core/lookups';
+import { NotifyService } from '../../core/notify';
+import type { EntityStore } from '../../core/store/entity-store';
+import { buildEntityForm, type EntityFormGroup, formToInput } from '../entity-form/form-builder';
+import { capitalise } from './entity-list-base';
+
+/**
+ * Create/edit page for one entity. The route decides the mode: `new` (no id)
+ * or `:id/edit`. Subclasses provide the store, fields and groups and reuse
+ * `entity-form-page.html`.
+ */
+@Directive()
+export abstract class EntityFormBase<T extends { id: number; name: string }, TInput> {
+  protected abstract readonly store: EntityStore<T, TInput>;
+  protected abstract readonly fields: readonly FieldDef<T>[];
+  protected abstract readonly groups: readonly FieldGroup[];
+  protected abstract readonly noun: string;
+  protected abstract readonly basePath: string;
+  /** Set when the entity can have files attached. */
+  protected readonly attachmentOwner: AttachmentOwner | null = null;
+
+  /** Route parameter; absent when creating. */
+  readonly id = input<string>();
+
+  /** Files picked while creating; uploaded right after the entity exists. */
+  protected readonly pendingFiles = signal<File[]>([]);
+  private readonly attachments = inject(AttachmentsApi);
+
+  protected readonly router = inject(Router);
+  protected readonly location = inject(Location);
+  protected readonly notify = inject(NotifyService);
+  private readonly lookups = inject(LookupService);
+
+  protected readonly numericId = computed(() => (this.id() ? Number(this.id()) : null));
+  protected readonly isEdit = computed(() => this.numericId() != null);
+  protected readonly existing = computed(() => {
+    const id = this.numericId();
+    return id == null ? undefined : this.store.byId().get(id);
+  });
+  protected readonly missing = computed(() => this.isEdit() && this.store.loaded() && !this.existing());
+  protected readonly form = signal<EntityFormGroup | null>(null);
+  protected readonly saving = signal(false);
+  protected readonly title = computed(() =>
+    this.isEdit() ? `Edit ${this.existing()?.name ?? this.noun}` : `New ${this.noun}`,
+  );
+
+  constructor() {
+    effect(() => {
+      if (this.form()) return;
+      if (!this.isEdit()) {
+        this.createForm(undefined);
+        return;
+      }
+      untracked(() => void this.store.ensureLoaded());
+      const row = this.existing();
+      if (row) this.createForm(row);
+    });
+    void this.lookups.ensureLoaded();
+  }
+
+  /** Hook for entity-specific behaviour once the form exists. */
+  protected onFormCreated(_form: EntityFormGroup): void {}
+
+  protected async save(): Promise<void> {
+    const form = this.form();
+    if (!form) return;
+    if (form.invalid) {
+      form.markAllAsTouched();
+      this.notify.error('Please fix the highlighted fields');
+      return;
+    }
+    this.saving.set(true);
+    try {
+      const input = formToInput<TInput>(this.fields, form);
+      const id = this.numericId();
+      const saved = id == null ? await this.store.create(input) : await this.store.update(id, input);
+      await this.uploadPending(saved.id);
+      this.notify.success(`${capitalise(this.noun)} ${id == null ? 'created' : 'saved'}`);
+      form.markAsPristine();
+      void this.router.navigate([this.basePath, saved.id]);
+    } catch {
+      // Reported by the HTTP interceptor.
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  protected cancel(): void {
+    this.location.back();
+  }
+
+  private async uploadPending(ownerId: number): Promise<void> {
+    const owner = this.attachmentOwner;
+    const files = this.pendingFiles();
+    if (!owner || !files.length) return;
+    for (const file of files) {
+      await this.attachments.upload(owner, ownerId, file);
+    }
+    this.pendingFiles.set([]);
+  }
+
+  private createForm(value: T | undefined): void {
+    const form = buildEntityForm(this.fields, value);
+    this.form.set(form);
+    this.onFormCreated(form);
+  }
+}
