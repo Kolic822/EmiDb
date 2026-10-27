@@ -63,10 +63,14 @@ that disk. Back them up by copying `DATA_DIR`.
 The laptop runs emidb; everything else on the Wi-Fi uses it in a browser. Node.js 22+ must be
 installed on the laptop (https://nodejs.org, default options).
 
-1. On your development machine run `npm run package` and copy the `release/emidb` folder to the
-   laptop (USB stick, cloud drive, anything). It is a few megabytes.
-2. On the laptop double-click `start.bat`. The first run downloads the runtime dependencies
-   (internet needed once) and then opens the app. Windows asks once whether Node.js may accept
+1. On the laptop install Git (https://git-scm.com) and clone the repository, e.g. into
+   `C:\emidb` (GitHub asks you to sign in once; the credentials are remembered).
+   Alternative without Git: run `npm run package` on your machine and copy `release/emidb`
+   over; that copy cannot update itself.
+2. Double-click `start.bat`. The first run installs and builds (a few minutes) and opens the app.
+   Every later start checks GitHub and, if there is a newer version, pulls and rebuilds it first
+   (skipped when offline). `update.bat` does the same on demand. Settings shows the running
+   version and commit. Windows asks once whether Node.js may accept
    connections; allow it on **private** networks. `allow-firewall.bat` (run as administrator)
    does the same without the prompt.
 3. The black window prints two addresses. On the tablet open the **"On this network"** one,

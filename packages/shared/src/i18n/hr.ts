@@ -209,6 +209,7 @@ export const hr: Dictionary = {
     'Koje stupce svaka tablica prikazuje zadano. Promjene vrijede odmah; izbornik Stupci na tablici i dalje može privremeno prikazati ili sakriti stupce i vratiti se na ove zadane.',
   '{count} columns': 'Stupaca: {count}',
   'Use built-in defaults': 'Koristi ugrađene zadane',
+  'To update, run update.bat on the computer that hosts emidb, or simply restart it.': 'Za ažuriranje pokrenite update.bat na računalu koje poslužuje emidb ili ga jednostavno ponovno pokrenite.',
 
   // Errors
   'Unexpected error': 'Neočekivana pogreška',

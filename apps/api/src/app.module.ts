@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module.js';
 import { ManufacturersModule } from './manufacturers/manufacturers.module.js';
 import { PickupSetsModule } from './pickup-sets/pickup-sets.module.js';
 import { PickupsModule } from './pickups/pickups.module.js';
+import { VersionModule } from './version/version.module.js';
 import { WiringDiagramsModule } from './wiring-diagrams/wiring-diagrams.module.js';
 
 @Module({
@@ -18,6 +19,7 @@ import { WiringDiagramsModule } from './wiring-diagrams/wiring-diagrams.module.j
     PickupSetsModule,
     WiringDiagramsModule,
     AttachmentsModule,
+    VersionModule,
     // In production the API also serves the built Angular app.
     ...(config.serveWeb
       ? [ServeStaticModule.forRoot({ rootPath: config.webDist, exclude: ['/api/{*path}'] })]

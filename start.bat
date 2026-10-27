@@ -10,6 +10,9 @@ if errorlevel 1 (
   exit /b 1
 )
 
+rem In a git checkout, pick up new versions from GitHub automatically (skipped when offline).
+if exist ".git" call update.bat :update
+
 if not exist "apps\api\dist\main.js" (
   echo First start: installing dependencies and building the app. This takes a few minutes...
   call npm install --no-audit --no-fund || goto :fail

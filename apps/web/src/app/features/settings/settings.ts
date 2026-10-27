@@ -1,4 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -8,6 +10,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { type FieldDef, type FieldGroup, fieldLabel, groupLabel, PICKUP_GROUPS, PICKUP_SET_GROUPS, WIRING_DIAGRAM_GROUPS } from '@emidb/shared';
 import { LanguageService, TranslatePipe } from '../../core/i18n';
 import { ColumnDefaults } from '../../core/column-defaults';
+import { API_BASE } from '../../core/http/crud-api';
 import { ACCENTS, THEME_MODES, ThemeService } from '../../core/theme';
 import type { ListState } from '../../shared/list-state/list-state';
 import { PageHeader } from '../../shared/page-header/page-header';
@@ -34,6 +37,9 @@ export class Settings {
   protected readonly accents = ACCENTS;
   protected readonly modes = THEME_MODES;
   private readonly defaults = inject(ColumnDefaults);
+  protected readonly version = toSignal(
+    inject(HttpClient).get<{ version: string; commit: string | null }>(`${API_BASE}/version`),
+  );
 
   protected readonly tables: TableSettings[] = [
     { label: 'Pickups', state: inject(PickupListState), groups: PICKUP_GROUPS },

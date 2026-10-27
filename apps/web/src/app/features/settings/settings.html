@@ -90,5 +90,12 @@
         </mat-expansion-panel>
       }
     </section>
+
+    @if (version(); as v) {
+      <p class="version muted">
+        emidb v{{ v.version }}@if (v.commit) { ({{ v.commit }})}
+        · {{ 'To update, run update.bat on the computer that hosts emidb, or simply restart it.' | t }}
+      </p>
+    }
   </div>
 </div>
