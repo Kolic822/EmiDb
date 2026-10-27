@@ -33,6 +33,16 @@ export interface ConfirmOptions {
     </mat-dialog-actions>
   `,
   styles: `
+    h2[mat-dialog-title] {
+      font: var(--mat-sys-title-large);
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    mat-dialog-content {
+      overflow-wrap: anywhere;
+    }
+
     .danger {
       --mat-button-filled-container-color: var(--mat-sys-error);
       --mat-button-filled-label-text-color: var(--mat-sys-on-error);

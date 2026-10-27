@@ -138,7 +138,12 @@ export class AttachmentsPanel {
       return;
     }
     const item = tile.attachment!;
-    const ok = await this.confirm.confirm({ title: `Delete “${item.fileName}”?`, confirmLabel: 'Delete', danger: true });
+    const ok = await this.confirm.confirm({
+      title: 'Delete file?',
+      message: `“${item.fileName}” will be removed permanently.`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
     if (!ok) return;
     await this.api.remove(item.id);
     this.items.update((items) => items.filter((i) => i.id !== item.id));
