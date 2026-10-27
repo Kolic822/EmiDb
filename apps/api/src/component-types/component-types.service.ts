@@ -1,10 +1,10 @@
-import type { ComponentType } from '@emidb/shared';
+import type { ComponentType, SwitchType } from '@emidb/shared';
 import { Inject, Injectable } from '@nestjs/common';
 import { asc, eq, inArray } from 'drizzle-orm';
 import { notFound } from '../common/errors.js';
 import { DATABASE, type Db, now } from '../database/database.js';
 import { potentiometerTypes, switchTypes } from '../database/schema.js';
-import type { ComponentTypeDto } from './component-type.dto.js';
+import type { ComponentTypeDto, SwitchTypeDto } from './component-type.dto.js';
 
 type ComponentTable = typeof potentiometerTypes | typeof switchTypes;
 
@@ -25,14 +25,14 @@ export abstract class ComponentTypesService {
   }
 
   create(dto: ComponentTypeDto): ComponentType {
-    return this.db.insert(this.table).values(this.toRow(dto)).returning().get();
+    return this.db.insert(this.table).values(this.toRow(dto) as typeof this.table.$inferInsert).returning().get();
   }
 
   update(id: number, dto: ComponentTypeDto): ComponentType {
     this.findOne(id);
     return this.db
       .update(this.table)
-      .set({ ...this.toRow(dto), updatedAt: now() })
+      .set({ ...(this.toRow(dto) as typeof this.table.$inferInsert), updatedAt: now() })
       .where(eq(this.table.id, id))
       .returning()
       .get();
@@ -47,7 +47,7 @@ export abstract class ComponentTypesService {
     if (ids.length) this.db.delete(this.table).where(inArray(this.table.id, ids)).run();
   }
 
-  private toRow(dto: ComponentTypeDto) {
+  protected toRow(dto: ComponentTypeDto): Record<string, unknown> {
     return { name: dto.name, description: dto.description ?? null };
   }
 }
@@ -63,5 +63,13 @@ export class PotentiometerTypesService extends ComponentTypesService {
 export class SwitchTypesService extends ComponentTypesService {
   constructor(@Inject(DATABASE) db: Db) {
     super(db, switchTypes, 'Switch type');
+  }
+
+  override findAll(): SwitchType[] {
+    return super.findAll() as SwitchType[];
+  }
+
+  protected override toRow(dto: SwitchTypeDto): Record<string, unknown> {
+    return { ...super.toRow(dto), manufacturerId: dto.manufacturerId ?? null };
   }
 }

@@ -91,6 +91,16 @@ export const potentiometerTypes = sqliteTable('potentiometer_types', {
 export const switchTypes = sqliteTable('switch_types', {
   id: id(),
   name: text().notNull().unique(),
+  manufacturerId: integer().references(() => manufacturers.id, { onDelete: 'set null' }),
+  description: text(),
+  ...timestamps,
+});
+
+export const potLayouts = sqliteTable('pot_layouts', {
+  id: id(),
+  name: text().notNull().unique(),
+  /** JSON array of control roles, position 1 first. */
+  roles: text({ mode: 'json' }).$type<string[]>().notNull(),
   description: text(),
   ...timestamps,
 });

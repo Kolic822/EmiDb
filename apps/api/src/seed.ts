@@ -6,6 +6,7 @@
  */
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
+import { DEFAULT_POT_LAYOUTS } from '@emidb/shared';
 import { config } from './config.js';
 import { closeDatabase, openDatabase } from './database/database.js';
 import {
@@ -13,6 +14,7 @@ import {
   pickupSets,
   pickups,
   potentiometerTypes,
+  potLayouts,
   switchTypes,
   wiringDiagrams,
   wiringDiagramSwitches,
@@ -185,6 +187,8 @@ const pots = db
   .returning({ id: potentiometerTypes.id, name: potentiometerTypes.name })
   .all();
 const pot = (name: string) => pots.find((p) => p.name === name)!.id;
+
+db.insert(potLayouts).values(DEFAULT_POT_LAYOUTS).onConflictDoNothing().run();
 
 const sws = db
   .insert(switchTypes)

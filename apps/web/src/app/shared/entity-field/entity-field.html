@@ -121,7 +121,7 @@
                 [value]="item"
                 (openedChange)="onOpened($event)"
                 (selectionChange)="onItemSelection($index, $event.value)"
-                [placeholder]="'Choose type' | t"
+                [placeholder]="'Choose…' | t"
               >
                 @if (searchable()) {
                   <app-select-search [(query)]="query" />

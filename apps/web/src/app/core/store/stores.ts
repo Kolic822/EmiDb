@@ -8,6 +8,10 @@ import type {
   PickupInput,
   PickupSet,
   PickupSetInput,
+  PotLayout,
+  PotLayoutInput,
+  SwitchType,
+  SwitchTypeInput,
   WiringDiagram,
   WiringDiagramInput,
   WiringPickupType,
@@ -52,6 +56,11 @@ export class PotentiometerTypesStore extends EntityStore<ComponentType, Componen
 }
 
 @Injectable({ providedIn: 'root' })
-export class SwitchTypesStore extends EntityStore<ComponentType, ComponentTypeInput> {
-  protected readonly api = new CrudApi<ComponentType, ComponentTypeInput>('switch-types');
+export class SwitchTypesStore extends EntityStore<SwitchType, SwitchTypeInput> {
+  protected readonly api = new CrudApi<SwitchType, SwitchTypeInput>('switch-types');
+}
+
+@Injectable({ providedIn: 'root' })
+export class PotLayoutsStore extends EntityStore<PotLayout, PotLayoutInput> {
+  protected readonly api = new CrudApi<PotLayout, PotLayoutInput>('pot-layouts');
 }

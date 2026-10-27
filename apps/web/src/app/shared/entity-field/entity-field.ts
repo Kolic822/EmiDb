@@ -117,9 +117,9 @@ export class EntityField {
     }
   }
 
-  /** Values of a repeated lookup (one entry per volume pot…), mirrored from the control. */
-  protected readonly items = linkedSignal<(number | null)[]>(
-    () => (this.formControl().value as (number | null)[] | null) ?? [],
+  /** Values of a repeated field (switches, pot positions…), mirrored from the control. */
+  protected readonly items = linkedSignal<(number | string | null)[]>(
+    () => (this.formControl().value as (number | string | null)[] | null) ?? [],
   );
 
   /** Singular label for the "add" button: "Volume pots" → "volume pot", "Switches" → "switch". */
@@ -135,7 +135,7 @@ export class EntityField {
       this.creatingAt.set(index);
       return;
     }
-    this.setItem(index, value as number | null);
+    this.setItem(index, value as number | string | null);
   }
 
   protected async saveNewItem(): Promise<void> {
@@ -160,7 +160,7 @@ export class EntityField {
     this.setItems([...this.items(), null]);
   }
 
-  protected setItem(index: number, value: number | null): void {
+  protected setItem(index: number, value: number | string | null): void {
     const next = this.items().slice();
     next[index] = value;
     this.setItems(next);
@@ -170,7 +170,7 @@ export class EntityField {
     this.setItems(this.items().filter((_, i) => i !== index));
   }
 
-  private setItems(items: (number | null)[]): void {
+  private setItems(items: (number | string | null)[]): void {
     this.items.set(items);
     this.formControl().setValue(items);
     this.formControl().markAsDirty();

@@ -106,7 +106,19 @@ export interface ComponentType extends Timestamps {
   description: string | null;
 }
 export type PotentiometerType = ComponentType;
-export type SwitchType = ComponentType;
+
+export interface SwitchType extends ComponentType {
+  manufacturerId: number | null;
+}
+
+/** A named arrangement of pot positions, e.g. "Les Paul": volume, volume, tone, tone. */
+export interface PotLayout extends Timestamps {
+  id: number;
+  name: string;
+  /** Role of each position, position 1 first. */
+  roles: ControlRole[];
+  description: string | null;
+}
 
 /** Pickup shape/kind used in wiring diagram slots, e.g. "Humbucker", "P90", "Jazz Bass". */
 export interface WiringPickupType extends Timestamps {
@@ -178,6 +190,8 @@ export type PickupSetInput = Writable<
   'manufacturerName' | 'neckName' | 'middleName' | 'bridgeName' | 'attachments'
 >;
 export type ComponentTypeInput = Writable<ComponentType, never>;
+export type SwitchTypeInput = Writable<SwitchType, never>;
 export type WiringPickupTypeInput = Writable<WiringPickupType, never>;
+export type PotLayoutInput = Writable<PotLayout, never>;
 export type WiringDiagramInput = Writable<WiringDiagram, 'manufacturerName' | 'attachments'>;
 export type AttachmentInput = Pick<Attachment, 'caption'>;

@@ -4,11 +4,15 @@ import {
   ManufacturersStore,
   PickupsStore,
   PotentiometerTypesStore,
+  PotLayoutsStore,
   SwitchTypesStore,
   WiringPickupTypesStore,
 } from './store/stores';
 
-type LookupKind = Extract<FieldKind, 'manufacturer' | 'pickup' | 'potentiometerType' | 'switchType' | 'wiringPickupType'>;
+type LookupKind = Extract<
+  FieldKind,
+  'manufacturer' | 'pickup' | 'potentiometerType' | 'switchType' | 'wiringPickupType' | 'potLayout'
+>;
 
 export interface LookupOption {
   value: number;
@@ -24,6 +28,7 @@ export class LookupService {
     potentiometerType: inject(PotentiometerTypesStore),
     switchType: inject(SwitchTypesStore),
     wiringPickupType: inject(WiringPickupTypesStore),
+    potLayout: inject(PotLayoutsStore),
   } satisfies Record<LookupKind, unknown>;
 
   /** Recomputed whenever any lookup collection changes. */
@@ -34,6 +39,7 @@ export class LookupService {
       potentiometerType: this.stores.potentiometerType.byId(),
       switchType: this.stores.switchType.byId(),
       wiringPickupType: this.stores.wiringPickupType.byId(),
+      potLayout: this.stores.potLayout.byId(),
     };
     return (field, id) => maps[field.kind as LookupKind]?.get(id)?.name;
   });
@@ -59,6 +65,11 @@ export class LookupService {
     return field.kind in this.stores;
   }
 
+  /** Pot layout by id, for the "Layout" quick-fill in the wiring diagram form. */
+  potLayout(id: number) {
+    return this.stores.potLayout.byId().get(id);
+  }
+
   /** Creates a lookup entry with just a name (for "Add new…" in dropdowns) and returns its id. */
   async create(field: FieldDef<any>, name: string): Promise<number> {
     switch (field.kind as LookupKind) {
@@ -71,7 +82,7 @@ export class LookupService {
         return row.id;
       }
       case 'switchType': {
-        const row = await this.stores.switchType.create({ name, description: null });
+        const row = await this.stores.switchType.create({ name, manufacturerId: null, description: null });
         return row.id;
       }
       case 'wiringPickupType': {

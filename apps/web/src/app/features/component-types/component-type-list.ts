@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { TranslatePipe } from '../../core/i18n';
 import { PageHeader } from '../../shared/page-header/page-header';
-import { PotentiometerTypeTable, SwitchTypeTable, WiringPickupTypeTable } from './component-type-table';
+import { PotentiometerTypeTable, PotLayoutTable, SwitchTypeTable, WiringPickupTypeTable } from './component-type-table';
 
 @Component({
   selector: 'app-component-type-list',
-  imports: [PageHeader, MatTabGroup, MatTab, PotentiometerTypeTable, SwitchTypeTable, WiringPickupTypeTable, TranslatePipe],
+  imports: [PageHeader, MatTabGroup, MatTab, PotentiometerTypeTable, SwitchTypeTable, WiringPickupTypeTable, PotLayoutTable, TranslatePipe],
   template: `
     <div class="page">
       <app-page-header [title]="'Pots & switches' | t" [subtitle]="'Component types used by wiring diagrams' | t" />
@@ -19,6 +19,9 @@ import { PotentiometerTypeTable, SwitchTypeTable, WiringPickupTypeTable } from '
         </mat-tab>
         <mat-tab [label]="'Pickup types' | t">
           <app-wiring-pickup-type-table />
+        </mat-tab>
+        <mat-tab [label]="'Pot layouts' | t">
+          <app-pot-layout-table />
         </mat-tab>
       </mat-tab-group>
     </div>

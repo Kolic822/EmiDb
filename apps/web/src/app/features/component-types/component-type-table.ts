@@ -8,6 +8,13 @@ import {
   type ComponentTypeInput,
   type FieldDef,
   type FieldGroup,
+  POT_LAYOUT_FIELDS,
+  POT_LAYOUT_GROUPS,
+  type PotLayout,
+  type PotLayoutInput,
+  SWITCH_TYPE_FIELDS,
+  type SwitchType,
+  type SwitchTypeInput,
   t,
   WIRING_PICKUP_TYPE_FIELDS,
   WIRING_PICKUP_TYPE_GROUPS,
@@ -16,7 +23,7 @@ import {
 } from '@emidb/shared';
 import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
-import { PotentiometerTypesStore, SwitchTypesStore, WiringPickupTypesStore } from '../../core/store/stores';
+import { PotentiometerTypesStore, PotLayoutsStore, SwitchTypesStore, WiringPickupTypesStore } from '../../core/store/stores';
 import { DataTable } from '../../shared/data-table/data-table';
 import { EntityDialogService } from '../../shared/entity-dialog/entity-dialog';
 import { capitalise, EntityListBase } from '../../shared/entity-page/entity-list-base';
@@ -87,9 +94,10 @@ export class PotentiometerTypeTable extends ComponentTypeTableBase {
   styleUrl: './component-type-table.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SwitchTypeTable extends ComponentTypeTableBase {
+export class SwitchTypeTable extends ComponentTypeTableBase<SwitchType, SwitchTypeInput> {
   protected readonly store = inject(SwitchTypesStore);
-  protected readonly state = new ListState<ComponentType>(COMPONENT_TYPE_FIELDS, 'switch-types', inject(LookupService).resolver);
+  protected override readonly fields = SWITCH_TYPE_FIELDS;
+  protected readonly state = new ListState<SwitchType>(SWITCH_TYPE_FIELDS, 'switch-types', inject(LookupService).resolver);
   protected readonly noun = 'switch type';
   protected readonly nounPlural = 'switch types';
   protected readonly title = 'Switch types';
@@ -121,6 +129,29 @@ export class WiringPickupTypeTable extends ComponentTypeTableBase<WiringPickupTy
   protected readonly nounPlural = 'pickup types';
   protected readonly title = 'Pickup types';
   protected readonly createLabel = 'New pickup type';
+
+  constructor() {
+    super();
+    this.init();
+  }
+}
+
+@Component({
+  selector: 'app-pot-layout-table',
+  imports: IMPORTS,
+  templateUrl: './component-type-table.html',
+  styleUrl: './component-type-table.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class PotLayoutTable extends ComponentTypeTableBase<PotLayout, PotLayoutInput> {
+  protected readonly store = inject(PotLayoutsStore);
+  protected override readonly fields = POT_LAYOUT_FIELDS;
+  protected override readonly groups = POT_LAYOUT_GROUPS;
+  protected readonly state = new ListState<PotLayout>(POT_LAYOUT_FIELDS, 'pot-layouts', inject(LookupService).resolver);
+  protected readonly noun = 'pot layout';
+  protected readonly nounPlural = 'pot layouts';
+  protected readonly title = 'Pot layouts';
+  protected readonly createLabel = 'New pot layout';
 
   constructor() {
     super();

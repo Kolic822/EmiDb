@@ -89,8 +89,10 @@ export function displayValue(
 ): string {
   if (value == null || value === '') return '';
   switch (field.kind) {
-    case 'enum':
-      return t(field.enumDef?.label(value as string) ?? String(value));
+    case 'enum': {
+      const values = Array.isArray(value) ? (value as string[]) : [value as string];
+      return values.map((v) => t(field.enumDef?.label(v) ?? String(v))).join(', ');
+    }
     case 'boolean':
       return t(value ? 'Yes' : 'No');
     case 'number':
@@ -102,7 +104,8 @@ export function displayValue(
     case 'pickup':
     case 'potentiometerType':
     case 'switchType':
-    case 'wiringPickupType': {
+    case 'wiringPickupType':
+    case 'potLayout': {
       const ids = Array.isArray(value) ? (value as number[]) : [value as number];
       return ids.map((id) => resolve?.(field, id) ?? `#${id}`).join(', ');
     }

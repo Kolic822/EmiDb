@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { parseIdList } from '../common/dto.js';
-import { ComponentTypeDto } from './component-type.dto.js';
+import { ComponentTypeDto, SwitchTypeDto } from './component-type.dto.js';
 import {
   ComponentTypesService,
   PotentiometerTypesService,
@@ -53,7 +53,17 @@ export class PotentiometerTypesController extends ComponentTypesController {
 
 @Controller('switch-types')
 export class SwitchTypesController extends ComponentTypesController {
-  constructor(service: SwitchTypesService) {
-    super(service);
+  constructor(private readonly switches: SwitchTypesService) {
+    super(switches);
+  }
+
+  @Post()
+  override create(@Body() dto: SwitchTypeDto) {
+    return this.switches.create(dto);
+  }
+
+  @Put(':id')
+  override update(@Param('id', ParseIntPipe) id: number, @Body() dto: SwitchTypeDto) {
+    return this.switches.update(id, dto);
   }
 }

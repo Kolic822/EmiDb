@@ -3,7 +3,6 @@ import {
   CapMaterial,
   CarrierType,
   ConnectionType,
-  ControlLayout,
   ControlRole,
   InformationSource,
   InsulationColor,
@@ -20,7 +19,16 @@ import {
   InstrumentFamily,
   WiringType,
 } from './enums.js';
-import type { ComponentType, Manufacturer, Pickup, PickupSet, WiringDiagram, WiringPickupType } from './models.js';
+import type {
+  ComponentType,
+  Manufacturer,
+  Pickup,
+  PickupSet,
+  PotLayout,
+  SwitchType,
+  WiringDiagram,
+  WiringPickupType,
+} from './models.js';
 import { t } from './i18n/i18n.js';
 
 /**
@@ -39,7 +47,8 @@ export type FieldKind =
   | 'pickup'
   | 'potentiometerType'
   | 'switchType'
-  | 'wiringPickupType';
+  | 'wiringPickupType'
+  | 'potLayout';
 
 export interface FieldGroup {
   id: string;
@@ -193,15 +202,23 @@ function controlFields(): FieldDef<WiringDiagram>[] {
   ]);
 }
 
-/** Pot roles for each layout preset, position 1 first. */
-export const CONTROL_LAYOUTS: Record<ControlLayout, ControlRole[]> = {
-  V: ['VOLUME'],
-  VT: ['VOLUME', 'TONE'],
-  VTT: ['VOLUME', 'TONE', 'TONE'],
-  VVT: ['VOLUME', 'VOLUME', 'TONE'],
-  VVTT: ['VOLUME', 'VOLUME', 'TONE', 'TONE'],
-  VVVT: ['VOLUME', 'VOLUME', 'VOLUME', 'TONE'],
-};
+/** Layouts every database starts with; the user can add more. */
+export const DEFAULT_POT_LAYOUTS: { name: string; roles: ControlRole[] }[] = [
+  { name: '1 volume', roles: ['VOLUME'] },
+  { name: 'Volume + tone', roles: ['VOLUME', 'TONE'] },
+  { name: 'Volume + 2 tones (Strat)', roles: ['VOLUME', 'TONE', 'TONE'] },
+  { name: '2 volumes + tone (Jazz Bass)', roles: ['VOLUME', 'VOLUME', 'TONE'] },
+  { name: '2 volumes + 2 tones (Les Paul)', roles: ['VOLUME', 'VOLUME', 'TONE', 'TONE'] },
+  { name: '3 volumes + tone', roles: ['VOLUME', 'VOLUME', 'VOLUME', 'TONE'] },
+];
+
+export const POT_LAYOUT_GROUPS: FieldGroup[] = [{ id: 'main', label: 'Pot layout' }];
+
+export const POT_LAYOUT_FIELDS: FieldDef<PotLayout>[] = [
+  { key: 'name', label: 'Name', group: 'main', kind: 'text', required: true, defaultColumn: true, fullWidth: true },
+  { key: 'roles', label: 'Positions', group: 'main', kind: 'enum', enumDef: ControlRole, multiple: true, defaultColumn: true, filterable: false },
+  { key: 'description', label: 'Description', group: 'main', kind: 'text', defaultColumn: true, fullWidth: true },
+];
 
 export const WIRING_DIAGRAM_GROUPS: FieldGroup[] = [
   { id: 'identity', label: 'Diagram' },
@@ -219,7 +236,7 @@ export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   { key: 'neckTypeId', label: 'Neck', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
   { key: 'middleTypeId', label: 'Middle', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
   { key: 'bridgeTypeId', label: 'Bridge', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
-  { key: 'layout' as keyof WiringDiagram & string, label: 'Layout', group: 'controls', kind: 'enum', enumDef: ControlLayout, transient: true, span: 2 },
+  { key: 'layout' as keyof WiringDiagram & string, label: 'Layout', group: 'controls', kind: 'potLayout', transient: true, span: 2 },
   { key: 'controlCount', label: 'Pots', group: 'controls', kind: 'integer', min: 0, max: MAX_CONTROLS, defaultColumn: true },
   ...controlFields(),
   { key: 'switches', label: 'Switches', group: 'switches', kind: 'switchType', multiple: true, creatable: true, defaultColumn: true },
@@ -242,6 +259,12 @@ export const COMPONENT_TYPE_GROUPS: FieldGroup[] = [{ id: 'main', label: 'Type' 
 
 export const COMPONENT_TYPE_FIELDS: FieldDef<ComponentType>[] = [
   { key: 'name', label: 'Name', group: 'main', kind: 'text', required: true, defaultColumn: true },
+  { key: 'description', label: 'Description', group: 'main', kind: 'text', defaultColumn: true },
+];
+
+export const SWITCH_TYPE_FIELDS: FieldDef<SwitchType>[] = [
+  { key: 'name', label: 'Name', group: 'main', kind: 'text', required: true, defaultColumn: true },
+  { key: 'manufacturerId', label: 'Manufacturer', group: 'main', kind: 'manufacturer', creatable: true, defaultColumn: true },
   { key: 'description', label: 'Description', group: 'main', kind: 'text', defaultColumn: true },
 ];
 
@@ -301,6 +324,7 @@ export function isLookupField(field: FieldDef<any>): boolean {
     field.kind === 'pickup' ||
     field.kind === 'potentiometerType' ||
     field.kind === 'switchType' ||
-    field.kind === 'wiringPickupType'
+    field.kind === 'wiringPickupType' ||
+    field.kind === 'potLayout'
   );
 }
