@@ -28,6 +28,7 @@ export class ManufacturerList extends EntityListBase<Manufacturer, ManufacturerI
   protected readonly title = 'Manufacturers';
   protected readonly createLabel = 'New manufacturer';
   protected readonly basePath = '/manufacturers';
+  protected override readonly supportsAttachments = true;
   private readonly dialogs = inject(EntityDialogService);
 
   constructor() {
@@ -42,8 +43,11 @@ export class ManufacturerList extends EntityListBase<Manufacturer, ManufacturerI
       groups: MANUFACTURER_GROUPS,
       submitLabel: 'Create',
       save: (input) => this.store.create(input),
+      attachmentOwner: 'manufacturer',
     });
-    if (saved) this.notify.success(t('{noun} created', { noun: t('Manufacturer') }));
+    if (!saved) return;
+    this.notify.success(t('{noun} created', { noun: t('Manufacturer') }));
+    void this.store.load();
   }
 
   protected override async open(row: Manufacturer): Promise<void> {
@@ -53,7 +57,11 @@ export class ManufacturerList extends EntityListBase<Manufacturer, ManufacturerI
       groups: MANUFACTURER_GROUPS,
       value: row,
       save: (input) => this.store.update(row.id, input),
+      attachmentOwner: 'manufacturer',
+      ownerId: row.id,
     });
-    if (saved) this.notify.success(t('{noun} saved', { noun: t('Manufacturer') }));
+    if (!saved) return;
+    this.notify.success(t('{noun} saved', { noun: t('Manufacturer') }));
+    void this.store.load();
   }
 }

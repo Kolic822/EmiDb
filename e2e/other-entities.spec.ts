@@ -73,6 +73,34 @@ test('manufacturers are edited in a dialog and rejected when the name is taken',
   await expect(page.locator('tbody tr', { hasText: 'Test Pickups Co' })).toBeVisible();
 });
 
+test('files attached to a manufacturer show up in the library', async ({ page }) => {
+  await page.goto('/manufacturers');
+  await page.getByRole('button', { name: 'New manufacturer' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Name', { exact: true }).fill('Library Test Maker');
+  await dialog.locator('app-attachments-panel input[type=file]').setInputFiles({
+    name: 'colour-codes.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+      'base64',
+    ),
+  });
+  await dialog.getByRole('button', { name: 'Create' }).click();
+  const row = page.locator('tbody tr', { hasText: 'Library Test Maker' });
+  await expect(row.getByRole('button', { name: 'Open colour-codes.png' })).toBeVisible();
+
+  await page.getByRole('link', { name: 'Library' }).click();
+  const tile = page.getByRole('button', { name: 'Open colour-codes.png' });
+  await expect(tile).toContainText('Library Test Maker');
+  await page.getByPlaceholder('Search files…').fill('nothing like this');
+  await expect(tile).toHaveCount(0);
+  await expect(page.getByText('No files match')).toBeVisible();
+  await page.getByPlaceholder('Search files…').fill('library test');
+  await tile.click();
+  await expect(page.getByRole('dialog').getByRole('img', { name: 'colour-codes.png' })).toBeVisible();
+});
+
 test('settings switch dark mode and accent, and define default columns', async ({ page }) => {
   await page.goto('/settings');
   await page.getByRole('radio', { name: 'Dark' }).click();

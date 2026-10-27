@@ -32,6 +32,8 @@ export interface Manufacturer extends Timestamps {
   country: string | null;
   website: string | null;
   notes: string | null;
+  /** Reference files: color codes, wiring sheets, catalogues. */
+  attachments: Attachment[];
 }
 
 export interface Pickup extends Timestamps {
@@ -110,6 +112,8 @@ export type PotentiometerType = ComponentType;
 
 export interface SwitchType extends ComponentType {
   manufacturerId: number | null;
+  /** Wiring sheets for this switch. */
+  attachments: Attachment[];
 }
 
 /** A named arrangement of pot positions, e.g. "Les Paul": volume, volume, tone, tone. */
@@ -186,14 +190,14 @@ export interface Attachment {
 
 type Writable<T, Derived extends keyof T> = Omit<T, 'id' | 'createdAt' | 'updatedAt' | Derived>;
 
-export type ManufacturerInput = Writable<Manufacturer, never>;
+export type ManufacturerInput = Writable<Manufacturer, 'attachments'>;
 export type PickupInput = Writable<Pickup, 'manufacturerName' | 'attachments'>;
 export type PickupSetInput = Writable<
   PickupSet,
   'manufacturerName' | 'neckName' | 'middleName' | 'bridgeName' | 'attachments'
 >;
 export type ComponentTypeInput = Writable<ComponentType, never>;
-export type SwitchTypeInput = Writable<SwitchType, never>;
+export type SwitchTypeInput = Writable<SwitchType, 'attachments'>;
 export type WiringPickupTypeInput = Writable<WiringPickupType, never>;
 export type PotLayoutInput = Writable<PotLayout, 'attachments'>;
 export type WiringDiagramInput = Writable<WiringDiagram, 'manufacturerName' | 'attachments'>;
@@ -205,4 +209,9 @@ export interface TrashItem {
   id: number;
   name: string;
   deletedAt: string;
+}
+
+/** A reference file with the name of the thing it belongs to, for the Library page. */
+export interface LibraryItem extends Attachment {
+  ownerName: string;
 }

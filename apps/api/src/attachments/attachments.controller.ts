@@ -21,6 +21,17 @@ import { ListAttachmentsQuery, UpdateAttachmentDto, UploadAttachmentDto } from '
 import { AttachmentsService } from './attachments.service.js';
 import { uploadOptions } from './upload.options.js';
 
+/** Every reference file in one list. */
+@Controller('library')
+export class LibraryController {
+  constructor(private readonly service: AttachmentsService) {}
+
+  @Get()
+  list() {
+    return this.service.library();
+  }
+}
+
 @Controller('attachments')
 export class AttachmentsController {
   constructor(private readonly service: AttachmentsService) {}

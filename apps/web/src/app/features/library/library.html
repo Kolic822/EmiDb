@@ -1,0 +1,45 @@
+<div class="page">
+  <app-page-header [title]="'Library' | t" [subtitle]="'Colour codes, wiring sheets and sketches attached to manufacturers, switches and pot layouts.' | t">
+    <input
+      class="search"
+      type="search"
+      [placeholder]="'Search files…' | t"
+      [attr.aria-label]="'Search files…' | t"
+      [value]="query()"
+      (input)="query.set($any($event.target).value)"
+    />
+    <mat-button-toggle-group [value]="kind()" (change)="kind.set($event.value)" [aria-label]="'File type' | t" hideSingleSelectionIndicator>
+      <mat-button-toggle value="all">{{ 'All' | t }}</mat-button-toggle>
+      <mat-button-toggle value="image">{{ 'Images' | t }}</mat-button-toggle>
+      <mat-button-toggle value="pdf">PDF</mat-button-toggle>
+    </mat-button-toggle-group>
+  </app-page-header>
+
+  <div class="page-scroll">
+    @if (visible().length) {
+      <div class="grid">
+        @for (item of visible(); track item.id) {
+          <button type="button" class="tile card" (click)="open(item)" [attr.aria-label]="'Open {name}' | t: { name: item.fileName }">
+            <span class="thumb">
+              @if (isImage(item)) {
+                <img [src]="item.url" [alt]="item.fileName" loading="lazy" />
+              } @else if (isPdf(item)) {
+                <app-pdf-thumbnail [src]="item.url" />
+              } @else {
+                <mat-icon>description</mat-icon>
+              }
+            </span>
+            <span class="owner">{{ item.ownerName }}</span>
+            <span class="file">{{ item.caption || item.fileName }}</span>
+          </button>
+        }
+      </div>
+    } @else if (loaded()) {
+      <app-empty-state
+        icon="folder_open"
+        [title]="(items().length ? 'No files match' : 'No reference files yet') | t"
+        [message]="(items().length ? 'Try clearing the search.' : 'Attach files to a manufacturer, switch type or pot layout and they show up here.') | t"
+      />
+    }
+  </div>
+</div>

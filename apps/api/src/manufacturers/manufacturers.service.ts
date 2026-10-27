@@ -1,6 +1,7 @@
 import type { Manufacturer } from '@emidb/shared';
 import { Inject, Injectable } from '@nestjs/common';
 import { and, asc, eq, inArray, isNull } from 'drizzle-orm';
+import { AttachmentsService } from '../attachments/attachments.service.js';
 import { notFound } from '../common/errors.js';
 import { DATABASE, type Db, now } from '../database/database.js';
 import { manufacturers } from '../database/schema.js';
@@ -8,34 +9,39 @@ import type { ManufacturerDto } from './manufacturer.dto.js';
 
 @Injectable()
 export class ManufacturersService {
-  constructor(@Inject(DATABASE) private readonly db: Db) {}
+  constructor(
+    @Inject(DATABASE) private readonly db: Db,
+    private readonly attachments: AttachmentsService,
+  ) {}
 
   findAll(): Manufacturer[] {
-    return this.db.select().from(manufacturers).where(isNull(manufacturers.deletedAt)).orderBy(asc(manufacturers.name)).all();
+    const rows = this.db.select().from(manufacturers).where(isNull(manufacturers.deletedAt)).orderBy(asc(manufacturers.name)).all();
+    return this.attachments.withAttachments('manufacturer', rows);
   }
 
   findOne(id: number): Manufacturer {
-    return (
+    const row =
       this.db
         .select()
         .from(manufacturers)
         .where(and(eq(manufacturers.id, id), isNull(manufacturers.deletedAt)))
-        .get() ?? notFound('Manufacturer', id)
-    );
+        .get() ?? notFound('Manufacturer', id);
+    return this.attachments.withAttachments('manufacturer', [row])[0];
   }
 
   create(dto: ManufacturerDto): Manufacturer {
-    return this.db.insert(manufacturers).values(this.toRow(dto)).returning().get();
+    const { id } = this.db.insert(manufacturers).values(this.toRow(dto)).returning({ id: manufacturers.id }).get();
+    return this.findOne(id);
   }
 
   update(id: number, dto: ManufacturerDto): Manufacturer {
     this.findOne(id);
-    return this.db
+    this.db
       .update(manufacturers)
       .set({ ...this.toRow(dto), updatedAt: now() })
       .where(eq(manufacturers.id, id))
-      .returning()
-      .get();
+      .run();
+    return this.findOne(id);
   }
 
   remove(id: number): void {

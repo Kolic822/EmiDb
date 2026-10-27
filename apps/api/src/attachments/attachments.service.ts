@@ -1,13 +1,21 @@
-import type { Attachment, AttachmentOwner } from '@emidb/shared';
+import type { Attachment, AttachmentOwner, LibraryItem } from '@emidb/shared';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
 import { createReadStream, existsSync } from 'node:fs';
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { notFound } from '../common/errors.js';
 import { config } from '../config.js';
 import { DATABASE, type Db } from '../database/database.js';
-import { attachments, pickupSets, pickups, potLayouts, wiringDiagrams } from '../database/schema.js';
+import {
+  attachments,
+  manufacturers,
+  pickupSets,
+  pickups,
+  potLayouts,
+  switchTypes,
+  wiringDiagrams,
+} from '../database/schema.js';
 import type { UpdateAttachmentDto, UploadAttachmentDto } from './attachment.dto.js';
 
 type AttachmentRow = typeof attachments.$inferSelect;
@@ -17,6 +25,8 @@ const OWNER_TABLES = {
   wiringDiagram: wiringDiagrams,
   pickupSet: pickupSets,
   potLayout: potLayouts,
+  manufacturer: manufacturers,
+  switchType: switchTypes,
 } as const;
 
 @Injectable()
@@ -37,6 +47,42 @@ export class AttachmentsService {
 
   findOne(id: number): Attachment {
     return toModel(this.row(id));
+  }
+
+  /** Reference files (manufacturers, switch types, pot layouts) with the name of their owner. */
+  library(): LibraryItem[] {
+    const items: LibraryItem[] = [];
+    const named = (rows: { file: AttachmentRow; name: string }[]) =>
+      items.push(...rows.map(({ file, name }) => ({ ...toModel(file), ownerName: name })));
+
+    named(
+      this.db
+        .select({ file: attachments, name: manufacturers.name })
+        .from(attachments)
+        .innerJoin(manufacturers, and(eq(attachments.owner, 'manufacturer'), eq(attachments.ownerId, manufacturers.id)))
+        .where(isNull(manufacturers.deletedAt))
+        .all(),
+    );
+    named(
+      this.db
+        .select({ file: attachments, name: potLayouts.name })
+        .from(attachments)
+        .innerJoin(potLayouts, and(eq(attachments.owner, 'potLayout'), eq(attachments.ownerId, potLayouts.id)))
+        .where(isNull(potLayouts.deletedAt))
+        .all(),
+    );
+    const switches = this.db
+      .select({ file: attachments, name: switchTypes.name, maker: manufacturers.name })
+      .from(attachments)
+      .innerJoin(switchTypes, and(eq(attachments.owner, 'switchType'), eq(attachments.ownerId, switchTypes.id)))
+      .leftJoin(manufacturers, eq(switchTypes.manufacturerId, manufacturers.id))
+      .where(isNull(switchTypes.deletedAt))
+      .all();
+    named(switches.map((row) => ({ file: row.file, name: row.maker ? `${row.name} (${row.maker})` : row.name })));
+
+    return items.sort(
+      (a, b) => a.ownerName.localeCompare(b.ownerName) || b.createdAt.localeCompare(a.createdAt),
+    );
   }
 
   /** Adds each row's attachments (one query for the whole list). */

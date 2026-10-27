@@ -253,7 +253,7 @@ export const attachments = sqliteTable(
   {
     id: id(),
     owner: text({
-      enum: ['pickup', 'wiringDiagram', 'pickupSet', 'potLayout'],
+      enum: ['pickup', 'wiringDiagram', 'pickupSet', 'potLayout', 'manufacturer', 'switchType'],
     }).notNull(),
     ownerId: integer().notNull(),
     fileName: text().notNull(),

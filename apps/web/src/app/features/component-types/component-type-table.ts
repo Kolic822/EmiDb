@@ -108,6 +108,8 @@ export class SwitchTypeTable extends ComponentTypeTableBase<SwitchType, SwitchTy
   protected readonly store = inject(SwitchTypesStore);
   protected override readonly fields = SWITCH_TYPE_FIELDS;
   protected readonly state = new ListState<SwitchType>(SWITCH_TYPE_FIELDS, 'switch-types', inject(LookupService).resolver);
+  protected override readonly attachmentOwner = 'switchType' as const;
+  protected override readonly supportsAttachments = true;
   protected readonly noun = 'switch type';
   protected readonly nounPlural = 'switch types';
   protected readonly title = 'Switch types';

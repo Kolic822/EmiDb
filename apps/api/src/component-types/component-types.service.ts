@@ -1,6 +1,7 @@
 import type { ComponentType, SwitchType } from '@emidb/shared';
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { and, asc, eq, inArray, isNull, ne } from 'drizzle-orm';
+import { AttachmentsService } from '../attachments/attachments.service.js';
 import { notFound } from '../common/errors.js';
 import { DATABASE, type Db, now } from '../database/database.js';
 import { potentiometerTypes, switchTypes } from '../database/schema.js';
@@ -68,22 +69,30 @@ export class PotentiometerTypesService extends ComponentTypesService {
 
 @Injectable()
 export class SwitchTypesService extends ComponentTypesService {
-  constructor(@Inject(DATABASE) db: Db) {
+  constructor(
+    @Inject(DATABASE) db: Db,
+    private readonly attachments: AttachmentsService,
+  ) {
     super(db, switchTypes, 'Switch type');
   }
 
   override findAll(): SwitchType[] {
-    return super.findAll() as SwitchType[];
+    return this.attachments.withAttachments('switchType', super.findAll()) as unknown as SwitchType[];
+  }
+
+  override findOne(id: number): SwitchType {
+    return this.attachments.withAttachments('switchType', [super.findOne(id)])[0] as unknown as SwitchType;
   }
 
   override create(dto: SwitchTypeDto): SwitchType {
     this.assertUnique(dto);
-    return super.create(dto) as SwitchType;
+    return this.findOne(super.create(dto).id);
   }
 
   override update(id: number, dto: SwitchTypeDto): SwitchType {
     this.assertUnique(dto, id);
-    return super.update(id, dto) as SwitchType;
+    super.update(id, dto);
+    return this.findOne(id);
   }
 
   /** Name must be unique per manufacturer; the index cannot enforce this for a missing manufacturer. */

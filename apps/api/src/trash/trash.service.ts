@@ -30,9 +30,9 @@ const REGISTRY: Record<TrashKind, { table: TrashTable; owner?: AttachmentOwner }
   pickup: { table: pickups, owner: 'pickup' },
   pickupSet: { table: pickupSets, owner: 'pickupSet' },
   wiringDiagram: { table: wiringDiagrams, owner: 'wiringDiagram' },
-  manufacturer: { table: manufacturers },
+  manufacturer: { table: manufacturers, owner: 'manufacturer' },
   potentiometerType: { table: potentiometerTypes },
-  switchType: { table: switchTypes },
+  switchType: { table: switchTypes, owner: 'switchType' },
   wiringPickupType: { table: wiringPickupTypes },
   potLayout: { table: potLayouts, owner: 'potLayout' },
 };
