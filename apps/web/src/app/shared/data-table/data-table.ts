@@ -47,13 +47,11 @@ export class DataTable<T extends { id: number }> {
   readonly selectable = input(true);
   readonly emptyTitle = input('Nothing here yet');
   readonly emptyMessage = input<string>();
-  /** Shows a column with a button that opens the row's attached files. */
-  readonly showAttachments = input(true);
+  /** Shows a pinned column with a button that opens the row's attached files. */
+  readonly showAttachments = input(false);
   readonly rowClick = output<T>();
 
-  protected readonly hasAttachmentColumn = computed(
-    () => this.showAttachments() && this.rows().some((row) => 'attachments' in row),
-  );
+  protected readonly hasAttachmentColumn = computed(() => this.showAttachments());
   protected readonly columnCount = computed(
     () => this.fields().length + (this.selectable() ? 1 : 0) + (this.hasAttachmentColumn() ? 1 : 0),
   );

@@ -17,6 +17,7 @@ export class WiringDiagramList extends EntityListBase<WiringDiagram, WiringDiagr
   protected readonly groups = WIRING_DIAGRAM_GROUPS;
   protected readonly noun = 'wiring diagram';
   protected readonly title = 'Wiring diagrams';
+  protected override readonly supportsAttachments = true;
   protected readonly basePath = '/wiring-diagrams';
   protected override readonly supportsFilter = true;
 

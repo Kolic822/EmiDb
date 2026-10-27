@@ -195,9 +195,36 @@ td {
 }
 
 .files {
-  width: 48px;
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  width: 52px;
+  min-width: 52px;
   padding: 0 8px;
   text-align: center;
+  background: var(--mat-sys-surface-container-lowest);
+  box-shadow: -1px 0 0 var(--mat-sys-outline-variant);
+}
+
+thead .files {
+  z-index: 3;
+  background: var(--mat-sys-surface-container-low);
+}
+
+.files-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+tbody tr:hover td.files {
+  background: color-mix(in srgb, var(--mat-sys-surface-container-lowest) 90%, var(--mat-sys-on-surface));
+}
+
+tbody tr.selected td.files {
+  background: color-mix(in srgb, var(--mat-sys-surface-container-lowest) 88%, var(--mat-sys-primary));
 }
 
 .empty-row td {

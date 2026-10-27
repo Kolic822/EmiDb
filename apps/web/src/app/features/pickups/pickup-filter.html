@@ -22,6 +22,7 @@
       [rows]="rows()"
       [totalCount]="store.rows().length"
       [loading]="store.loading() && !store.loaded()"
+      [showAttachments]="true"
       emptyTitle="No pickups match"
       emptyMessage="Loosen a tolerance or clear a field."
       (rowClick)="open($event)"

@@ -22,6 +22,8 @@ export abstract class EntityListBase<T extends { id: number }, TInput> {
   protected abstract readonly basePath: string;
   protected readonly supportsFilter: boolean = false;
   protected readonly supportsCompare: boolean = false;
+  /** Entities that can have files attached get a pinned files column. */
+  protected readonly supportsAttachments: boolean = false;
 
   protected readonly router = inject(Router);
   protected readonly confirm = inject(ConfirmService);

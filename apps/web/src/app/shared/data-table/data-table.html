@@ -45,7 +45,7 @@
             </th>
           }
           @if (hasAttachmentColumn()) {
-            <th class="files" aria-label="Files"></th>
+            <th class="files"><mat-icon class="files-icon" aria-label="Files">attach_file</mat-icon></th>
           }
         </tr>
       </thead>
@@ -92,7 +92,11 @@
             }
             @if (hasAttachmentColumn()) {
               <td class="files">
-                <app-attachment-button [attachments]="attachmentsOf(row)" />
+                @if (attachmentsOf(row)?.length) {
+                  <app-attachment-button [attachments]="attachmentsOf(row)" />
+                } @else {
+                  <span class="empty">—</span>
+                }
               </td>
             }
           </tr>

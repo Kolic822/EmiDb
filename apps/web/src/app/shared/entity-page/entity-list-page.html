@@ -31,6 +31,7 @@
       [rows]="rows()"
       [totalCount]="store.rows().length"
       [loading]="store.loading() && !store.loaded()"
+      [showAttachments]="supportsAttachments"
       [emptyTitle]="store.rows().length ? 'No ' + noun + 's match' : 'No ' + noun + 's yet'"
       [emptyMessage]="store.rows().length ? 'Try clearing a filter or the search.' : 'Add your first ' + noun + ' to get started.'"
       (rowClick)="open($event)"
