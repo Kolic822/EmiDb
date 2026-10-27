@@ -1,6 +1,6 @@
 import type { ComponentType, SwitchType } from '@emidb/shared';
-import { Inject, Injectable } from '@nestjs/common';
-import { asc, eq, inArray } from 'drizzle-orm';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import { and, asc, eq, inArray, isNull, ne } from 'drizzle-orm';
 import { notFound } from '../common/errors.js';
 import { DATABASE, type Db, now } from '../database/database.js';
 import { potentiometerTypes, switchTypes } from '../database/schema.js';
@@ -67,6 +67,28 @@ export class SwitchTypesService extends ComponentTypesService {
 
   override findAll(): SwitchType[] {
     return super.findAll() as SwitchType[];
+  }
+
+  override create(dto: SwitchTypeDto): SwitchType {
+    this.assertUnique(dto);
+    return super.create(dto) as SwitchType;
+  }
+
+  override update(id: number, dto: SwitchTypeDto): SwitchType {
+    this.assertUnique(dto, id);
+    return super.update(id, dto) as SwitchType;
+  }
+
+  /** Name must be unique per manufacturer; the index cannot enforce this for a missing manufacturer. */
+  private assertUnique(dto: SwitchTypeDto, exceptId?: number): void {
+    const sameManufacturer =
+      dto.manufacturerId == null ? isNull(switchTypes.manufacturerId) : eq(switchTypes.manufacturerId, dto.manufacturerId);
+    const clash = this.db
+      .select({ id: switchTypes.id })
+      .from(switchTypes)
+      .where(and(eq(switchTypes.name, dto.name), sameManufacturer, exceptId == null ? undefined : ne(switchTypes.id, exceptId)))
+      .get();
+    if (clash) throw new ConflictException('An entry with that name already exists');
   }
 
   protected override toRow(dto: SwitchTypeDto): Record<string, unknown> {

@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 const timestamps = {
   createdAt: text()
@@ -88,13 +88,18 @@ export const potentiometerTypes = sqliteTable('potentiometer_types', {
   ...timestamps,
 });
 
-export const switchTypes = sqliteTable('switch_types', {
-  id: id(),
-  name: text().notNull().unique(),
-  manufacturerId: integer().references(() => manufacturers.id, { onDelete: 'set null' }),
-  description: text(),
-  ...timestamps,
-});
+export const switchTypes = sqliteTable(
+  'switch_types',
+  {
+    id: id(),
+    name: text().notNull(),
+    manufacturerId: integer().references(() => manufacturers.id, { onDelete: 'set null' }),
+    description: text(),
+    ...timestamps,
+  },
+  // The same switch model can come from several manufacturers.
+  (table) => [uniqueIndex('switch_types_name_manufacturer_unique').on(table.name, table.manufacturerId)],
+);
 
 export const potLayouts = sqliteTable('pot_layouts', {
   id: id(),

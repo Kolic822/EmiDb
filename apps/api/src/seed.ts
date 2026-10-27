@@ -24,14 +24,14 @@ import {
 mkdirSync(path.dirname(config.databaseFile), { recursive: true });
 const db = openDatabase(config.databaseFile);
 
-if (db.select({ id: manufacturers.id }).from(manufacturers).limit(1).get()) {
+// Migrations may add reference entries (manufacturers, layouts); real data means pickups exist.
+if (db.select({ id: pickups.id }).from(pickups).limit(1).get()) {
   console.log('Database already has data, nothing to do.');
   closeDatabase();
   process.exit(0);
 }
 
-const makers = db
-  .insert(manufacturers)
+db.insert(manufacturers)
   .values([
     { name: 'Seymour Duncan', country: 'USA', website: 'https://www.seymourduncan.com' },
     { name: 'DiMarzio', country: 'USA', website: 'https://www.dimarzio.com' },
@@ -40,9 +40,11 @@ const makers = db
     { name: 'Bare Knuckle', country: 'UK', website: 'https://www.bareknucklepickups.co.uk' },
     { name: 'EMG', country: 'USA', website: 'https://www.emgpickups.com' },
     { name: 'Lollar', country: 'USA', website: 'https://www.lollarguitars.com' },
+    { name: 'Schaller', country: 'Germany', website: 'https://www.schaller.info' },
   ])
-  .returning({ id: manufacturers.id, name: manufacturers.name })
-  .all();
+  .onConflictDoNothing()
+  .run();
+const makers = db.select({ id: manufacturers.id, name: manufacturers.name }).from(manufacturers).all();
 const maker = (name: string) => makers.find((m) => m.name === name)!.id;
 
 const pickupRows = db
@@ -197,7 +199,6 @@ const sws = db
       'S One',
       'Three Way Blade',
       'Three Way Super Switch',
-      'Three Way Blade Schaller',
       'Three Way Toggle',
       'Three Way Two Pole Slide',
       'Four Way Blade',
@@ -205,7 +206,6 @@ const sws = db
       'Four Pdt On On On',
       'Five Way Blade',
       'Five Way Blade Super Switch',
-      'Five Way Blade Schaller',
       'Five Way Rotary',
       'Two Pole Five Way Rotary',
       'DPDT On On',
@@ -218,7 +218,12 @@ const sws = db
       'Free Way 3B3 02',
       'Free Way 5B5 01',
       'Free Way 5B5 02',
-    ].map((name) => ({ name })),
+    ]
+      .map((name): { name: string; manufacturerId?: number } => ({ name }))
+      .concat([
+        { name: 'Three Way Blade', manufacturerId: maker('Schaller') },
+        { name: 'Five Way Blade', manufacturerId: maker('Schaller') },
+      ]),
   )
   .returning({ id: switchTypes.id, name: switchTypes.name })
   .all();
