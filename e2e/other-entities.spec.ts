@@ -15,13 +15,13 @@ test('wiring diagram shows pots, switches and can be created with components', a
   await page.getByRole('option', { name: 'Guitar wiring' }).click();
   await expect(page.getByLabel('Volume pot 1', { exact: true })).toHaveCount(0);
   // Clicking a field's label is how Material opens an (empty) select.
-  await page.getByText('Volume pots', { exact: true }).click();
+  await page.locator('mat-label', { hasText: /^Volume pots$/ }).click();
   await page.getByRole('option', { name: '2', exact: true }).click();
   await expect(page.getByLabel('Volume pot 2', { exact: true })).toBeVisible();
   await expect(page.getByLabel('Volume pot 3', { exact: true })).toHaveCount(0);
-  await page.getByText('Volume pot 1', { exact: true }).click();
+  await page.locator('mat-label', { hasText: /^Volume pot 1$/ }).click();
   await page.getByRole('option', { name: '250k audio' }).click();
-  await page.getByText('Volume pot 2 function', { exact: true }).click();
+  await page.locator('mat-label', { hasText: /^Volume pot 2 function$/ }).click();
   await page.getByRole('option', { name: 'Push-push' }).click();
   await page.getByRole('button', { name: 'Add switch' }).click();
   await page.locator('.multi', { hasText: 'Switches' }).getByRole('combobox').click();
@@ -36,7 +36,7 @@ test('wiring diagram shows pots, switches and can be created with components', a
 
 test('wiring diagrams filter by the function of a specific pot position', async ({ page }) => {
   await page.goto('/wiring-diagrams/filter');
-  await page.getByText('Volume pot 2 function', { exact: true }).click();
+  await page.locator('mat-label', { hasText: /^Volume pot 2 function$/ }).click();
   await page.getByRole('option', { name: 'Push-pull' }).click();
   await page.keyboard.press('Escape');
   await expect(page.getByText(/^1 of \d+ diagrams match$/)).toBeVisible();

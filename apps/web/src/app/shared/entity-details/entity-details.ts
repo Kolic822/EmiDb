@@ -10,12 +10,12 @@ import { FieldValuePipe } from '../pipes/field-value.pipe';
   imports: [FieldValuePipe, MatIcon],
   template: `
     @for (section of sections(); track section.id) {
-      <section class="card">
+      <section class="card" [class.half]="section.width === 'half'">
         <h2>{{ section.label }}</h2>
-        <dl>
+        <dl [style.grid-template-columns]="columnsOf(section)">
           @for (field of section.fields; track field.key) {
             @let value = row()[field.key];
-            <div class="item" [class.wide]="field.kind === 'textarea'">
+            <div class="item" [class.wide]="field.kind === 'textarea' || field.fullWidth">
               <dt>{{ field.label }}</dt>
               <dd [class.empty]="value == null || value === '' || value?.length === 0">
                 @switch (field.kind) {
@@ -42,13 +42,25 @@ import { FieldValuePipe } from '../pipes/field-value.pipe';
   `,
   styles: `
     :host {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
     }
 
     section {
+      grid-column: 1 / -1;
       padding: 18px 20px 14px;
+      min-width: 0;
+
+      &.half {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 900px) {
+      section.half {
+        grid-column: 1 / -1;
+      }
     }
 
     h2 {
@@ -102,6 +114,10 @@ export class EntityDetails {
   readonly row = input.required<Record<string, any>>();
 
   protected readonly resolver = computed(() => this.lookups.resolver());
+
+  protected columnsOf(section: FieldGroup): string | null {
+    return section.columns ? `repeat(${section.columns}, minmax(0, 1fr))` : null;
+  }
   protected readonly sections = computed(() => {
     const row = this.row();
     return this.groups()

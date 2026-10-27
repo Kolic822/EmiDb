@@ -13,11 +13,11 @@ import type { EntityFormGroup } from './form-builder';
   imports: [EntityField],
   template: `
     @for (section of sections(); track section.id) {
-      <section class="card">
+      <section class="card" [class.half]="section.width === 'half'">
         <h2>{{ section.label }}</h2>
-        <div class="grid">
+        <div class="grid" [style.grid-template-columns]="columnsOf(section)">
           @for (field of section.fields; track field.key) {
-            <app-entity-field [field]="field" [formControl]="controlFor(field.key)" />
+            <app-entity-field [field]="field" [formControl]="controlFor(field.key)" [class.wide]="field.fullWidth" />
           }
         </div>
       </section>
@@ -25,13 +25,25 @@ import type { EntityFormGroup } from './form-builder';
   `,
   styles: `
     :host {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
     }
 
     section {
+      grid-column: 1 / -1;
       padding: 18px 20px 6px;
+      min-width: 0;
+
+      &.half {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 900px) {
+      section.half {
+        grid-column: 1 / -1;
+      }
     }
 
     h2 {
@@ -73,5 +85,9 @@ export class EntityForm {
 
   protected controlFor(key: string): FormControl<unknown> {
     return this.form().controls[key];
+  }
+
+  protected columnsOf(section: FieldGroup): string | null {
+    return section.columns ? `repeat(${section.columns}, minmax(0, 1fr))` : null;
   }
 }

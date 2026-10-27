@@ -40,6 +40,10 @@ export type FieldKind =
 export interface FieldGroup {
   id: string;
   label: string;
+  /** Half-width sections sit side by side in forms and detail views. */
+  width?: 'full' | 'half';
+  /** Fixed number of field columns inside the section (default: as many as fit). */
+  columns?: number;
 }
 
 export interface FieldDef<T = Record<string, unknown>> {
@@ -63,6 +67,8 @@ export interface FieldDef<T = Record<string, unknown>> {
   filterable?: boolean;
   /** Only relevant (shown in forms and details) while another field is at least `min`. */
   showWhen?: { key: keyof T & string; min: number };
+  /** Spans the whole section width. */
+  fullWidth?: boolean;
 }
 
 export const PICKUP_GROUPS: FieldGroup[] = [
@@ -137,20 +143,21 @@ export const PICKUP_SET_FIELDS: FieldDef<PickupSet>[] = [
 function potFields(
   prefix: 'volumePot' | 'tonePot',
   label: string,
+  group: 'volume' | 'tone',
   countKey: 'volumePotCount' | 'tonePotCount',
 ): FieldDef<WiringDiagram>[] {
   return [1, 2, 3].flatMap((n): FieldDef<WiringDiagram>[] => [
     {
       key: `${prefix}${n}TypeId` as keyof WiringDiagram & string,
       label: `${label} ${n}`,
-      group: 'controls',
+      group,
       kind: 'potentiometerType',
       showWhen: { key: countKey, min: n },
     },
     {
       key: `${prefix}${n}Function` as keyof WiringDiagram & string,
       label: `${label} ${n} function`,
-      group: 'controls',
+      group,
       kind: 'enum',
       enumDef: PotFunction,
       showWhen: { key: countKey, min: n },
@@ -161,7 +168,9 @@ function potFields(
 export const WIRING_DIAGRAM_GROUPS: FieldGroup[] = [
   { id: 'identity', label: 'Diagram' },
   { id: 'pickups', label: 'Pickups' },
-  { id: 'controls', label: 'Pots & switches' },
+  { id: 'volume', label: 'Volume pots', width: 'half', columns: 2 },
+  { id: 'tone', label: 'Tone pots', width: 'half', columns: 2 },
+  { id: 'switches', label: 'Switches' },
   { id: 'options', label: 'Wiring options' },
 ];
 
@@ -173,11 +182,11 @@ export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   { key: 'neck', label: 'Neck', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
   { key: 'middle', label: 'Middle', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
   { key: 'bridge', label: 'Bridge', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
-  { key: 'volumePotCount', label: 'Volume pots', group: 'controls', kind: 'integer', min: 0, max: 3, defaultColumn: true },
-  ...potFields('volumePot', 'Volume pot', 'volumePotCount'),
-  { key: 'tonePotCount', label: 'Tone pots', group: 'controls', kind: 'integer', min: 0, max: 3, defaultColumn: true },
-  ...potFields('tonePot', 'Tone pot', 'tonePotCount'),
-  { key: 'switches', label: 'Switches', group: 'controls', kind: 'switchType', multiple: true, defaultColumn: true },
+  { key: 'volumePotCount', label: 'Volume pots', group: 'volume', kind: 'integer', min: 0, max: 3, defaultColumn: true, fullWidth: true },
+  ...potFields('volumePot', 'Volume pot', 'volume', 'volumePotCount'),
+  { key: 'tonePotCount', label: 'Tone pots', group: 'tone', kind: 'integer', min: 0, max: 3, defaultColumn: true, fullWidth: true },
+  ...potFields('tonePot', 'Tone pot', 'tone', 'tonePotCount'),
+  { key: 'switches', label: 'Switches', group: 'switches', kind: 'switchType', multiple: true, defaultColumn: true },
   { key: 'phaseReversible', label: 'Phase reversible', group: 'options', kind: 'boolean' },
   { key: 'splitCoil', label: 'Split coil', group: 'options', kind: 'boolean' },
   { key: 'serial', label: 'Serial', group: 'options', kind: 'boolean' },
