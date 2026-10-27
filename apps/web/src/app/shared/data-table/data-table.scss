@@ -198,52 +198,56 @@ td {
   padding: 0 0 0 6px;
 }
 
+// Pinned right-hand columns: files, then edit / duplicate at the very edge.
+$actions-width: 92px;
+
+.files,
 .actions {
-  width: 84px;
-  min-width: 84px;
-  padding: 0 4px;
-  text-align: right;
-  white-space: nowrap;
-
-  .mat-mdc-icon-button {
-    --mat-icon-button-state-layer-size: 32px;
-    width: 32px;
-    height: 32px;
-    padding: 4px;
-    opacity: 0;
-    transition: opacity 120ms;
-    color: var(--mat-sys-on-surface-variant);
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-  }
-}
-
-@media (hover: hover) {
-  tbody tr:hover .actions .mat-mdc-icon-button,
-  tbody tr:focus-within .actions .mat-mdc-icon-button {
-    opacity: 1;
-  }
-}
-
-.files {
   position: sticky;
-  right: 0;
   z-index: 1;
-  width: 52px;
-  min-width: 52px;
-  padding: 0 8px;
-  text-align: center;
   background: var(--mat-sys-surface-container-lowest);
   box-shadow: -1px 0 0 var(--mat-sys-outline-variant);
 }
 
-thead .files {
+thead .files,
+thead .actions {
   z-index: 3;
   background: var(--mat-sys-surface-container-low);
+}
+
+.files {
+  right: 0;
+  width: 52px;
+  min-width: 52px;
+  padding: 0 8px;
+  text-align: center;
+}
+
+.actions {
+  right: 0;
+  width: $actions-width;
+  min-width: $actions-width;
+  padding: 0 6px;
+  text-align: right;
+  white-space: nowrap;
+
+  .mat-mdc-icon-button {
+    --mat-icon-button-state-layer-size: 40px;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    color: var(--mat-sys-on-surface-variant);
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+table.with-actions .files {
+  right: $actions-width;
 }
 
 .files-icon {
@@ -255,12 +259,14 @@ thead .files {
 }
 
 @media (hover: hover) {
-  tbody tr:hover td.files {
+  tbody tr:hover td.files,
+  tbody tr:hover td.actions {
     background: color-mix(in srgb, var(--mat-sys-surface-container-lowest) 90%, var(--mat-sys-on-surface));
   }
 }
 
-tbody tr.selected td.files {
+tbody tr.selected td.files,
+tbody tr.selected td.actions {
   background: color-mix(in srgb, var(--mat-sys-surface-container-lowest) 88%, var(--mat-sys-primary));
 }
 

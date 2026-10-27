@@ -61,7 +61,7 @@ import type { EntityFormGroup } from './form-builder';
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 4px 16px;
+      gap: 12px 16px;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -117,8 +117,8 @@ interface Section {
     .fields {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding-top: 4px;
+      gap: 8px;
+      padding: 2px 0 4px;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
