@@ -1,11 +1,11 @@
 <div class="page">
-  <app-page-header title="Filter wiring diagrams" [subtitle]="subtitle()" backLink="/wiring-diagrams">
+  <app-page-header [title]="'Filter wiring diagrams' | t" [subtitle]="subtitle()" backLink="/wiring-diagrams">
     @if (state.activeCriteriaCount() || state.query()) {
-      <button mat-button (click)="state.clearCriteria()">Clear all</button>
+      <button mat-button (click)="state.clearCriteria()">{{ 'Clear all' | t }}</button>
     }
     <a mat-flat-button routerLink="/wiring-diagrams">
       <mat-icon>table_rows</mat-icon>
-      Show in table
+      {{ 'Show in table' | t }}
     </a>
   </app-page-header>
 
@@ -20,8 +20,8 @@
       [loading]="store.loading() && !store.loaded()"
       [showAttachments]="true"
       [selectable]="false"
-      emptyTitle="No diagrams match"
-      emptyMessage="Clear a field to widen the search."
+      [emptyTitle]="'No diagrams match' | t"
+      [emptyMessage]="'Clear a field to widen the search.' | t"
       (rowClick)="open($event)"
     />
   </div>

@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { MatAnchor, MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
-import { PICKUP_GROUPS, type Pickup } from '@emidb/shared';
+import { PICKUP_GROUPS, type Pickup, t } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
 import { PickupsStore } from '../../core/store/stores';
 import { DataTable } from '../../shared/data-table/data-table';
@@ -17,7 +18,7 @@ import { PickupListState } from './pickup-list-state';
  */
 @Component({
   selector: 'app-pickup-filter',
-  imports: [PageHeader, FilterPanel, DataTable, MatButton, MatAnchor, MatIcon, RouterLink],
+  imports: [PageHeader, FilterPanel, DataTable, MatButton, MatAnchor, MatIcon, RouterLink, TranslatePipe],
   templateUrl: './pickup-filter.html',
   styleUrl: './pickup-filter.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,7 +31,9 @@ export class PickupFilter {
   private readonly lookups = inject(LookupService);
 
   protected readonly rows = this.state.view(this.store.rows);
-  protected readonly subtitle = computed(() => `${this.rows().length} of ${this.store.rows().length} pickups match`);
+  protected readonly subtitle = computed(() =>
+    t('{shown} of {total} pickups match', { shown: this.rows().length, total: this.store.rows().length }),
+  );
   protected readonly selectedIds = computed(() => [...this.state.selection()]);
 
   constructor() {

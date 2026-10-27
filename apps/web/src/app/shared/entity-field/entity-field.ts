@@ -5,7 +5,8 @@ import { MatError, MatFormField, MatLabel, MatSuffix } from '@angular/material/f
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
-import { type FieldDef, isNumericField } from '@emidb/shared';
+import { type FieldDef, fieldLabel, isNumericField, t } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
 
 type Control = 'text' | 'textarea' | 'number' | 'select' | 'select-multi' | 'boolean';
@@ -16,7 +17,7 @@ const SELECT_MAX_RANGE = 6;
 /** Renders the right Material control for a field definition bound to a FormControl. */
 @Component({
   selector: 'app-entity-field',
-  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatError, MatSuffix, MatInput, MatSelect, MatOption, MatIcon, MatIconButton],
+  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatError, MatSuffix, MatInput, MatSelect, MatOption, MatIcon, MatIconButton, TranslatePipe],
   templateUrl: './entity-field.html',
   styleUrl: './entity-field.scss',
   host: { '[class.wide]': 'control() === "textarea" || control() === "select-multi"' },
@@ -27,6 +28,8 @@ export class EntityField {
 
   readonly field = input.required<FieldDef<any>>();
   readonly formControl = input.required<FormControl<unknown>>();
+
+  protected readonly label = computed(() => fieldLabel(this.field()));
 
   protected readonly control = computed<Control>(() => {
     const field = this.field();
@@ -56,7 +59,7 @@ export class EntityField {
   );
 
   /** Singular label for the "add" button: "Volume pots" → "volume pot", "Switches" → "switch". */
-  protected readonly singular = computed(() => singularise(this.field().label.toLowerCase()));
+  protected readonly singular = computed(() => singularise(this.label().toLowerCase()));
 
   protected addItem(): void {
     this.setItems([...this.items(), null]);
@@ -81,10 +84,10 @@ export class EntityField {
   protected errorText(): string {
     const errors = this.formControl().errors;
     if (!errors) return '';
-    if (errors['required']) return 'Required';
-    if (errors['min']) return `Minimum ${errors['min'].min}`;
-    if (errors['max']) return `Maximum ${errors['max'].max}`;
-    return 'Invalid value';
+    if (errors['required']) return t('Required');
+    if (errors['min']) return t('Minimum {min}', { min: errors['min'].min });
+    if (errors['max']) return t('Maximum {max}', { max: errors['max'].max });
+    return t('Invalid value');
   }
 }
 

@@ -9,7 +9,8 @@ import { MatOption } from '@angular/material/select';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTooltip } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
-import { displayValue, type FieldDef, isNumericField, PICKUP_FIELDS, PICKUP_GROUPS, type Pickup } from '@emidb/shared';
+import { displayValue, type FieldDef, fieldLabel, groupLabel, isNumericField, PICKUP_FIELDS, PICKUP_GROUPS, type Pickup } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
 import { storedSignal } from '../../core/storage';
 import { PickupsStore } from '../../core/store/stores';
@@ -25,6 +26,7 @@ interface CompareCell {
 
 interface CompareRow {
   field: FieldDef<Pickup>;
+  label: string;
   cells: CompareCell[];
   differs: boolean;
 }
@@ -39,7 +41,7 @@ const MAX_COMPARED = 8;
 
 @Component({
   selector: 'app-pickup-compare',
-  imports: [FormsModule, PageHeader, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, MatSlideToggle, MatFormField, MatPrefix, MatInput, MatAutocomplete, MatAutocompleteTrigger, MatOption, RouterLink, Truncate],
+  imports: [FormsModule, PageHeader, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, MatSlideToggle, MatFormField, MatPrefix, MatInput, MatAutocomplete, MatAutocompleteTrigger, MatOption, RouterLink, Truncate, TranslatePipe],
   templateUrl: './pickup-compare.html',
   styleUrl: './pickup-compare.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,6 +87,7 @@ export class PickupCompare {
     const onlyDifferences = this.onlyDifferences();
     return PICKUP_GROUPS.map((group) => ({
       ...group,
+      label: groupLabel(group),
       rows: PICKUP_FIELDS.filter((field) => field.group === group.id && field.key !== 'name')
         .map((field) => buildRow(field, pickups, resolve))
         .filter((row) => !onlyDifferences || row.differs),
@@ -137,6 +140,7 @@ function buildRow(
   }
   return {
     field,
+    label: fieldLabel(field),
     differs,
     cells: texts.map((text, i) => ({ text, extreme: extremes[i] })),
   };

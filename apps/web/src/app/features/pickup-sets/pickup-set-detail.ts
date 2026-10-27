@@ -3,7 +3,8 @@ import { MatAnchor, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
-import { displayValue, PICKUP_FIELDS, type Pickup, PickupType } from '@emidb/shared';
+import { displayValue, fieldLabel, PICKUP_FIELDS, type Pickup, PickupType, t } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
 import { NotifyService } from '../../core/notify';
 import { PickupSetsStore, PickupsStore } from '../../core/store/stores';
@@ -21,7 +22,7 @@ const SPEC_KEYS: (keyof Pickup)[] = ['type', 'resistance', 'inductance', 'output
 
 @Component({
   selector: 'app-pickup-set-detail',
-  imports: [PageHeader, AttachmentsPanel, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, RouterLink],
+  imports: [PageHeader, AttachmentsPanel, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, RouterLink, TranslatePipe],
   templateUrl: './pickup-set-detail.html',
   styleUrl: './pickup-set-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -72,14 +73,18 @@ export class PickupSetDetail {
   }
 
   protected typeLabel(pickup: Pickup): string {
-    return PickupType.label(pickup.type);
+    return t(PickupType.label(pickup.type));
+  }
+
+  protected label(field: (typeof PICKUP_FIELDS)[number]): string {
+    return fieldLabel(field);
   }
 
   protected async remove(): Promise<void> {
     const set = this.set();
     if (!set || !(await this.confirm.confirmDelete(1, 'set'))) return;
     await this.store.remove([set.id]);
-    this.notify.success('Set deleted');
+    this.notify.success(t('{noun} deleted', { noun: t('Set') }));
     void this.router.navigate(['/sets']);
   }
 }

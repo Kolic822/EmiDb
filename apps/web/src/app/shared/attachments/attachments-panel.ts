@@ -5,7 +5,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatTooltip } from '@angular/material/tooltip';
-import type { Attachment, AttachmentOwner } from '@emidb/shared';
+import { type Attachment, type AttachmentOwner, t } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { AttachmentsApi } from '../../core/http/attachments-api';
 import { NotifyService } from '../../core/notify';
 import { ConfirmService } from '../confirm/confirm';
@@ -34,7 +35,7 @@ interface Tile {
  */
 @Component({
   selector: 'app-attachments-panel',
-  imports: [FormsModule, MatButton, MatIconButton, MatIcon, MatProgressBar, MatTooltip, FileSizePipe, PdfThumbnail],
+  imports: [FormsModule, MatButton, MatIconButton, MatIcon, MatProgressBar, MatTooltip, FileSizePipe, PdfThumbnail, TranslatePipe],
   templateUrl: './attachments-panel.html',
   styleUrl: './attachments-panel.scss',
   host: {
@@ -139,9 +140,9 @@ export class AttachmentsPanel {
     }
     const item = tile.attachment!;
     const ok = await this.confirm.confirm({
-      title: 'Delete file?',
-      message: `“${item.fileName}” will be removed permanently.`,
-      confirmLabel: 'Delete',
+      title: t('Delete file?'),
+      message: t('“{name}” will be removed permanently.', { name: item.fileName }),
+      confirmLabel: t('Delete'),
       danger: true,
     });
     if (!ok) return;
@@ -161,7 +162,7 @@ export class AttachmentsPanel {
         const created = await this.api.upload(this.owner(), this.ownerId()!, file);
         this.items.update((items) => [created, ...items]);
       }
-      this.notify.success(files.length === 1 ? 'File uploaded' : `${files.length} files uploaded`);
+      this.notify.success(files.length === 1 ? t('File uploaded') : t('{count} files uploaded', { count: files.length }));
     } catch {
       // The HTTP interceptor already reported the error.
     } finally {

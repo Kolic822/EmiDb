@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import type { FormControl } from '@angular/forms';
-import { type FieldDef, type FieldGroup, isFieldRelevant } from '@emidb/shared';
+import { type FieldDef, type FieldGroup, groupLabel, isFieldRelevant } from '@emidb/shared';
 import { map, startWith, switchMap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { EntityField } from '../entity-field/entity-field';
@@ -14,7 +14,7 @@ import type { EntityFormGroup } from './form-builder';
   template: `
     @for (section of sections(); track section.id) {
       <section class="card" [class.half]="section.width === 'half'">
-        <h2>{{ section.label }}</h2>
+        <h2>{{ groupName(section) }}</h2>
         <div class="grid" [style.grid-template-columns]="columnsOf(section)">
           @for (field of section.fields; track field.key) {
             <app-entity-field [field]="field" [formControl]="controlFor(field.key)" [class.wide]="field.fullWidth" />
@@ -85,6 +85,10 @@ export class EntityForm {
 
   protected controlFor(key: string): FormControl<unknown> {
     return this.form().controls[key];
+  }
+
+  protected groupName(section: FieldGroup): string {
+    return groupLabel(section);
   }
 
   protected columnsOf(section: FieldGroup): string | null {

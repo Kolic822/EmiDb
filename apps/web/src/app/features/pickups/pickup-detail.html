@@ -3,13 +3,13 @@
     <app-page-header [title]="pickup.name" [subtitle]="subtitle()" backLink="/pickups">
       <a mat-stroked-button [routerLink]="['/pickups/compare']" [queryParams]="{ ids: pickup.id }">
         <mat-icon>compare_arrows</mat-icon>
-        Compare
+        {{ 'Compare' | t }}
       </a>
       <a mat-flat-button routerLink="edit">
         <mat-icon>edit</mat-icon>
-        Edit
+        {{ 'Edit' | t }}
       </a>
-      <button mat-icon-button (click)="remove()" matTooltip="Delete pickup" aria-label="Delete pickup">
+      <button mat-icon-button (click)="remove()" [matTooltip]="'Delete pickup' | t" [attr.aria-label]="'Delete pickup' | t">
         <mat-icon>delete</mat-icon>
       </button>
     </app-page-header>
@@ -20,31 +20,31 @@
         <aside>
           <app-attachments-panel owner="pickup" [ownerId]="pickup.id" />
           <section class="card sets">
-            <h2>Part of sets</h2>
+            <h2>{{ 'Part of sets' | t }}</h2>
             @if (memberOf().length) {
               <ul>
                 @for (set of memberOf(); track set.id) {
                   <li>
                     <a [routerLink]="['/sets', set.id]">{{ set.name }}</a>
                     <span class="muted">
-                      {{ set.neckId === pickup.id ? 'neck' : set.middleId === pickup.id ? 'middle' : 'bridge' }}
+                      {{ (set.neckId === pickup.id ? 'neck' : set.middleId === pickup.id ? 'middle' : 'bridge') | t }}
                     </span>
                   </li>
                 }
               </ul>
             } @else {
-              <p class="muted">Not used in any set.</p>
+              <p class="muted">{{ 'Not used in any set.' | t }}</p>
             }
           </section>
           <p class="meta muted">
-            Created {{ pickup.createdAt.slice(0, 10) }} · Updated {{ pickup.updatedAt.slice(0, 10) }}
+            {{ 'Created {created} · Updated {updated}' | t: { created: pickup.createdAt.slice(0, 10), updated: pickup.updatedAt.slice(0, 10) } }}
           </p>
         </aside>
       </div>
     </div>
   } @else if (missing()) {
-    <app-empty-state icon="error" title="Pickup not found">
-      <a mat-stroked-button routerLink="/pickups">Back to pickups</a>
+    <app-empty-state icon="error" [title]="'Pickup not found' | t">
+      <a mat-stroked-button routerLink="/pickups">{{ 'Back to pickups' | t }}</a>
     </app-empty-state>
   }
 </div>

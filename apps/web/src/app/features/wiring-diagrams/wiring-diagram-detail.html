@@ -3,9 +3,9 @@
     <app-page-header [title]="diagram.name" [subtitle]="subtitle()" backLink="/wiring-diagrams">
       <a mat-flat-button routerLink="edit">
         <mat-icon>edit</mat-icon>
-        Edit
+        {{ 'Edit' | t }}
       </a>
-      <button mat-icon-button (click)="remove()" matTooltip="Delete diagram" aria-label="Delete diagram">
+      <button mat-icon-button (click)="remove()" [matTooltip]="'Delete diagram' | t" [attr.aria-label]="'Delete diagram' | t">
         <mat-icon>delete</mat-icon>
       </button>
     </app-page-header>
@@ -17,8 +17,8 @@
       </div>
     </div>
   } @else if (missing()) {
-    <app-empty-state icon="error" title="Wiring diagram not found">
-      <a mat-stroked-button routerLink="/wiring-diagrams">Back to diagrams</a>
+    <app-empty-state icon="error" [title]="'Wiring diagram not found' | t">
+      <a mat-stroked-button routerLink="/wiring-diagrams">{{ 'Back to diagrams' | t }}</a>
     </app-empty-state>
   }
 </div>

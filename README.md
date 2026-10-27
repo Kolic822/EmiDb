@@ -79,7 +79,7 @@ installs and builds (a few minutes), later runs start immediately.
 
 ```bash
 docker build -t emidb .
-docker run -p 3000:3210 -v emidb-data:/data emidb
+docker run -p 3210:3210 -v emidb-data:/data emidb
 ```
 
 Any Node host works as well: `npm ci && npm run build && npm start`.

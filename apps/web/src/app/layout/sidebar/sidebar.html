@@ -1,6 +1,6 @@
-<nav class="sidebar" aria-label="Main">
+<nav class="sidebar" [attr.aria-label]="'Main' | t">
   <div class="brand">
-    <a routerLink="/pickups" class="logo" aria-label="emidb home">
+    <a routerLink="/pickups" class="logo" [attr.aria-label]="'emidb home' | t">
       <span class="logo-mark"><mat-icon>graphic_eq</mat-icon></span>
       <span class="logo-text">emidb</span>
     </a>
@@ -8,9 +8,9 @@
       mat-icon-button
       class="collapse"
       (click)="layout.toggleSidebar()"
-      [matTooltip]="layout.collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+      [matTooltip]="(layout.collapsed() ? 'Expand sidebar' : 'Collapse sidebar') | t"
       matTooltipPosition="right"
-      aria-label="Toggle sidebar"
+      [attr.aria-label]="'Toggle sidebar' | t"
     >
       <mat-icon>{{ layout.collapsed() ? 'left_panel_open' : 'left_panel_close' }}</mat-icon>
     </button>
@@ -18,17 +18,17 @@
 
   @for (section of sections; track section.title) {
     <div class="section">
-      <div class="section-title">{{ section.title }}</div>
+      <div class="section-title">{{ section.title | t }}</div>
       @for (item of section.items; track item.link) {
         <a
           class="nav-item"
           [routerLink]="item.link"
           routerLinkActive="active"
-          [matTooltip]="layout.collapsed() ? item.label : ''"
+          [matTooltip]="layout.collapsed() ? (item.label | t) : ''"
           matTooltipPosition="right"
         >
           <mat-icon>{{ item.icon }}</mat-icon>
-          <span class="label">{{ item.label }}</span>
+          <span class="label">{{ item.label | t }}</span>
         </a>
       }
     </div>
@@ -39,11 +39,11 @@
       class="nav-item"
       [routerLink]="settings.link"
       routerLinkActive="active"
-      [matTooltip]="layout.collapsed() ? settings.label : ''"
+      [matTooltip]="layout.collapsed() ? (settings.label | t) : ''"
       matTooltipPosition="right"
     >
       <mat-icon>{{ settings.icon }}</mat-icon>
-      <span class="label">{{ settings.label }}</span>
+      <span class="label">{{ settings.label | t }}</span>
     </a>
   </div>
 </nav>

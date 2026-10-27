@@ -4,21 +4,22 @@ import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import type { Attachment } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 
 @Component({
   selector: 'app-attachment-preview',
-  imports: [MatIcon, MatIconButton, MatDialogClose],
+  imports: [MatIcon, MatIconButton, MatDialogClose, TranslatePipe],
   template: `
     <header>
       <span class="title">{{ data.caption || data.fileName }}</span>
-      <a mat-icon-button [href]="data.url + '?download'" target="_blank" rel="noopener" aria-label="Download">
+      <a mat-icon-button [href]="data.url + '?download'" target="_blank" rel="noopener" [attr.aria-label]="'Download' | t">
         <mat-icon>download</mat-icon>
       </a>
-      <button mat-icon-button mat-dialog-close aria-label="Close"><mat-icon>close</mat-icon></button>
+      <button mat-icon-button mat-dialog-close [attr.aria-label]="'Close' | t"><mat-icon>close</mat-icon></button>
     </header>
     <div class="body">
       @if (data.mimeType === 'application/pdf') {
-        <iframe [src]="pdfUrl" title="PDF preview"></iframe>
+        <iframe [src]="pdfUrl" [title]="'PDF preview' | t"></iframe>
       } @else {
         <img [src]="data.url" [alt]="data.caption || data.fileName" />
       }

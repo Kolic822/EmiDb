@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { type FieldDef, type FieldGroup, isFieldRelevant } from '@emidb/shared';
+import { type FieldDef, type FieldGroup, fieldLabel, groupLabel, isFieldRelevant } from '@emidb/shared';
 import { LookupService } from '../../core/lookups';
 import { FieldValuePipe } from '../pipes/field-value.pipe';
 
@@ -11,12 +11,12 @@ import { FieldValuePipe } from '../pipes/field-value.pipe';
   template: `
     @for (section of sections(); track section.id) {
       <section class="card" [class.half]="section.width === 'half'">
-        <h2>{{ section.label }}</h2>
+        <h2>{{ groupName(section) }}</h2>
         <dl [style.grid-template-columns]="columnsOf(section)">
           @for (field of section.fields; track field.key) {
             @let value = row()[field.key];
             <div class="item" [class.wide]="field.kind === 'textarea' || field.fullWidth">
-              <dt>{{ field.label }}</dt>
+              <dt>{{ label(field) }}</dt>
               <dd [class.empty]="value == null || value === '' || value?.length === 0">
                 @switch (field.kind) {
                   @case ('url') {
@@ -114,6 +114,14 @@ export class EntityDetails {
   readonly row = input.required<Record<string, any>>();
 
   protected readonly resolver = computed(() => this.lookups.resolver());
+
+  protected label(field: FieldDef<any>): string {
+    return fieldLabel(field);
+  }
+
+  protected groupName(section: FieldGroup): string {
+    return groupLabel(section);
+  }
 
   protected columnsOf(section: FieldGroup): string | null {
     return section.columns ? `repeat(${section.columns}, minmax(0, 1fr))` : null;

@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
+import { TranslatePipe } from '../../core/i18n';
 
 @Component({
   selector: 'app-empty-state',
-  imports: [MatIcon],
+  imports: [MatIcon, TranslatePipe],
   template: `
     <mat-icon>{{ icon() }}</mat-icon>
-    <div class="title">{{ title() }}</div>
+    <div class="title">{{ title() | t }}</div>
     @if (message()) {
-      <div class="message">{{ message() }}</div>
+      <div class="message">{{ message()! | t }}</div>
     }
     <div class="actions"><ng-content /></div>
   `,

@@ -60,7 +60,7 @@ export const hr: Dictionary = {
   'Compare results': 'Usporedi rezultate',
   'Compare selected': 'Usporedi odabrane',
   'Delete': 'Obriši',
-  'Search {noun}s…': 'Pretraži…',
+  'Search {noun}…': 'Pretraži…',
   'Search…': 'Pretraži…',
   'Clear search': 'Očisti pretragu',
   'Clear all': 'Očisti sve',

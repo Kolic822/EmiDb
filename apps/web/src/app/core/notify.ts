@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { t } from '@emidb/shared';
 
 @Injectable({ providedIn: 'root' })
 export class NotifyService {
@@ -10,6 +11,6 @@ export class NotifyService {
   }
 
   error(message: string): void {
-    this.snackBar.open(message, 'Dismiss', { duration: 6000 });
+    this.snackBar.open(message, t('Dismiss'), { duration: 6000 });
   }
 }

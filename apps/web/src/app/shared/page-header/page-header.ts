@@ -2,14 +2,15 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../core/i18n';
 
 @Component({
   selector: 'app-page-header',
-  imports: [MatIcon, MatIconButton, RouterLink],
+  imports: [MatIcon, MatIconButton, RouterLink, TranslatePipe],
   template: `
     <div class="header">
       @if (backLink(); as link) {
-        <a mat-icon-button [routerLink]="link" class="back" aria-label="Back">
+        <a mat-icon-button [routerLink]="link" class="back" [attr.aria-label]="'Back' | t">
           <mat-icon>arrow_back</mat-icon>
         </a>
       }

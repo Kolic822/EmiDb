@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { MatFormField, MatLabel, MatPrefix, MatSuffix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
-import { type Criterion, type FieldDef, isNumericField } from '@emidb/shared';
+import { type Criterion, type FieldDef, fieldLabel, isNumericField } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
 
 /**
@@ -12,7 +13,7 @@ import { LookupService } from '../../core/lookups';
  */
 @Component({
   selector: 'app-filter-field',
-  imports: [FormsModule, MatFormField, MatLabel, MatPrefix, MatSuffix, MatInput, MatSelect, MatOption],
+  imports: [FormsModule, MatFormField, MatLabel, MatPrefix, MatSuffix, MatInput, MatSelect, MatOption, TranslatePipe],
   templateUrl: './filter-field.html',
   styleUrl: './filter-field.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +25,8 @@ export class FilterField {
   readonly criterion = model<Criterion | undefined>();
   /** Compact layout for header menus (no floating label). */
   readonly compact = input(false);
+
+  protected readonly label = computed(() => fieldLabel(this.field()));
 
   protected readonly kind = computed(() => {
     const field = this.field();

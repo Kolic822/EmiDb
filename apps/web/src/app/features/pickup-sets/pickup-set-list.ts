@@ -16,7 +16,9 @@ export class PickupSetList extends EntityListBase<PickupSet, PickupSetInput> {
   protected readonly state = inject(PickupSetListState);
   protected readonly groups = PICKUP_SET_GROUPS;
   protected readonly noun = 'set';
+  protected readonly nounPlural = 'sets';
   protected readonly title = 'Pickup sets';
+  protected readonly createLabel = 'New set';
   protected override readonly supportsAttachments = true;
   protected readonly basePath = '/sets';
 

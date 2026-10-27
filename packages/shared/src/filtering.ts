@@ -1,5 +1,6 @@
 import type { FieldDef } from './fields.js';
-import { isNumericField } from './fields.js';
+import { fieldLabel, isNumericField } from './fields.js';
+import { t } from './i18n/i18n.js';
 
 /**
  * Filter criteria. One criterion per field; a row matches when every criterion matches.
@@ -89,9 +90,9 @@ export function displayValue(
   if (value == null || value === '') return '';
   switch (field.kind) {
     case 'enum':
-      return field.enumDef?.label(value as string) ?? String(value);
+      return t(field.enumDef?.label(value as string) ?? String(value));
     case 'boolean':
-      return value ? 'Yes' : 'No';
+      return t(value ? 'Yes' : 'No');
     case 'number':
     case 'integer': {
       const text = formatNumber(value as number);
@@ -156,24 +157,24 @@ export function describeCriterion(
 ): string {
   switch (criterion.kind) {
     case 'text':
-      return `${field.label} contains “${criterion.value.trim()}”`;
+      return t('{label} contains “{value}”', { label: fieldLabel(field), value: criterion.value.trim() });
     case 'in': {
       const labels = criterion.values.map((v) => displayValue(field, v, resolve));
-      return `${field.label}: ${labels.join(', ')}`;
+      return `${fieldLabel(field)}: ${labels.join(', ')}`;
     }
     case 'near': {
       const unit = field.unit ? ` ${field.unit}` : '';
       const tolerance = criterion.tolerance ? ` ± ${formatNumber(criterion.tolerance)}` : '';
-      return `${field.label} ≈ ${formatNumber(criterion.value)}${tolerance}${unit}`;
+      return `${fieldLabel(field)} ≈ ${formatNumber(criterion.value)}${tolerance}${unit}`;
     }
     case 'range': {
       const unit = field.unit ? ` ${field.unit}` : '';
       if (criterion.min != null && criterion.max != null)
-        return `${field.label} ${formatNumber(criterion.min)}–${formatNumber(criterion.max)}${unit}`;
-      if (criterion.min != null) return `${field.label} ≥ ${formatNumber(criterion.min)}${unit}`;
-      return `${field.label} ≤ ${formatNumber(criterion.max ?? 0)}${unit}`;
+        return `${fieldLabel(field)} ${formatNumber(criterion.min)}–${formatNumber(criterion.max)}${unit}`;
+      if (criterion.min != null) return `${fieldLabel(field)} ≥ ${formatNumber(criterion.min)}${unit}`;
+      return `${fieldLabel(field)} ≤ ${formatNumber(criterion.max ?? 0)}${unit}`;
     }
     case 'boolean':
-      return `${field.label}: ${criterion.value ? 'Yes' : 'No'}`;
+      return `${fieldLabel(field)}: ${t(criterion.value ? 'Yes' : 'No')}`;
   }
 }

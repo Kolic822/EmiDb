@@ -1,9 +1,9 @@
 <div class="page">
-  <app-page-header [title]="title" [subtitle]="subtitle()">
+  <app-page-header [title]="title | t" [subtitle]="subtitle()">
     @if (supportsFilter) {
       <a mat-stroked-button routerLink="filter">
         <mat-icon>filter_alt</mat-icon>
-        Filter
+        {{ 'Filter' | t }}
         @if (state.activeCriteriaCount()) {
           <span class="badge">{{ state.activeCriteriaCount() }}</span>
         }
@@ -12,14 +12,14 @@
     <app-column-picker [state]="state" [groups]="groups" />
     <button mat-flat-button (click)="create()">
       <mat-icon>add</mat-icon>
-      New {{ noun }}
+      {{ createLabel | t }}
     </button>
 
-    <app-list-toolbar toolbar [state]="state" [noun]="noun" (delete)="deleteSelected()">
+    <app-list-toolbar toolbar [state]="state" [searchPlaceholder]="searchPlaceholder()" (delete)="deleteSelected()">
       @if (supportsCompare) {
         <button mat-flat-button (click)="compare()" [disabled]="!canCompare()">
           <mat-icon>compare_arrows</mat-icon>
-          Compare
+          {{ 'Compare' | t }}
         </button>
       }
     </app-list-toolbar>
@@ -32,8 +32,8 @@
       [totalCount]="store.rows().length"
       [loading]="store.loading() && !store.loaded()"
       [showAttachments]="supportsAttachments"
-      [emptyTitle]="store.rows().length ? 'No ' + noun + 's match' : 'No ' + noun + 's yet'"
-      [emptyMessage]="store.rows().length ? 'Try clearing a filter or the search.' : 'Add your first ' + noun + ' to get started.'"
+      [emptyTitle]="(store.rows().length ? 'No {noun}s match' : 'No {noun}s yet') | t: { noun: noun | t }"
+      [emptyMessage]="(store.rows().length ? 'Try clearing a filter or the search.' : 'Add your first {noun} to get started.') | t: { noun: noun | t }"
       (rowClick)="open($event)"
     />
   </div>

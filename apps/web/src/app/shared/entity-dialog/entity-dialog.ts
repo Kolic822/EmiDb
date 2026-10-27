@@ -11,6 +11,7 @@ import {
 } from '@angular/material/dialog';
 import type { FieldDef, FieldGroup } from '@emidb/shared';
 import { firstValueFrom } from 'rxjs';
+import { TranslatePipe } from '../../core/i18n';
 import { EntityForm } from '../entity-form/entity-form';
 import { buildEntityForm, formToInput } from '../entity-form/form-builder';
 
@@ -27,7 +28,7 @@ export interface EntityDialogData<T, TInput> {
 /** Small create/edit dialog for simple entities (manufacturers, pot and switch types). */
 @Component({
   selector: 'app-entity-dialog',
-  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatButton, EntityForm],
+  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatButton, EntityForm, TranslatePipe],
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
     <mat-dialog-content>
@@ -36,8 +37,8 @@ export interface EntityDialogData<T, TInput> {
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-flat-button (click)="submit()" [disabled]="saving()">{{ data.submitLabel ?? 'Save' }}</button>
+      <button mat-button mat-dialog-close>{{ 'Cancel' | t }}</button>
+      <button mat-flat-button (click)="submit()" [disabled]="saving()">{{ (data.submitLabel ?? 'Save') | t }}</button>
     </mat-dialog-actions>
   `,
   styles: `

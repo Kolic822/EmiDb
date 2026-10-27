@@ -19,6 +19,7 @@ import {
   WiringType,
 } from './enums.js';
 import type { ComponentType, Manufacturer, Pickup, PickupSet, WiringDiagram } from './models.js';
+import { t } from './i18n/i18n.js';
 
 /**
  * Field metadata drives tables, forms, filters and the compare view,
@@ -48,7 +49,9 @@ export interface FieldGroup {
 
 export interface FieldDef<T = Record<string, unknown>> {
   key: keyof T & string;
+  /** English source label; translated through `fieldLabel()`. May contain `{placeholders}`. */
   label: string;
+  labelParams?: Record<string, string | number>;
   group: string;
   kind: FieldKind;
   unit?: string;
@@ -149,14 +152,16 @@ function potFields(
   return [1, 2, 3].flatMap((n): FieldDef<WiringDiagram>[] => [
     {
       key: `${prefix}${n}TypeId` as keyof WiringDiagram & string,
-      label: `${label} ${n}`,
+      label: `${label} {n}`,
+      labelParams: { n },
       group,
       kind: 'potentiometerType',
       showWhen: { key: countKey, min: n },
     },
     {
       key: `${prefix}${n}Function` as keyof WiringDiagram & string,
-      label: `${label} ${n} function`,
+      label: `${label} {n} function`,
+      labelParams: { n },
       group,
       kind: 'enum',
       enumDef: PotFunction,
@@ -208,6 +213,16 @@ export const COMPONENT_TYPE_FIELDS: FieldDef<ComponentType>[] = [
   { key: 'name', label: 'Name', group: 'main', kind: 'text', required: true, defaultColumn: true },
   { key: 'description', label: 'Description', group: 'main', kind: 'text', defaultColumn: true },
 ];
+
+/** Translated label of a field. */
+export function fieldLabel(field: FieldDef<any>): string {
+  return t(field.label, field.labelParams);
+}
+
+/** Translated label of a field group. */
+export function groupLabel(group: FieldGroup): string {
+  return t(group.label);
+}
 
 /** Whether a field applies to this row (see `FieldDef.showWhen`). */
 export function isFieldRelevant<T extends object>(field: FieldDef<T>, row: Partial<T> | null | undefined): boolean {

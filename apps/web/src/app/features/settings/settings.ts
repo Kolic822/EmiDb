@@ -4,7 +4,8 @@ import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { type FieldDef, type FieldGroup, PICKUP_GROUPS, PICKUP_SET_GROUPS, WIRING_DIAGRAM_GROUPS } from '@emidb/shared';
+import { type FieldDef, type FieldGroup, fieldLabel, groupLabel, PICKUP_GROUPS, PICKUP_SET_GROUPS, WIRING_DIAGRAM_GROUPS } from '@emidb/shared';
+import { LanguageService, TranslatePipe } from '../../core/i18n';
 import { ColumnDefaults } from '../../core/column-defaults';
 import { ACCENTS, THEME_MODES, ThemeService } from '../../core/theme';
 import type { ListState } from '../../shared/list-state/list-state';
@@ -21,13 +22,14 @@ interface TableSettings {
 
 @Component({
   selector: 'app-settings',
-  imports: [PageHeader, MatButton, MatButtonToggleGroup, MatButtonToggle, MatCheckbox, MatIcon, MatTooltip],
+  imports: [PageHeader, MatButton, MatButtonToggleGroup, MatButtonToggle, MatCheckbox, MatIcon, MatTooltip, TranslatePipe],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Settings {
   protected readonly theme = inject(ThemeService);
+  protected readonly language = inject(LanguageService);
   protected readonly accents = ACCENTS;
   protected readonly modes = THEME_MODES;
   private readonly defaults = inject(ColumnDefaults);
@@ -48,9 +50,13 @@ export class Settings {
     ),
   );
 
+  protected label(field: FieldDef<any>): string {
+    return fieldLabel(field);
+  }
+
   protected sections(table: TableSettings): { id: string; label: string; fields: FieldDef<any>[] }[] {
     return table.groups
-      .map((group) => ({ ...group, fields: table.state.columnFields.filter((f) => f.group === group.id) }))
+      .map((group) => ({ ...group, label: groupLabel(group), fields: table.state.columnFields.filter((f) => f.group === group.id) }))
       .filter((group) => group.fields.length);
   }
 

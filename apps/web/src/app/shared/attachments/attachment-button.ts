@@ -5,19 +5,20 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
 import type { Attachment } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { AttachmentPreview } from './attachment-preview';
 
 /** Icon button that opens a row's attachment directly (menu when there are several). */
 @Component({
   selector: 'app-attachment-button',
-  imports: [MatIconButton, MatIcon, MatMenu, MatMenuItem, MatMenuTrigger, MatTooltip],
+  imports: [MatIconButton, MatIcon, MatMenu, MatMenuItem, MatMenuTrigger, MatTooltip, TranslatePipe],
   template: `
     @if (items().length === 1) {
-      <button mat-icon-button (click)="open(items()[0]); $event.stopPropagation()" [matTooltip]="items()[0].caption || items()[0].fileName" [attr.aria-label]="'Open ' + items()[0].fileName">
+      <button mat-icon-button (click)="open(items()[0]); $event.stopPropagation()" [matTooltip]="items()[0].caption || items()[0].fileName" [attr.aria-label]="'Open {name}' | t: { name: items()[0].fileName }">
         <mat-icon>{{ icon(items()[0]) }}</mat-icon>
       </button>
     } @else if (items().length > 1) {
-      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()" [matTooltip]="items().length + ' files'" [attr.aria-label]="items().length + ' attachments'">
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()" [matTooltip]="'{count} files' | t: { count: items().length }" [attr.aria-label]="'{count} attachments' | t: { count: items().length }">
         <mat-icon>attach_file</mat-icon>
         <span class="count">{{ items().length }}</span>
       </button>

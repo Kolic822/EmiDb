@@ -5,7 +5,8 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatTooltip } from '@angular/material/tooltip';
-import { type Attachment, type Criterion, type FieldDef, isEmptyCriterion, isNumericField } from '@emidb/shared';
+import { type Attachment, type Criterion, type FieldDef, fieldLabel, isEmptyCriterion, isNumericField } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
 import { AttachmentButton } from '../attachments/attachment-button';
 import { EmptyState } from '../empty-state/empty-state';
@@ -32,6 +33,7 @@ import { FieldValuePipe } from '../pipes/field-value.pipe';
     FieldValuePipe,
     EmptyState,
     AttachmentButton,
+    TranslatePipe,
   ],
   templateUrl: './data-table.html',
   styleUrl: './data-table.scss',
@@ -75,6 +77,10 @@ export class DataTable<T extends { id: number }> {
     const selection = this.selection();
     return !this.allSelected() && this.rows().some((row) => selection.has(row.id));
   });
+
+  protected label(field: FieldDef<T>): string {
+    return fieldLabel(field);
+  }
 
   protected isNumeric(field: FieldDef<T>): boolean {
     return isNumericField(field);

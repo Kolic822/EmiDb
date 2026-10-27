@@ -8,7 +8,9 @@ import {
   MatDialogContent,
   MatDialogTitle,
 } from '@angular/material/dialog';
+import { t } from '@emidb/shared';
 import { firstValueFrom } from 'rxjs';
+import { TranslatePipe } from '../../core/i18n';
 
 export interface ConfirmOptions {
   title: string;
@@ -19,16 +21,16 @@ export interface ConfirmOptions {
 
 @Component({
   selector: 'app-confirm-dialog',
-  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatButton],
+  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatButton, TranslatePipe],
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
     @if (data.message) {
       <mat-dialog-content>{{ data.message }}</mat-dialog-content>
     }
     <mat-dialog-actions align="end">
-      <button mat-button [mat-dialog-close]="false">Cancel</button>
+      <button mat-button [mat-dialog-close]="false">{{ 'Cancel' | t }}</button>
       <button mat-flat-button [mat-dialog-close]="true" [class.danger]="data.danger" cdkFocusInitial>
-        {{ data.confirmLabel ?? 'Confirm' }}
+        {{ (data.confirmLabel ?? 'Confirm') | t }}
       </button>
     </mat-dialog-actions>
   `,
@@ -68,11 +70,10 @@ export class ConfirmService {
 
   /** Standard "delete N things" prompt. */
   confirmDelete(count: number, noun: string): Promise<boolean> {
-    const what = count === 1 ? `this ${noun}` : `${count} ${noun}s`;
     return this.confirm({
-      title: `Delete ${what}?`,
-      message: 'This cannot be undone. Attached files are deleted as well.',
-      confirmLabel: 'Delete',
+      title: count === 1 ? t('Delete this {noun}?', { noun: t(noun) }) : t('Delete {count} {noun}s?', { count, noun: t(noun) }),
+      message: t('This cannot be undone. Attached files are deleted as well.'),
+      confirmLabel: t('Delete'),
       danger: true,
     });
   }

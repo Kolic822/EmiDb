@@ -16,6 +16,7 @@ export class PickupSetForm extends EntityFormBase<PickupSet, PickupSetInput> {
   protected readonly fields = PICKUP_SET_FIELDS;
   protected readonly groups = PICKUP_SET_GROUPS;
   protected readonly noun = 'set';
+  protected readonly createLabel = 'New set';
   protected override readonly attachmentOwner = 'pickupSet' as const;
   protected readonly basePath = '/sets';
 }

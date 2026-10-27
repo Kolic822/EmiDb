@@ -1,6 +1,6 @@
 import { computed, Directive, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import type { FieldGroup } from '@emidb/shared';
+import { type FieldGroup, t } from '@emidb/shared';
 import { LookupService } from '../../core/lookups';
 import { NotifyService } from '../../core/notify';
 import type { EntityStore } from '../../core/store/entity-store';
@@ -16,9 +16,11 @@ export abstract class EntityListBase<T extends { id: number }, TInput> {
   protected abstract readonly store: EntityStore<T, TInput>;
   protected abstract readonly state: ListState<T>;
   protected abstract readonly groups: readonly FieldGroup[];
-  /** Singular, lower case: "pickup". */
+  /** English source strings; translated at render time. */
   protected abstract readonly noun: string;
+  protected abstract readonly nounPlural: string;
   protected abstract readonly title: string;
+  protected abstract readonly createLabel: string;
   protected abstract readonly basePath: string;
   protected readonly supportsFilter: boolean = false;
   protected readonly supportsCompare: boolean = false;
@@ -39,9 +41,10 @@ export abstract class EntityListBase<T extends { id: number }, TInput> {
   protected readonly subtitle = computed(() => {
     const total = this.store.rows().length;
     const shown = this.rows().length;
-    const plural = `${this.noun}s`;
-    return shown === total ? `${total} ${plural}` : `${shown} of ${total} ${plural}`;
+    const noun = t(this.nounPlural);
+    return shown === total ? `${total} ${noun}` : t('{shown} of {total} {noun}', { shown, total, noun });
   });
+  protected readonly searchPlaceholder = computed(() => t('Search {noun}…', { noun: t(this.nounPlural) }));
   protected readonly selectedIds = computed(() => [...this.state.selection()]);
   protected readonly canCompare = computed(() => this.selectedIds().length >= 2);
 
@@ -68,7 +71,11 @@ export abstract class EntityListBase<T extends { id: number }, TInput> {
     if (!(await this.confirm.confirmDelete(ids.length, this.noun))) return;
     await this.store.remove(ids);
     this.state.clearSelection();
-    this.notify.success(ids.length === 1 ? `${capitalise(this.noun)} deleted` : `${ids.length} ${this.noun}s deleted`);
+    this.notify.success(
+      ids.length === 1
+        ? t('{noun} deleted', { noun: capitalise(t(this.noun)) })
+        : t('{count} {noun}s deleted', { count: ids.length, noun: t(this.nounPlural) }),
+    );
   }
 }
 

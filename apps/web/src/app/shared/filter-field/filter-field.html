@@ -2,12 +2,12 @@
   @case ('text') {
     <mat-form-field [appearance]="compact() ? 'outline' : 'outline'" [subscriptSizing]="'dynamic'">
       @if (!compact()) {
-        <mat-label>{{ field().label }}</mat-label>
+        <mat-label>{{ label() }}</mat-label>
       }
       <input
         matInput
         type="text"
-        [placeholder]="compact() ? 'Contains…' : ''"
+        [placeholder]="compact() ? ('Contains…' | t) : ''"
         [ngModel]="text()"
         (ngModelChange)="setText($event)"
         autocomplete="off"
@@ -17,16 +17,16 @@
   @case ('in') {
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       @if (!compact()) {
-        <mat-label>{{ field().label }}</mat-label>
+        <mat-label>{{ label() }}</mat-label>
       }
       <mat-select
         multiple
-        [placeholder]="compact() ? 'Any of…' : ''"
+        [placeholder]="compact() ? ('Any of…' | t) : ''"
         [ngModel]="selected()"
         (ngModelChange)="setSelected($event)"
       >
         @for (option of options(); track option.value) {
-          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          <mat-option [value]="option.value">{{ option.label | t }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -35,13 +35,13 @@
     <div class="number-row">
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="value">
         @if (!compact()) {
-          <mat-label>{{ field().label }}</mat-label>
+          <mat-label>{{ label() }}</mat-label>
         }
         <input
           matInput
           type="number"
           [step]="field().step ?? 'any'"
-          [placeholder]="compact() ? 'Value' : ''"
+          [placeholder]="compact() ? ('Value' | t) : ''"
           [ngModel]="near()"
           (ngModelChange)="setNear($event, tolerance())"
         />
@@ -51,7 +51,7 @@
       </mat-form-field>
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="tolerance">
         @if (!compact()) {
-          <mat-label>tol.</mat-label>
+          <mat-label>{{ 'tol.' | t }}</mat-label>
         }
         <span matTextPrefix class="pm">±</span>
         <input
@@ -69,12 +69,12 @@
   @case ('boolean') {
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       @if (!compact()) {
-        <mat-label>{{ field().label }}</mat-label>
+        <mat-label>{{ label() }}</mat-label>
       }
-      <mat-select [placeholder]="compact() ? 'Any' : ''" [ngModel]="bool()" (ngModelChange)="setBool($event)">
-        <mat-option [value]="null">Any</mat-option>
-        <mat-option [value]="true">Yes</mat-option>
-        <mat-option [value]="false">No</mat-option>
+      <mat-select [placeholder]="compact() ? ('Any' | t) : ''" [ngModel]="bool()" (ngModelChange)="setBool($event)">
+        <mat-option [value]="null">{{ 'Any' | t }}</mat-option>
+        <mat-option [value]="true">{{ 'Yes' | t }}</mat-option>
+        <mat-option [value]="false">{{ 'No' | t }}</mat-option>
       </mat-select>
     </mat-form-field>
   }

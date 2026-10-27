@@ -3,6 +3,7 @@ import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { TranslatePipe } from '../../core/i18n';
 import { LayoutService } from '../layout.service';
 
 interface NavItem {
@@ -13,7 +14,7 @@ interface NavItem {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive, MatIcon, MatIconButton, MatTooltip],
+  imports: [RouterLink, RouterLinkActive, MatIcon, MatIconButton, MatTooltip, TranslatePipe],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
   host: { '[class.collapsed]': 'layout.collapsed()' },

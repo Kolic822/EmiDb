@@ -1,15 +1,15 @@
 <div class="page">
-  <app-page-header title="Filter pickups" [subtitle]="subtitle()" backLink="/pickups">
+  <app-page-header [title]="'Filter pickups' | t" [subtitle]="subtitle()" backLink="/pickups">
     @if (state.activeCriteriaCount() || state.query()) {
-      <button mat-button (click)="state.clearCriteria()">Clear all</button>
+      <button mat-button (click)="state.clearCriteria()">{{ 'Clear all' | t }}</button>
     }
     <button mat-stroked-button (click)="compare()" [disabled]="rows().length < 2 || rows().length > 8">
       <mat-icon>compare_arrows</mat-icon>
-      Compare {{ selectedIds().length >= 2 ? 'selected' : 'results' }}
+      {{ (selectedIds().length >= 2 ? 'Compare selected' : 'Compare results') | t }}
     </button>
     <a mat-flat-button routerLink="/pickups">
       <mat-icon>table_rows</mat-icon>
-      Show in table
+      {{ 'Show in table' | t }}
     </a>
   </app-page-header>
 
@@ -23,8 +23,8 @@
       [totalCount]="store.rows().length"
       [loading]="store.loading() && !store.loaded()"
       [showAttachments]="true"
-      emptyTitle="No pickups match"
-      emptyMessage="Loosen a tolerance or clear a field."
+      [emptyTitle]="'No pickups match' | t"
+      [emptyMessage]="'Loosen a tolerance or clear a field.' | t"
       (rowClick)="open($event)"
     />
   </div>

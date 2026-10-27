@@ -3,7 +3,8 @@ import { MatAnchor, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
-import { WIRING_DIAGRAM_FIELDS, WIRING_DIAGRAM_GROUPS, WiringType } from '@emidb/shared';
+import { t, WIRING_DIAGRAM_FIELDS, WIRING_DIAGRAM_GROUPS, WiringType } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
 import { NotifyService } from '../../core/notify';
 import { WiringDiagramsStore } from '../../core/store/stores';
@@ -15,7 +16,7 @@ import { PageHeader } from '../../shared/page-header/page-header';
 
 @Component({
   selector: 'app-wiring-diagram-detail',
-  imports: [PageHeader, EntityDetails, AttachmentsPanel, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, RouterLink],
+  imports: [PageHeader, EntityDetails, AttachmentsPanel, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, RouterLink, TranslatePipe],
   templateUrl: './wiring-diagram-detail.html',
   styleUrl: './wiring-diagram-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,7 +41,7 @@ export class WiringDiagramDetail {
     const manufacturer = diagram.manufacturerId
       ? this.lookups.resolver()(WIRING_DIAGRAM_FIELDS[1], diagram.manufacturerId)
       : null;
-    return [manufacturer, WiringType.label(diagram.wiringType)].filter(Boolean).join(' · ');
+    return [manufacturer, diagram.wiringType && t(WiringType.label(diagram.wiringType))].filter(Boolean).join(' · ');
   });
 
   constructor() {
@@ -52,7 +53,7 @@ export class WiringDiagramDetail {
     const diagram = this.diagram();
     if (!diagram || !(await this.confirm.confirmDelete(1, 'wiring diagram'))) return;
     await this.store.remove([diagram.id]);
-    this.notify.success('Wiring diagram deleted');
+    this.notify.success(t('{noun} deleted', { noun: t('Wiring diagram') }));
     void this.router.navigate(['/wiring-diagrams']);
   }
 }

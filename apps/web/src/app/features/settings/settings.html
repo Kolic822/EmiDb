@@ -1,37 +1,50 @@
 <div class="page">
-  <app-page-header title="Settings" subtitle="Saved in this browser" />
+  <app-page-header [title]="'Settings' | t" [subtitle]="'Saved in this browser' | t" />
   <div class="page-scroll">
     <section class="card">
-      <h2>Appearance</h2>
+      <h2>{{ 'Appearance' | t }}</h2>
       <div class="row">
-        <div class="row-label">Mode</div>
+        <div class="row-label">{{ 'Language' | t }}</div>
+        <mat-button-toggle-group
+          hideSingleSelectionIndicator
+          [value]="language.current()"
+          (change)="language.change($event.value)"
+          [attr.aria-label]="'Language' | t"
+        >
+          @for (lang of language.languages; track lang.id) {
+            <mat-button-toggle [value]="lang.id">{{ lang.label }}</mat-button-toggle>
+          }
+        </mat-button-toggle-group>
+      </div>
+      <div class="row">
+        <div class="row-label">{{ 'Mode' | t }}</div>
         <mat-button-toggle-group
           hideSingleSelectionIndicator
           [value]="theme.mode()"
           (change)="theme.mode.set($event.value)"
-          aria-label="Colour mode"
+          [attr.aria-label]="'Colour mode' | t"
         >
           @for (mode of modes; track mode.id) {
             <mat-button-toggle [value]="mode.id">
               <mat-icon>{{ mode.icon }}</mat-icon>
-              {{ mode.label }}
+              {{ mode.label | t }}
             </mat-button-toggle>
           }
         </mat-button-toggle-group>
       </div>
       <div class="row">
-        <div class="row-label">Accent</div>
-        <div class="swatches" role="radiogroup" aria-label="Accent colour">
+        <div class="row-label">{{ 'Accent' | t }}</div>
+        <div class="swatches" role="radiogroup" [attr.aria-label]="'Accent colour' | t">
           @for (accent of accents; track accent.id) {
             <button
               type="button"
               class="swatch"
               role="radio"
               [attr.aria-checked]="theme.accent() === accent.id"
-              [attr.aria-label]="accent.label"
+              [attr.aria-label]="accent.label | t"
               [class.active]="theme.accent() === accent.id"
               [style.--swatch]="accent.color"
-              [matTooltip]="accent.label"
+              [matTooltip]="accent.label | t"
               (click)="theme.accent.set(accent.id)"
             >
               @if (theme.accent() === accent.id) {
@@ -44,18 +57,17 @@
     </section>
 
     <section class="card">
-      <h2>Default columns</h2>
+      <h2>{{ 'Default columns' | t }}</h2>
       <p class="muted">
-        Which columns each table shows by default. Changes apply immediately; the Columns menu on a table
-        can still show or hide columns for the moment and go back to these defaults.
+        {{ 'Which columns each table shows by default. Changes apply immediately; the Columns menu on a table can still show or hide columns for the moment and go back to these defaults.' | t }}
       </p>
       @for (table of tables; track table.label) {
         <div class="table-block">
           <div class="table-head">
-            <h3>{{ table.label }}</h3>
-            <span class="muted">{{ selected()[table.state.storageKey].size }} columns</span>
+            <h3>{{ table.label | t }}</h3>
+            <span class="muted">{{ '{count} columns' | t: { count: selected()[table.state.storageKey].size } }}</span>
             @if (isCustom(table)) {
-              <button mat-button (click)="useBuiltIn(table)">Use built-in defaults</button>
+              <button mat-button (click)="useBuiltIn(table)">{{ 'Use built-in defaults' | t }}</button>
             }
           </div>
           <div class="groups">
@@ -67,7 +79,7 @@
                     [checked]="selected()[table.state.storageKey].has(field.key)"
                     (change)="toggle(table, field.key)"
                   >
-                    {{ field.label }}
+                    {{ label(field) }}
                   </mat-checkbox>
                 }
               </div>

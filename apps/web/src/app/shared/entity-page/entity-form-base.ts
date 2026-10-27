@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { computed, Directive, effect, inject, input, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
-import type { AttachmentOwner, FieldDef, FieldGroup } from '@emidb/shared';
+import { type AttachmentOwner, type FieldDef, type FieldGroup, t } from '@emidb/shared';
 import { AttachmentsApi } from '../../core/http/attachments-api';
 import { LookupService } from '../../core/lookups';
 import { NotifyService } from '../../core/notify';
@@ -20,6 +20,8 @@ export abstract class EntityFormBase<T extends { id: number; name: string }, TIn
   protected abstract readonly fields: readonly FieldDef<T>[];
   protected abstract readonly groups: readonly FieldGroup[];
   protected abstract readonly noun: string;
+  /** English title for the create page, e.g. "New pickup". */
+  protected abstract readonly createLabel: string;
   protected abstract readonly basePath: string;
   /** Set when the entity can have files attached. */
   protected readonly attachmentOwner: AttachmentOwner | null = null;
@@ -46,7 +48,7 @@ export abstract class EntityFormBase<T extends { id: number; name: string }, TIn
   protected readonly form = signal<EntityFormGroup | null>(null);
   protected readonly saving = signal(false);
   protected readonly title = computed(() =>
-    this.isEdit() ? `Edit ${this.existing()?.name ?? this.noun}` : `New ${this.noun}`,
+    this.isEdit() ? t('Edit {name}', { name: this.existing()?.name ?? t(this.noun) }) : t(this.createLabel),
   );
 
   constructor() {
@@ -71,7 +73,7 @@ export abstract class EntityFormBase<T extends { id: number; name: string }, TIn
     if (!form) return;
     if (form.invalid) {
       form.markAllAsTouched();
-      this.notify.error('Please fix the highlighted fields');
+      this.notify.error(t('Please fix the highlighted fields'));
       return;
     }
     this.saving.set(true);
@@ -80,7 +82,8 @@ export abstract class EntityFormBase<T extends { id: number; name: string }, TIn
       const id = this.numericId();
       const saved = id == null ? await this.store.create(input) : await this.store.update(id, input);
       await this.uploadPending(saved.id);
-      this.notify.success(`${capitalise(this.noun)} ${id == null ? 'created' : 'saved'}`);
+      const noun = capitalise(t(this.noun));
+      this.notify.success(id == null ? t('{noun} created', { noun }) : t('{noun} saved', { noun }));
       form.markAsPristine();
       void this.router.navigate([this.basePath, saved.id]);
     } catch {

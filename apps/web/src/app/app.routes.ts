@@ -1,4 +1,5 @@
 import type { Routes } from '@angular/router';
+import { pageTitle } from './core/i18n';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'pickups' },
@@ -18,17 +19,17 @@ export const routes: Routes = [
   {
     path: 'manufacturers',
     loadComponent: () => import('./features/manufacturers/manufacturer-list').then((m) => m.ManufacturerList),
-    title: 'Manufacturers · emidb',
+    title: pageTitle('Manufacturers'),
   },
   {
     path: 'components',
     loadComponent: () => import('./features/component-types/component-type-list').then((m) => m.ComponentTypeList),
-    title: 'Pots & switches · emidb',
+    title: pageTitle('Pots & switches'),
   },
   {
     path: 'settings',
     loadComponent: () => import('./features/settings/settings').then((m) => m.Settings),
-    title: 'Settings · emidb',
+    title: pageTitle('Settings'),
   },
   { path: '**', redirectTo: 'pickups' },
 ];

@@ -3,34 +3,35 @@ import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
-import type { FieldDef, FieldGroup } from '@emidb/shared';
+import { type FieldDef, type FieldGroup, fieldLabel, groupLabel } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { ListState } from '../list-state/list-state';
 
 /** "Columns" button + menu to show/hide table columns, grouped by section. */
 @Component({
   selector: 'app-column-picker',
-  imports: [MatButton, MatIcon, MatMenu, MatMenuTrigger, MatCheckbox],
+  imports: [MatButton, MatIcon, MatMenu, MatMenuTrigger, MatCheckbox, TranslatePipe],
   template: `
     <button mat-stroked-button [matMenuTriggerFor]="menu">
       <mat-icon>view_column</mat-icon>
-      Columns
+      {{ 'Columns' | t }}
     </button>
     <mat-menu #menu="matMenu" class="column-picker-menu">
       <div class="picker" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
         <div class="picker-header">
-          <span>{{ visible().size }} of {{ state().columnFields.length }} columns</span>
+          <span>{{ '{visible} of {total} columns' | t: { visible: visible().size, total: state().columnFields.length } }}</span>
           <span class="picker-actions">
-            <button type="button" class="link-btn" (click)="state().saveColumnsAsDefault()">Save as default</button>
-            <button type="button" class="link-btn" (click)="state().resetColumns()">Reset to default</button>
+            <button type="button" class="link-btn" (click)="state().saveColumnsAsDefault()">{{ 'Save as default' | t }}</button>
+            <button type="button" class="link-btn" (click)="state().resetColumns()">{{ 'Reset to default' | t }}</button>
           </span>
         </div>
         <div class="groups">
           @for (group of grouped(); track group.id) {
             <div class="group">
-              <div class="group-title">{{ group.label }}</div>
+              <div class="group-title">{{ groupName(group) }}</div>
               @for (field of group.fields; track field.key) {
                 <mat-checkbox [checked]="visible().has(field.key)" (change)="toggle(field.key)">
-                  {{ field.label }}
+                  {{ label(field) }}
                 </mat-checkbox>
               }
             </div>
@@ -105,6 +106,14 @@ export class ColumnPicker<T extends { id: number }> {
       }))
       .filter((group) => group.fields.length),
   );
+
+  protected label(field: FieldDef<T>): string {
+    return fieldLabel(field);
+  }
+
+  protected groupName(group: FieldGroup): string {
+    return groupLabel(group);
+  }
 
   protected toggle(key: string): void {
     this.state().visibleKeys.update((keys) =>

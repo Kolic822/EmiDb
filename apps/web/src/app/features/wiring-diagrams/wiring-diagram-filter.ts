@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { MatAnchor, MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
-import { WIRING_DIAGRAM_GROUPS, type WiringDiagram } from '@emidb/shared';
+import { t, WIRING_DIAGRAM_GROUPS, type WiringDiagram } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
 import { WiringDiagramsStore } from '../../core/store/stores';
 import { DataTable } from '../../shared/data-table/data-table';
@@ -12,7 +13,7 @@ import { WiringDiagramListState } from './wiring-diagram-list-state';
 
 @Component({
   selector: 'app-wiring-diagram-filter',
-  imports: [PageHeader, FilterPanel, DataTable, MatButton, MatAnchor, MatIcon, RouterLink],
+  imports: [PageHeader, FilterPanel, DataTable, MatButton, MatAnchor, MatIcon, RouterLink, TranslatePipe],
   templateUrl: './wiring-diagram-filter.html',
   styleUrl: '../pickups/pickup-filter.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,7 +26,9 @@ export class WiringDiagramFilter {
   private readonly lookups = inject(LookupService);
 
   protected readonly rows = this.state.view(this.store.rows);
-  protected readonly subtitle = computed(() => `${this.rows().length} of ${this.store.rows().length} diagrams match`);
+  protected readonly subtitle = computed(() =>
+    t('{shown} of {total} diagrams match', { shown: this.rows().length, total: this.store.rows().length }),
+  );
 
   constructor() {
     void this.store.ensureLoaded();

@@ -9,6 +9,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
 import { errorInterceptor } from './core/http/error.interceptor';
+import { LanguageService } from './core/i18n';
 import { ThemeService } from './core/theme';
 
 export const appConfig: ApplicationConfig = {
@@ -18,6 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptors([errorInterceptor])),
     provideAppInitializer(() => {
       inject(MatIconRegistry).setDefaultFontSetClass('material-symbols-outlined');
+      inject(LanguageService).init();
       inject(ThemeService).init();
     }),
   ],

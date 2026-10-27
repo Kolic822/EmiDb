@@ -5,6 +5,7 @@ import {
   type Manufacturer,
   type ManufacturerInput,
 } from '@emidb/shared';
+import { t } from '@emidb/shared';
 import { LookupService } from '../../core/lookups';
 import { ManufacturersStore } from '../../core/store/stores';
 import { EntityDialogService } from '../../shared/entity-dialog/entity-dialog';
@@ -23,7 +24,9 @@ export class ManufacturerList extends EntityListBase<Manufacturer, ManufacturerI
   protected readonly state = new ListState<Manufacturer>(MANUFACTURER_FIELDS, 'manufacturers', inject(LookupService).resolver);
   protected readonly groups = MANUFACTURER_GROUPS;
   protected readonly noun = 'manufacturer';
+  protected readonly nounPlural = 'manufacturers';
   protected readonly title = 'Manufacturers';
+  protected readonly createLabel = 'New manufacturer';
   protected readonly basePath = '/manufacturers';
   private readonly dialogs = inject(EntityDialogService);
 
@@ -34,23 +37,23 @@ export class ManufacturerList extends EntityListBase<Manufacturer, ManufacturerI
 
   protected override async create(): Promise<void> {
     const saved = await this.dialogs.open<Manufacturer, ManufacturerInput>({
-      title: 'New manufacturer',
+      title: t('New manufacturer'),
       fields: MANUFACTURER_FIELDS,
       groups: MANUFACTURER_GROUPS,
       submitLabel: 'Create',
       save: (input) => this.store.create(input),
     });
-    if (saved) this.notify.success('Manufacturer created');
+    if (saved) this.notify.success(t('{noun} created', { noun: t('Manufacturer') }));
   }
 
   protected override async open(row: Manufacturer): Promise<void> {
     const saved = await this.dialogs.open<Manufacturer, ManufacturerInput>({
-      title: `Edit ${row.name}`,
+      title: t('Edit {name}', { name: row.name }),
       fields: MANUFACTURER_FIELDS,
       groups: MANUFACTURER_GROUPS,
       value: row,
       save: (input) => this.store.update(row.id, input),
     });
-    if (saved) this.notify.success('Manufacturer saved');
+    if (saved) this.notify.success(t('{noun} saved', { noun: t('Manufacturer') }));
   }
 }

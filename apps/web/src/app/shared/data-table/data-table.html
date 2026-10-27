@@ -12,7 +12,7 @@
                 [checked]="allSelected()"
                 [indeterminate]="someSelected()"
                 (change)="toggleAll()"
-                aria-label="Select all"
+                [attr.aria-label]="'Select all' | t"
               />
             </th>
           }
@@ -20,7 +20,7 @@
             <th [class.num]="isNumeric(field)" [class.sorted]="sort()?.key === field.key" [class.filtered]="hasFilter(field)">
               <div class="th">
                 <button type="button" class="sort" (click)="state().toggleSort(field.key)">
-                  <span class="label">{{ field.label }}</span>
+                  <span class="label">{{ label(field) }}</span>
                   @if (field.unit) {
                     <span class="unit">{{ field.unit }}</span>
                   }
@@ -34,8 +34,8 @@
                     class="filter-btn"
                     [matMenuTriggerFor]="filterMenu"
                     [matMenuTriggerData]="{ field: field }"
-                    [matTooltip]="'Filter ' + field.label.toLowerCase()"
-                    [attr.aria-label]="'Filter ' + field.label.toLowerCase()"
+                    [matTooltip]="'Filter {label}' | t: { label: label(field) }"
+                    [attr.aria-label]="'Filter {label}' | t: { label: label(field) }"
                     (click)="$event.stopPropagation()"
                   >
                     <mat-icon>{{ hasFilter(field) ? 'filter_alt' : 'filter_list' }}</mat-icon>
@@ -45,7 +45,7 @@
             </th>
           }
           @if (hasAttachmentColumn()) {
-            <th class="files"><mat-icon class="files-icon" aria-label="Files">attach_file</mat-icon></th>
+            <th class="files"><mat-icon class="files-icon" [attr.aria-label]="'Files' | t">attach_file</mat-icon></th>
           }
         </tr>
       </thead>
@@ -116,12 +116,12 @@
     <span>
       {{ rows().length }}
       @if (totalCount() != null && totalCount() !== rows().length) {
-        of {{ totalCount() }}
+        {{ 'of' | t }} {{ totalCount() }}
       }
-      {{ rows().length === 1 ? 'entry' : 'entries' }}
+      {{ (rows().length === 1 ? 'entry' : 'entries') | t }}
     </span>
     @if (selection().size) {
-      <span>· {{ selection().size }} selected</span>
+      <span>· {{ '{count} selected' | t: { count: selection().size } }}</span>
     }
   </div>
 </div>
@@ -129,10 +129,10 @@
 <mat-menu #filterMenu="matMenu" class="column-filter-menu">
   <ng-template matMenuContent let-field="field">
     <div class="column-filter" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-      <div class="column-filter-title">{{ field.label }}</div>
+      <div class="column-filter-title">{{ label(field) }}</div>
       <app-filter-field [field]="field" [criterion]="criterionFor(field)" (criterionChange)="setCriterion(field, $event)" [compact]="true" />
       @if (hasFilter(field)) {
-        <button type="button" class="clear" (click)="setCriterion(field, undefined)">Clear</button>
+        <button type="button" class="clear" (click)="setCriterion(field, undefined)">{{ 'Clear' | t }}</button>
       }
     </div>
   </ng-template>

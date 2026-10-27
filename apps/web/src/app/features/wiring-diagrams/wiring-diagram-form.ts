@@ -21,6 +21,7 @@ export class WiringDiagramForm extends EntityFormBase<WiringDiagram, WiringDiagr
   protected readonly fields = WIRING_DIAGRAM_FIELDS;
   protected readonly groups = WIRING_DIAGRAM_GROUPS;
   protected readonly noun = 'wiring diagram';
+  protected readonly createLabel = 'New wiring diagram';
   protected override readonly attachmentOwner = 'wiringDiagram' as const;
   protected readonly basePath = '/wiring-diagrams';
 }

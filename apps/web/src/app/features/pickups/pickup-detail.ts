@@ -3,7 +3,8 @@ import { MatAnchor, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
-import { PICKUP_FIELDS, PICKUP_GROUPS, PickupType } from '@emidb/shared';
+import { PICKUP_FIELDS, PICKUP_GROUPS, PickupType, t } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
 import { NotifyService } from '../../core/notify';
 import { PickupSetsStore, PickupsStore } from '../../core/store/stores';
@@ -15,7 +16,7 @@ import { PageHeader } from '../../shared/page-header/page-header';
 
 @Component({
   selector: 'app-pickup-detail',
-  imports: [PageHeader, EntityDetails, AttachmentsPanel, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, RouterLink],
+  imports: [PageHeader, EntityDetails, AttachmentsPanel, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, RouterLink, TranslatePipe],
   templateUrl: './pickup-detail.html',
   styleUrl: './pickup-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,7 +42,7 @@ export class PickupDetail {
     const pickup = this.pickup();
     if (!pickup) return '';
     const manufacturer = pickup.manufacturerId ? this.lookups.resolver()(this.fields[1], pickup.manufacturerId) : null;
-    return [manufacturer, PickupType.label(pickup.type), pickup.year].filter(Boolean).join(' · ');
+    return [manufacturer, pickup.type && t(PickupType.label(pickup.type)), pickup.year].filter(Boolean).join(' · ');
   });
 
   protected readonly memberOf = computed(() => {
@@ -59,7 +60,7 @@ export class PickupDetail {
     const pickup = this.pickup();
     if (!pickup || !(await this.confirm.confirmDelete(1, 'pickup'))) return;
     await this.store.remove([pickup.id]);
-    this.notify.success('Pickup deleted');
+    this.notify.success(t('{noun} deleted', { noun: t('Pickup') }));
     void this.router.navigate(['/pickups']);
   }
 }

@@ -1,17 +1,17 @@
 <section class="card">
   <div class="head">
     <h2>
-      Files
+      {{ 'Files' | t }}
       @if (tiles().length) {
         <span class="muted">{{ tiles().length }}</span>
       }
     </h2>
     @if (isPending() && tiles().length) {
-      <span class="hint muted">Uploaded when you save</span>
+      <span class="hint muted">{{ 'Uploaded when you save' | t }}</span>
     }
     <button mat-stroked-button type="button" (click)="picker.click()" [disabled]="busy()">
       <mat-icon>upload</mat-icon>
-      {{ isPending() ? 'Add files' : 'Upload' }}
+      {{ (isPending() ? 'Add files' : 'Upload') | t }}
     </button>
     <input #picker type="file" multiple hidden (change)="onFilesPicked($event)" />
   </div>
@@ -42,16 +42,16 @@
                   (keydown.enter)="saveCaption(item)"
                   (keydown.escape)="editingId.set(null)"
                   (blur)="saveCaption(item)"
-                  placeholder="Caption"
+                  [placeholder]="'Caption' | t"
                   autofocus
                 />
               } @else {
                 <button type="button" class="caption" (click)="startEdit(item)" [class.placeholder]="!item.caption">
-                  {{ item.caption || 'Add caption' }}
+                  {{ item.caption || ('Add caption' | t) }}
                 </button>
               }
             } @else {
-              <span class="caption placeholder">Not uploaded yet</span>
+              <span class="caption placeholder">{{ 'Not uploaded yet' | t }}</span>
             }
             <div class="sub">
               <span class="name" [title]="tile.name">{{ tile.name }}</span>
@@ -60,11 +60,11 @@
           </div>
           <div class="tile-actions">
             @if (tile.attachment; as item) {
-              <a mat-icon-button [href]="item.url + '?download'" target="_blank" rel="noopener" matTooltip="Download" aria-label="Download">
+              <a mat-icon-button [href]="item.url + '?download'" target="_blank" rel="noopener" [matTooltip]="'Download' | t" [attr.aria-label]="'Download' | t">
                 <mat-icon>download</mat-icon>
               </a>
             }
-            <button mat-icon-button type="button" (click)="remove(tile)" matTooltip="Remove" aria-label="Remove">
+            <button mat-icon-button type="button" (click)="remove(tile)" [matTooltip]="'Remove' | t" [attr.aria-label]="'Remove' | t">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -74,7 +74,7 @@
   } @else {
     <button type="button" class="dropzone" (click)="picker.click()">
       <mat-icon>cloud_upload</mat-icon>
-      <span>Drop images, PDFs or documents here, or click to choose</span>
+      <span>{{ 'Drop images, PDFs or documents here, or click to choose' | t }}</span>
     </button>
   }
 </section>
