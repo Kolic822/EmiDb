@@ -84,6 +84,8 @@ export interface FieldDef<T = Record<string, unknown>> {
   showWhen?: { key: keyof T & string; min: number };
   /** Filtered by an exact value only (no ± tolerance), e.g. a count of pots. */
   exact?: boolean;
+  /** First field of a cluster of related fields (e.g. pot 2's role, type and function); lists set it apart. */
+  clusterStart?: boolean;
   /** Spans the whole section width. */
   fullWidth?: boolean;
   /** Number of grid columns to span in a fixed-column section. */
@@ -181,6 +183,7 @@ function controlFields(): FieldDef<WiringDiagram>[] {
       kind: 'enum',
       enumDef: ControlRole,
       filterSingle: true,
+      clusterStart: n > 1,
       showWhen: { key: 'controlCount', min: n },
     },
     {

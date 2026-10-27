@@ -40,6 +40,7 @@ interface Section {
           <div class="fields">
             @for (field of section.fields; track field.key) {
               <app-filter-field
+                [class.cluster-start]="field.clusterStart"
                 [field]="field"
                 [criterion]="criterionFor(field)"
                 (criterionChange)="setCriterion(field, $event)"
@@ -112,6 +113,13 @@ interface Section {
       font: var(--mat-sys-label-small);
       font-weight: 600;
       letter-spacing: 0;
+    }
+
+    // Each pot (role, type, function) is its own block of three.
+    .cluster-start {
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--mat-sys-outline-variant);
     }
 
     .fields {

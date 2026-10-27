@@ -126,6 +126,13 @@ thead th {
   }
 }
 
+// No hover on touch screens, so the filter button is always visible there.
+@media (hover: none) {
+  .filter-btn {
+    opacity: 0.65;
+  }
+}
+
 tbody tr {
   cursor: pointer;
 
