@@ -17,7 +17,13 @@ import type { EntityFormGroup } from './form-builder';
         <h2>{{ groupName(section) }}</h2>
         <div class="grid" [style.grid-template-columns]="columnsOf(section)">
           @for (field of section.fields; track field.key) {
-            <app-entity-field [field]="field" [formControl]="controlFor(field.key)" [record]="value()" [class.wide]="field.fullWidth" />
+            <app-entity-field
+              [field]="field"
+              [formControl]="controlFor(field.key)"
+              [record]="value()"
+              [class.wide]="field.fullWidth"
+              [style.grid-column]="field.span ? 'span ' + field.span : null"
+            />
           }
         </div>
       </section>

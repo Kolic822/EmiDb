@@ -75,6 +75,8 @@ export interface FieldDef<T = Record<string, unknown>> {
   showWhen?: { key: keyof T & string; min: number };
   /** Spans the whole section width. */
   fullWidth?: boolean;
+  /** Number of grid columns to span in a fixed-column section. */
+  span?: number;
   /** Lookup that offers "Add new…" directly in the dropdown. */
   creatable?: boolean;
   /** Filter by one value instead of "any of" (e.g. the type at one pot position). */
@@ -217,7 +219,7 @@ export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   { key: 'neckTypeId', label: 'Neck', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
   { key: 'middleTypeId', label: 'Middle', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
   { key: 'bridgeTypeId', label: 'Bridge', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
-  { key: 'layout' as keyof WiringDiagram & string, label: 'Layout', group: 'controls', kind: 'enum', enumDef: ControlLayout, transient: true },
+  { key: 'layout' as keyof WiringDiagram & string, label: 'Layout', group: 'controls', kind: 'enum', enumDef: ControlLayout, transient: true, span: 2 },
   { key: 'controlCount', label: 'Pots', group: 'controls', kind: 'integer', min: 0, max: MAX_CONTROLS, defaultColumn: true },
   ...controlFields(),
   { key: 'switches', label: 'Switches', group: 'switches', kind: 'switchType', multiple: true, creatable: true, defaultColumn: true },

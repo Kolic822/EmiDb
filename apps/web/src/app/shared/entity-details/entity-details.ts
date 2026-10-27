@@ -15,7 +15,7 @@ import { FieldValuePipe } from '../pipes/field-value.pipe';
         <dl [style.grid-template-columns]="columnsOf(section)">
           @for (field of section.fields; track field.key) {
             @let value = row()[field.key];
-            <div class="item" [class.wide]="field.kind === 'textarea' || field.fullWidth">
+            <div class="item" [class.wide]="field.kind === 'textarea' || field.fullWidth" [style.grid-column]="field.span ? 'span ' + field.span : null">
               <dt>{{ label(field) }}</dt>
               <dd [class.empty]="value == null || value === '' || value?.length === 0">
                 @switch (field.kind) {
