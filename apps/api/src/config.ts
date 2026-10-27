@@ -20,5 +20,6 @@ export const config = {
   get serveWeb() {
     return existsSync(this.webDist);
   },
-  maxUploadBytes: 25 * 1024 * 1024,
+  /** Per-file upload limit; total storage is only bounded by the disk behind DATA_DIR. */
+  maxUploadBytes: Number(process.env.MAX_UPLOAD_MB ?? 25) * 1024 * 1024,
 };

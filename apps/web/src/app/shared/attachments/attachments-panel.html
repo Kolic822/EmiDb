@@ -24,7 +24,9 @@
       @for (tile of tiles(); track tile.key) {
         <div class="tile">
           <button type="button" class="thumb" (click)="open(tile)" [matTooltip]="tile.name" [disabled]="!tile.attachment">
-            @if (tile.src) {
+            @if (tile.isPdf && tile.src) {
+              <app-pdf-thumbnail [src]="tile.src" />
+            } @else if (tile.src) {
               <img [src]="tile.src" [alt]="tile.caption || tile.name" loading="lazy" />
             } @else {
               <mat-icon>{{ icon(tile) }}</mat-icon>

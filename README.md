@@ -52,6 +52,11 @@ Migrations in `apps/api/drizzle` run automatically when the API starts.
 | `PORT` | `3000` | API (and UI) port |
 | `DATA_DIR` | `apps/api/data` | SQLite file and uploaded files |
 | `WEB_DIST` | `apps/web/dist/web/browser` | Built UI to serve; skipped when missing |
+| `MAX_UPLOAD_MB` | `25` | Largest single file that can be attached |
+
+The database file and uploaded files are **not** part of the git repository (`apps/api/data` is
+ignored); they live in `DATA_DIR` on whatever machine runs the API, so storage is limited only by
+that disk. Back them up by copying `DATA_DIR`.
 
 ## Deploying
 

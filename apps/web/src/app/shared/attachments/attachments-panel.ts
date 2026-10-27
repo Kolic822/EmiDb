@@ -11,6 +11,7 @@ import { NotifyService } from '../../core/notify';
 import { ConfirmService } from '../confirm/confirm';
 import { FileSizePipe } from '../pipes/file-size.pipe';
 import { AttachmentPreview } from './attachment-preview';
+import { PdfThumbnail } from './pdf-thumbnail';
 
 /** One card in the grid: a stored attachment, or a file waiting for the first save. */
 interface Tile {
@@ -20,7 +21,7 @@ interface Tile {
   caption: string | null;
   isImage: boolean;
   isPdf: boolean;
-  /** Image source for the thumbnail (API url or object URL). */
+  /** Source for an image or PDF thumbnail (API url or object URL). */
   src: string | null;
   attachment?: Attachment;
   file?: File;
@@ -33,7 +34,7 @@ interface Tile {
  */
 @Component({
   selector: 'app-attachments-panel',
-  imports: [FormsModule, MatButton, MatIconButton, MatIcon, MatProgressBar, MatTooltip, FileSizePipe],
+  imports: [FormsModule, MatButton, MatIconButton, MatIcon, MatProgressBar, MatTooltip, FileSizePipe, PdfThumbnail],
   templateUrl: './attachments-panel.html',
   styleUrl: './attachments-panel.scss',
   host: {
@@ -165,28 +166,30 @@ export class AttachmentsPanel {
 
   private attachmentTile(item: Attachment): Tile {
     const isImage = item.mimeType.startsWith('image/');
+    const isPdf = item.mimeType === 'application/pdf';
     return {
       key: `a${item.id}`,
       name: item.fileName,
       size: item.size,
       caption: item.caption,
       isImage,
-      isPdf: item.mimeType === 'application/pdf',
-      src: isImage ? item.url : null,
+      isPdf,
+      src: isImage || isPdf ? item.url : null,
       attachment: item,
     };
   }
 
   private fileTile(file: File, index: number): Tile {
     const isImage = file.type.startsWith('image/');
+    const isPdf = file.type === 'application/pdf';
     return {
       key: `f${index}-${file.name}`,
       name: file.name,
       size: file.size,
       caption: null,
       isImage,
-      isPdf: file.type === 'application/pdf',
-      src: isImage ? this.objectUrl(file) : null,
+      isPdf,
+      src: isImage || isPdf ? this.objectUrl(file) : null,
       file,
     };
   }
