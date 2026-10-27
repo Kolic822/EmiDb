@@ -33,5 +33,7 @@ export const config = {
     return existsSync(this.webDist);
   },
   /** Per-file upload limit; total storage is only bounded by the disk behind DATA_DIR. */
+  /** Largest backup zip accepted by Restore. */
+  maxRestoreBytes: Number(process.env.MAX_RESTORE_MB ?? 4096) * 1024 * 1024,
   maxUploadBytes: Number(process.env.MAX_UPLOAD_MB ?? 25) * 1024 * 1024,
 };

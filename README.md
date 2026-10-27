@@ -54,10 +54,37 @@ Migrations in `apps/api/drizzle` run automatically when the API starts.
 | `DATA_DIR` | `apps/api/data` | SQLite file and uploaded files |
 | `WEB_DIST` | `apps/web/dist/web/browser` | Built UI to serve; skipped when missing |
 | `MAX_UPLOAD_MB` | `25` | Largest single file that can be attached |
+| `MAX_RESTORE_MB` | `4096` | Largest backup zip that Restore accepts |
+| `APP_PASSWORD` | *(empty)* | When set, everything needs this password (see below) |
+| `SESSION_SECRET` | derived from the password | Signs the sign-in cookie; set it to keep sessions across password changes |
+| `TRUST_PROXY` | `false` (`true` on Railway/Render) | Use the proxy's client address, so sign-in attempts are throttled per person |
 
 The database file and uploaded files are **not** part of the git repository (`apps/api/data` is
 ignored); they live in `DATA_DIR` on whatever machine runs the API, so storage is limited only by
-that disk. Back them up by copying `DATA_DIR`.
+that disk.
+
+### Password
+
+Set `APP_PASSWORD` and the whole API (data, files, backups) refuses requests until someone has
+signed in; the app then shows a password screen first. It is one shared password, not user
+accounts: a correct password gives a sign-in cookie that lasts 90 days, five wrong attempts lock
+that address out for a minute, and **Settings → About → Sign out** ends the session. Changing the
+password signs everybody out. Use it for any server reachable from the internet, such as Railway.
+On a hosted server the cookie is only sent over https.
+
+### Backup and restore
+
+**Settings → Backup** downloads one zip with a consistent copy of the database and every uploaded
+file, and restores such a zip. A restore replaces *all* current data and is applied in one
+transaction, so a damaged or unrelated zip is refused and nothing changes. Backups from older versions
+of the app can be restored; ones from a newer version are refused. The server keeps no copies by itself,
+so download one now and then and keep it away from the server.
+
+### Photos and storage
+
+On phones and tablets the file panel has a **Take photo** button that opens the camera. Large photos
+are scaled to at most 2400 px on the longest side before they are uploaded. **Settings → Storage** shows
+how much space the files and the database take and how much is free on the disk.
 
 ## Workshop setup: one Windows laptop, tablets on the same Wi-Fi
 

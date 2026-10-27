@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { BackupModule } from './backup/backup.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { AttachmentsModule } from './attachments/attachments.module.js';
 import { ComponentTypesModule } from './component-types/component-types.module.js';
@@ -30,6 +31,7 @@ import { WiringPickupTypesModule } from './wiring-pickup-types/wiring-pickup-typ
     VersionModule,
     TrashModule,
     StorageModule,
+    BackupModule,
     // In production the API also serves the built Angular app.
     ...(config.serveWeb
       ? [

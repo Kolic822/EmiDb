@@ -5,6 +5,8 @@ import { expect, test } from '@playwright/test';
 test('the API refuses requests without a session, but the version stays public', async ({ request }) => {
   expect((await request.get('/api/pickups')).status()).toBe(401);
   expect((await request.get('/api/attachments?owner=pickup&ownerId=1')).status()).toBe(401);
+  expect((await request.get('/api/backup')).status()).toBe(401);
+  expect((await request.get('/api/library')).status()).toBe(401);
   expect((await request.get('/api/version')).ok()).toBe(true);
   expect(await (await request.get('/api/auth')).json()).toEqual({ required: true, authenticated: false });
 });

@@ -19,6 +19,12 @@ export function openDatabase(file: string): Db {
   return db;
 }
 
+/** The raw better-sqlite3 handle, for backup and restore which work below the ORM. */
+export function getSqlite(): Database.Database {
+  if (!sqlite) throw new Error('Database is not open');
+  return sqlite;
+}
+
 export function closeDatabase(): void {
   sqlite?.close();
   sqlite = undefined;

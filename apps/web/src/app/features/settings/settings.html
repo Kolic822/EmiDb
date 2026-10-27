@@ -117,6 +117,31 @@
     </section>
 
     <section class="card">
+      <h2>{{ 'Backup' | t }}</h2>
+      <p class="muted">{{ 'One zip with the whole database and all files. Keep a copy somewhere safe, away from the server.' | t }}</p>
+      <div class="row">
+        <div class="row-label">{{ 'Download' | t }}</div>
+        <div class="update-row">
+          <a mat-flat-button [href]="backupUrl" download (click)="backupDownloaded()">
+            <mat-icon>download</mat-icon>
+            {{ 'Download backup' | t }}
+          </a>
+          <span class="muted">{{ 'Last downloaded here: {when}' | t: { when: lastBackupText() } }}</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-label">{{ 'Restore' | t }}</div>
+        <div class="update-row">
+          <button mat-stroked-button (click)="restoreInput.click()" [disabled]="restoring()">
+            <mat-icon>upload_file</mat-icon>
+            {{ (restoring() ? 'Restoring…' : 'Restore from backup') | t }}
+          </button>
+          <input #restoreInput type="file" accept=".zip,application/zip" hidden (change)="restore($event)" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
       <h2>{{ 'About' | t }}</h2>
       @if (auth.required()) {
         <div class="row">

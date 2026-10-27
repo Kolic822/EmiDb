@@ -12,6 +12,9 @@ services:
         value: /data
       - key: NODE_ENV
         value: production
+      # Set a password in the Render dashboard (Environment → APP_PASSWORD) before sharing the URL.
+      - key: APP_PASSWORD
+        sync: false
     disk:
       name: emidb-data
       mountPath: /data
