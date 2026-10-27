@@ -343,5 +343,7 @@ export const hr: Dictionary = {
   'Blend': 'Blend',
   'Stacked / concentric': 'Dvostruki / koncentrični',
   'No-load': 'No-load',
+  'TBX': 'TBX',
+  'S-1 switch': 'S-1 sklopka',
   'With switch': 'Sa sklopkom',
 };

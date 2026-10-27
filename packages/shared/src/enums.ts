@@ -142,6 +142,8 @@ export const PotFunction = defineEnum({
   BLEND: 'Blend',
   STACKED: 'Stacked / concentric',
   NO_LOAD: 'No-load',
+  TBX: 'TBX',
+  S1_SWITCH: 'S-1 switch',
   SWITCHED: 'With switch',
 });
 export type PotFunction = EnumValue<typeof PotFunction>;

@@ -209,6 +209,10 @@ const sws = db
       'SPDT On On',
       'SPDT On Off On',
       'SPDT On On On',
+      'Free Way 3B3 01',
+      'Free Way 3B3 02',
+      'Free Way 5B5 01',
+      'Free Way 5B5 02',
     ].map((name) => ({ name })),
   )
   .returning({ id: switchTypes.id, name: switchTypes.name })
