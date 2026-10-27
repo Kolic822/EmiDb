@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { Public } from '../auth/public.decorator.js';
 import { API_ROOT, config } from '../config.js';
 
 export interface VersionInfo {
@@ -18,6 +19,7 @@ export class VersionController {
   private readonly version = readVersion();
   private readonly commit = readCommit();
 
+  @Public()
   @Get()
   get(): VersionInfo {
     return { version: this.version, commit: this.commit, build: readBuild() };

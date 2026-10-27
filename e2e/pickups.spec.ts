@@ -105,7 +105,7 @@ test.describe('Create and edit', () => {
     await expect(page.getByLabel('Tesla')).toHaveValue('0.05');
     await page.getByLabel('Potted').click();
     await page.getByRole('option', { name: 'Yes' }).click();
-    await page.locator('app-attachments-panel input[type=file]').setInputFiles({
+    await page.locator('app-attachments-panel input[type=file][multiple]').setInputFiles({
       name: 'photo.png',
       mimeType: 'image/png',
       buffer: Buffer.from(
@@ -134,7 +134,7 @@ test.describe('Create and edit', () => {
 
   test('uploads, previews and deletes an attachment', async ({ page }) => {
     await page.goto('/pickups/1');
-    await page.locator('app-attachments-panel input[type=file]').setInputFiles({
+    await page.locator('app-attachments-panel input[type=file][multiple]').setInputFiles({
       name: 'wiring.png',
       mimeType: 'image/png',
       buffer: Buffer.from(
@@ -211,7 +211,7 @@ test.describe('Duplicate', () => {
 test.describe('PDF preview', () => {
   test('renders pages with pdf.js instead of relying on the browser viewer', async ({ page }) => {
     await page.goto('/pickups/2');
-    await page.locator('app-attachments-panel input[type=file]').setInputFiles('e2e/fixtures/sample.pdf');
+    await page.locator('app-attachments-panel input[type=file][multiple]').setInputFiles('e2e/fixtures/sample.pdf');
     const tile = page.locator('app-attachments-panel .tile', { hasText: 'sample.pdf' });
     await expect(tile.locator('app-pdf-thumbnail canvas')).toBeVisible();
 

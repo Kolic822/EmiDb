@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,6 +14,17 @@ export const config = {
   },
   get uploadsDir() {
     return path.join(this.dataDir, 'uploads');
+  },
+  /** When set, the whole API needs this password (shared by everyone who uses the workshop database). */
+  get appPassword() {
+    return process.env.APP_PASSWORD ?? '';
+  },
+  /** Signs session cookies; derived from the password unless given, so a new password signs everyone out. */
+  get sessionSecret() {
+    return process.env.SESSION_SECRET ?? createHash('sha256').update(`emidb-session:${this.appPassword}`).digest('hex');
+  },
+  get trustProxy() {
+    return process.env.TRUST_PROXY === 'true' || !!process.env.RAILWAY_ENVIRONMENT || !!process.env.RENDER;
   },
   migrationsDir: path.join(API_ROOT, 'drizzle'),
   /** Built Angular app, served by the API in production when present. */

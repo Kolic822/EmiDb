@@ -1,14 +1,16 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { networkInterfaces } from 'node:os';
 import { AppModule } from './app.module.js';
 import { SqliteExceptionFilter } from './common/sqlite-exception.filter.js';
 import { config } from './config.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // Behind Railway/Render every request comes from the proxy; trust it for the real client address.
+  if (config.trustProxy) app.set('trust proxy', 1);
   app.setGlobalPrefix('api');
-  app.enableCors({ origin: true });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

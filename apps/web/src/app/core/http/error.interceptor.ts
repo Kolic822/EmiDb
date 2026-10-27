@@ -2,13 +2,20 @@ import { HttpErrorResponse, type HttpInterceptorFn } from '@angular/common/http'
 import { inject } from '@angular/core';
 import { t } from '@emidb/shared';
 import { catchError, throwError } from 'rxjs';
+import { Auth, isUnauthorized } from '../auth';
 import { NotifyService } from '../notify';
 
 /** Surfaces API errors as a snackbar and rethrows a readable Error. */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const notify = inject(NotifyService);
+  const auth = inject(Auth);
   return next(req).pipe(
     catchError((error: unknown) => {
+      // A lapsed session sends the user back to the password screen instead of showing an error.
+      if (isUnauthorized(error) && !req.url.endsWith('/auth/login')) {
+        auth.expire();
+        return throwError(() => new Error(t('Sign in required')));
+      }
       const message = describe(error);
       notify.error(message);
       return throwError(() => new Error(message));

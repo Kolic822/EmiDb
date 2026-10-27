@@ -118,6 +118,15 @@
 
     <section class="card">
       <h2>{{ 'About' | t }}</h2>
+      @if (auth.required()) {
+        <div class="row">
+          <div class="row-label">{{ 'Access' | t }}</div>
+          <button mat-stroked-button (click)="auth.logout()">
+            <mat-icon>logout</mat-icon>
+            {{ 'Sign out' | t }}
+          </button>
+        </div>
+      }
       <div class="row">
         <div class="row-label">{{ 'Version' | t }}</div>
         <div class="version">

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { AuthModule } from './auth/auth.module.js';
 import { AttachmentsModule } from './attachments/attachments.module.js';
 import { ComponentTypesModule } from './component-types/component-types.module.js';
 import { config } from './config.js';
@@ -16,6 +17,7 @@ import { WiringPickupTypesModule } from './wiring-pickup-types/wiring-pickup-typ
 
 @Module({
   imports: [
+    AuthModule,
     DatabaseModule,
     ManufacturersModule,
     ComponentTypesModule,

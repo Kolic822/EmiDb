@@ -78,7 +78,7 @@ test('files attached to a manufacturer show up in the library', async ({ page })
   await page.getByRole('button', { name: 'New manufacturer' }).click();
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('Name', { exact: true }).fill('Library Test Maker');
-  await dialog.locator('app-attachments-panel input[type=file]').setInputFiles({
+  await dialog.locator('app-attachments-panel input[type=file][multiple]').setInputFiles({
     name: 'colour-codes.png',
     mimeType: 'image/png',
     buffer: Buffer.from(
@@ -189,7 +189,7 @@ test('a pot layout can be created with positions and a sketch', async ({ page })
   await dialog.getByRole('button', { name: 'Add position' }).click();
   await dialog.locator('.multi-row').nth(1).getByRole('combobox').click();
   await page.getByRole('option', { name: 'Tone' }).click();
-  await dialog.locator('app-attachments-panel input[type=file]').setInputFiles({
+  await dialog.locator('app-attachments-panel input[type=file][multiple]').setInputFiles({
     name: 'sketch.png',
     mimeType: 'image/png',
     buffer: Buffer.from(
