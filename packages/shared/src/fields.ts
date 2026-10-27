@@ -82,6 +82,8 @@ export interface FieldDef<T = Record<string, unknown>> {
   filterable?: boolean;
   /** Only relevant (shown in forms and details) while another field is at least `min`. */
   showWhen?: { key: keyof T & string; min: number };
+  /** Filtered by an exact value only (no ± tolerance), e.g. a count of pots. */
+  exact?: boolean;
   /** Spans the whole section width. */
   fullWidth?: boolean;
   /** Number of grid columns to span in a fixed-column section. */
@@ -239,7 +241,7 @@ export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   { key: 'middleTypeId', label: 'Middle', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
   { key: 'bridgeTypeId', label: 'Bridge', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
   { key: 'layout' as keyof WiringDiagram & string, label: 'Layout', group: 'controls', kind: 'potLayout', transient: true, span: 2 },
-  { key: 'controlCount', label: 'Pots', group: 'controls', kind: 'integer', min: 0, max: MAX_CONTROLS, defaultColumn: true, detailsSpan: 3 },
+  { key: 'controlCount', label: 'Pots', group: 'controls', kind: 'integer', min: 0, max: MAX_CONTROLS, exact: true, defaultColumn: true, detailsSpan: 3 },
   ...controlFields(),
   { key: 'switches', label: 'Switches', group: 'switches', kind: 'switchType', multiple: true, creatable: true, defaultColumn: true },
   { key: 'phaseReversible', label: 'Phase reversible', group: 'options', kind: 'boolean' },

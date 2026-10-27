@@ -135,13 +135,20 @@ export class FilterPanel<T extends { id: number }> {
     this.state().setCriterion(field.key as keyof T & string, criterion);
   }
 
+  /** Position fields (Pot 3 …) are offered only for as many positions as the count filter asks for. */
+  private applies(field: FieldDef<any>, criteria: Record<string, Criterion | undefined>): boolean {
+    if (!field.showWhen) return true;
+    const count = criteria[field.showWhen.key];
+    return count?.kind === 'near' && count.value >= field.showWhen.min;
+  }
+
   protected readonly sections = computed<Section[]>(() => {
     const state = this.state();
     const criteria = state.criteria() as Record<string, Criterion | undefined>;
     const collapsed = new Set(state.collapsedFilterGroups());
     return this.groups()
       .map((group) => {
-        const fields = state.filterableFields.filter((f) => f.group === group.id);
+        const fields = state.filterableFields.filter((f) => f.group === group.id && this.applies(f, criteria));
         return {
           id: group.id,
           label: groupLabel(group),

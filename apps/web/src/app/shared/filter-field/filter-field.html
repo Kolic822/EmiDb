@@ -76,6 +76,7 @@
           <span matTextSuffix class="unit">{{ field().unit }}</span>
         }
       </mat-form-field>
+      @if (!field().exact) {
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="tolerance">
         @if (!compact()) {
           <mat-label>{{ 'tol.' | t }}</mat-label>
@@ -91,6 +92,7 @@
           (ngModelChange)="setNear(near(), $event)"
         />
       </mat-form-field>
+      }
     </div>
   }
   @case ('boolean') {

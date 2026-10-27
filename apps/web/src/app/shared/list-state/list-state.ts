@@ -84,6 +84,12 @@ export class ListState<T extends { id: number }> {
       const next = { ...criteria };
       if (isEmptyCriterion(criterion)) delete next[key];
       else next[key] = criterion;
+      // Fields that only apply up to a count (pot 3 needs at least 3 pots) lose their filter when the count drops.
+      for (const field of this.fields) {
+        if (field.showWhen?.key !== key || !(field.key in next)) continue;
+        const count = next[key];
+        if (count?.kind !== 'near' || count.value < field.showWhen.min) delete next[field.key as keyof T & string];
+      }
       return next;
     });
   }

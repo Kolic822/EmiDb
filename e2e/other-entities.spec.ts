@@ -46,11 +46,29 @@ test('wiring diagram shows pots, switches and can be created with components', a
 
 test('wiring diagrams filter by the function of a specific pot position', async ({ page }) => {
   await page.goto('/wiring-diagrams/filter');
+  // Pot positions only appear for as many pots as the Pots filter asks for, and a count has no tolerance.
+  await expect(page.locator('mat-label', { hasText: /^Pot 1 function$/ })).toHaveCount(0);
+  const pots = page.locator('app-filter-field', { hasText: /^\s*Pots\s*$/ }).or(page.locator('app-filter-field').filter({ has: page.locator('mat-label', { hasText: /^Pots$/ }) }));
+  await expect(pots.getByLabel('tol.')).toHaveCount(0);
+  await page.getByLabel('Pots', { exact: true }).fill('2');
+  await expect(page.locator('mat-label', { hasText: /^Pot 2 function$/ })).toBeVisible();
+  await expect(page.locator('mat-label', { hasText: /^Pot 3 function$/ })).toHaveCount(0);
+
+  await page.getByLabel('Pots', { exact: true }).fill('4');
+  await expect(page.locator('mat-label', { hasText: /^Pot 4 function$/ })).toBeVisible();
+  await expect(page.locator('mat-label', { hasText: /^Pot 5 function$/ })).toHaveCount(0);
   await page.locator('mat-label', { hasText: /^Pot 2 function$/ }).click();
   await page.getByRole('option', { name: 'Push-pull' }).click();
   await page.keyboard.press('Escape');
   await expect(page.getByText(/^1 of \d+ diagrams match$/)).toBeVisible();
   await expect(page.locator('app-data-table tbody')).toContainText('HH coil split push-pull');
+
+  // Lowering the count drops the filters of the positions that are gone.
+  await page.getByLabel('Pots', { exact: true }).fill('1');
+  await expect(page.locator('mat-label', { hasText: /^Pot 2 function$/ })).toHaveCount(0);
+  await page.getByLabel('Pots', { exact: true }).fill('3');
+  await expect(page.locator('mat-label', { hasText: /^Pot 3 function$/ })).toBeVisible();
+  await expect(page.locator('.subtitle')).toHaveText(/^[1-9]\d* of \d+ diagrams match$/);
 });
 
 test('set detail shows its pickups side by side', async ({ page }) => {
