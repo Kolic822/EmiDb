@@ -3,7 +3,7 @@
     <mat-progress-bar mode="indeterminate" class="progress" />
   }
   <div class="scroll">
-    <table [class.with-actions]="showActions()">
+    <table [class.with-actions]="actionsVisible()">
       <thead>
         <tr>
           @if (selectable()) {
@@ -47,7 +47,7 @@
           @if (hasAttachmentColumn()) {
             <th class="files"><mat-icon class="files-icon" [attr.aria-label]="'Files' | t">attach_file</mat-icon></th>
           }
-          @if (showActions()) {
+          @if (actionsVisible()) {
             <th class="actions"></th>
           }
         </tr>
@@ -102,7 +102,7 @@
                 }
               </td>
             }
-            @if (showActions()) {
+            @if (actionsVisible()) {
               <td class="actions" (click)="$event.stopPropagation()">
                 <button mat-icon-button (click)="edit.emit(row)" [matTooltip]="'Edit' | t" [attr.aria-label]="'Edit' | t">
                   <mat-icon>edit</mat-icon>

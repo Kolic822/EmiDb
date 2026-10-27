@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
 import { type FieldDef, type FieldGroup, fieldLabel, groupLabel } from '@emidb/shared';
 import { TranslatePipe } from '../../core/i18n';
 import { ListState } from '../list-state/list-state';
@@ -10,7 +11,7 @@ import { ListState } from '../list-state/list-state';
 /** "Columns" button + menu to show/hide table columns, grouped by section. */
 @Component({
   selector: 'app-column-picker',
-  imports: [MatButton, MatIcon, MatMenu, MatMenuTrigger, MatCheckbox, TranslatePipe],
+  imports: [MatButton, MatIconButton, MatTooltip, MatIcon, MatMenu, MatMenuTrigger, MatCheckbox, TranslatePipe],
   template: `
     <button mat-stroked-button [matMenuTriggerFor]="menu">
       <mat-icon>view_column</mat-icon>
@@ -21,9 +22,15 @@ import { ListState } from '../list-state/list-state';
         <div class="picker-header">
           <span>{{ '{visible} of {total} columns' | t: { visible: visible().size, total: state().columnFields.length } }}</span>
           <span class="picker-actions">
-            <button type="button" class="link-btn" (click)="showAll()">{{ 'Show all' | t }}</button>
-            <button type="button" class="link-btn" (click)="state().saveColumnsAsDefault()">{{ 'Save as default' | t }}</button>
-            <button type="button" class="link-btn" (click)="state().resetColumns()">{{ 'Reset to default' | t }}</button>
+            <button mat-icon-button type="button" (click)="showAll()" [matTooltip]="'Show all' | t" [attr.aria-label]="'Show all' | t">
+              <mat-icon>select_all</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="state().saveColumnsAsDefault()" [matTooltip]="'Save as default' | t" [attr.aria-label]="'Save as default' | t">
+              <mat-icon>save</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="state().resetColumns()" [matTooltip]="'Reset to default' | t" [attr.aria-label]="'Reset to default' | t">
+              <mat-icon>restart_alt</mat-icon>
+            </button>
           </span>
         </div>
         <div class="groups">
@@ -34,6 +41,17 @@ import { ListState } from '../list-state/list-state';
                 <mat-checkbox [checked]="visible().has(field.key)" (change)="toggle(field.key)">
                   {{ label(field) }}
                 </mat-checkbox>
+              }
+            </div>
+          }
+          @if (hasFiles() || hasActions()) {
+            <div class="group">
+              <div class="group-title">{{ 'Side columns' | t }}</div>
+              @if (hasFiles()) {
+                <mat-checkbox [checked]="pinnedShown('files')" (change)="togglePinned('files')">{{ 'Files' | t }}</mat-checkbox>
+              }
+              @if (hasActions()) {
+                <mat-checkbox [checked]="pinnedShown('actions')" (change)="togglePinned('actions')">{{ 'Edit and duplicate buttons' | t }}</mat-checkbox>
               }
             </div>
           }
@@ -59,16 +77,16 @@ import { ListState } from '../list-state/list-state';
 
     .picker-actions {
       display: flex;
-      gap: 14px;
-    }
+      gap: 2px;
+      margin: -6px -8px -6px 0;
 
-    .link-btn {
-      background: none;
-      border: 0;
-      padding: 0;
-      color: var(--mat-sys-primary);
-      font: var(--mat-sys-label-large);
-      cursor: pointer;
+      .mat-mdc-icon-button {
+        --mat-icon-button-state-layer-size: 36px;
+        width: 36px;
+        height: 36px;
+        padding: 6px;
+        color: var(--mat-sys-primary);
+      }
     }
 
     .groups {
@@ -97,6 +115,10 @@ import { ListState } from '../list-state/list-state';
 export class ColumnPicker<T extends { id: number }> {
   readonly state = input.required<ListState<T>>();
   readonly groups = input.required<readonly FieldGroup[]>();
+  /** The table has a pinned files column that can be switched off. */
+  readonly hasFiles = input(false);
+  /** The table has pinned edit / duplicate buttons that can be switched off. */
+  readonly hasActions = input(false);
 
   protected readonly visible = computed(() => new Set(this.state().visibleKeys()));
   protected readonly grouped = computed(() =>
@@ -118,6 +140,15 @@ export class ColumnPicker<T extends { id: number }> {
 
   protected showAll(): void {
     this.state().visibleKeys.set(this.state().columnFields.map((field) => field.key));
+    this.state().hiddenPinned.set([]);
+  }
+
+  protected pinnedShown(key: 'files' | 'actions'): boolean {
+    return !this.state().hiddenPinned().includes(key);
+  }
+
+  protected togglePinned(key: 'files' | 'actions'): void {
+    this.state().hiddenPinned.update((hidden) => (hidden.includes(key) ? hidden.filter((k) => k !== key) : [...hidden, key]));
   }
 
   protected toggle(key: string): void {

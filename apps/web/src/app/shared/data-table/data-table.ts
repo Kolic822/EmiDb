@@ -57,13 +57,19 @@ export class DataTable<T extends { id: number }> {
   readonly edit = output<T>();
   readonly duplicate = output<T>();
 
-  protected readonly hasAttachmentColumn = computed(() => this.showAttachments());
+  /** The pinned columns also respect the switches in the Columns menu. */
+  protected readonly hasAttachmentColumn = computed(
+    () => this.showAttachments() && !this.state().hiddenPinned().includes('files'),
+  );
+  protected readonly actionsVisible = computed(
+    () => this.showActions() && !this.state().hiddenPinned().includes('actions'),
+  );
   protected readonly columnCount = computed(
     () =>
       this.fields().length +
       (this.selectable() ? 1 : 0) +
       (this.hasAttachmentColumn() ? 1 : 0) +
-      (this.showActions() ? 1 : 0),
+      (this.actionsVisible() ? 1 : 0),
   );
 
   protected attachmentsOf(row: T): Attachment[] | undefined {

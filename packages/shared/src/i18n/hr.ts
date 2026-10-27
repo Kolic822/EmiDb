@@ -93,6 +93,8 @@ export const hr: Dictionary = {
   'A restore is already running': 'Povrat je već u tijeku',
   'Your data is not saved permanently.': 'Vaši podaci se ne spremaju trajno.',
   'The data folder {dir} is not on a persistent volume, so every deploy wipes it. Add a Railway volume mounted at that path, then download backups meanwhile.': 'Mapa s podacima {dir} nije na trajnom volumenu pa je svako postavljanje nove verzije briše. Dodajte Railway volumen na tu putanju, a do tada preuzimajte sigurnosne kopije.',
+  'Side columns': 'Pomoćni stupci',
+  'Edit and duplicate buttons': 'Gumbi za uređivanje i dupliciranje',
   'Library': 'Knjižnica',
   'Colour codes, wiring sheets and sketches attached to manufacturers, switches and pot layouts.': 'Šifre boja, sheme ožičenja i skice priložene proizvođačima, sklopkama i rasporedima potenciometara.',
   'Search files…': 'Traži datoteke…',

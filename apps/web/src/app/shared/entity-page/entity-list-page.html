@@ -15,7 +15,7 @@
         {{ 'Find match' | t }}
       </a>
     }
-    <app-column-picker [state]="state" [groups]="groups" />
+    <app-column-picker [state]="state" [groups]="groups" [hasFiles]="supportsAttachments" [hasActions]="supportsRowActions" />
     <button mat-flat-button (click)="create()">
       <mat-icon>add</mat-icon>
       {{ createLabel | t }}

@@ -31,6 +31,8 @@ export class ListState<T extends { id: number }> {
   readonly selection = signal<ReadonlySet<number>>(new Set());
   readonly visibleKeys: WritableSignal<string[]>;
   readonly visibleFields: Signal<FieldDef<T>[]>;
+  /** Pinned side columns the user switched off: `files` (attachments) and/or `actions` (edit / duplicate). */
+  readonly hiddenPinned: WritableSignal<string[]>;
   /** Filter view sections the user has folded away. */
   readonly collapsedFilterGroups: WritableSignal<string[]>;
   readonly activeCriteriaCount = computed(() => countActiveCriteria(this.criteria()));
@@ -43,6 +45,7 @@ export class ListState<T extends { id: number }> {
     private readonly resolver: Signal<LookupResolver>,
   ) {
     this.visibleKeys = storedSignal<string[]>(`${storageKey}.columns`, this.defaultKeys());
+    this.hiddenPinned = storedSignal<string[]>(`${storageKey}.hiddenPinned`, []);
     this.collapsedFilterGroups = storedSignal<string[]>(`${storageKey}.filterCollapsed`, []);
     this.visibleFields = computed(() => {
       const visible = new Set(this.visibleKeys());
@@ -123,6 +126,7 @@ export class ListState<T extends { id: number }> {
   /** Back to the user's saved default (Settings), or the built-in one. */
   resetColumns(): void {
     this.visibleKeys.set(this.defaultKeys());
+    this.hiddenPinned.set([]);
   }
 
   /** Remember the current columns as this table's default. */

@@ -277,3 +277,31 @@ test('closest match ranks pickups by what was measured', async ({ page }) => {
   await page.locator('tbody tr').first().click();
   await expect(page).toHaveURL(/\/pickups\/\d+$/);
 });
+
+test('the files and edit/duplicate columns can be switched off in the Columns menu', async ({ page }) => {
+  await page.goto('/pickups');
+  const table = page.locator('app-data-table');
+  await expect(table.getByRole('button', { name: 'Edit' }).first()).toBeVisible();
+  await expect(table.locator('th.files')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Columns' }).click();
+  const menu = page.locator('.picker');
+  // The three actions are icon buttons now, named by their tooltips.
+  for (const name of ['Show all', 'Save as default', 'Reset to default']) {
+    await expect(menu.getByRole('button', { name })).toBeVisible();
+  }
+  await menu.getByRole('checkbox', { name: 'Edit and duplicate buttons' }).uncheck();
+  await menu.getByRole('checkbox', { name: 'Files' }).uncheck();
+  await page.keyboard.press('Escape');
+  await expect(table.getByRole('button', { name: 'Edit' })).toHaveCount(0);
+  await expect(table.locator('th.files')).toHaveCount(0);
+
+  // The choice is remembered, and Reset brings both back.
+  await page.reload();
+  await expect(table.getByRole('button', { name: 'Edit' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Columns' }).click();
+  await page.locator('.picker').getByRole('button', { name: 'Reset to default' }).click();
+  await page.keyboard.press('Escape');
+  await expect(table.getByRole('button', { name: 'Edit' }).first()).toBeVisible();
+  await expect(table.locator('th.files')).toBeVisible();
+});
