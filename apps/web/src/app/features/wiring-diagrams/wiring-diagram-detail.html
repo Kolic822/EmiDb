@@ -12,8 +12,8 @@
 
     <div class="page-scroll">
       <div class="layout">
-        <app-attachments-panel class="files" owner="wiringDiagram" [ownerId]="diagram.id" />
         <app-entity-details [fields]="fields" [groups]="groups" [row]="diagram" />
+        <app-attachments-panel class="files" owner="wiringDiagram" [ownerId]="diagram.id" />
       </div>
     </div>
   } @else if (missing()) {
