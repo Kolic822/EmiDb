@@ -100,6 +100,8 @@ export class Settings {
       databaseBytes: number;
       freeBytes: number | null;
       totalBytes: number | null;
+      persistent: boolean | null;
+      dataDir: string;
     }>(`${API_BASE}/storage`),
   );
 

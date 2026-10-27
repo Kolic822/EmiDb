@@ -16,6 +16,11 @@ import { seedSampleData } from './sample-data.js';
         const db = openDatabase(config.databaseFile);
         const logger = new Logger('Database');
         logger.log(`Using ${config.databaseFile}`);
+        if (config.persistent === false) {
+          logger.error(
+            `DATA IS NOT PERSISTENT: ${config.dataDir} is not on a Railway volume (mount path: ${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? 'none'}). Everything is lost on the next deploy.`,
+          );
+        }
         // Hosted databases start empty; this loads sample data once (until pickups exist).
         if (process.env['SEED_SAMPLE_DATA'] === 'true') {
           logger.log(seedSampleData(db) ?? 'SEED_SAMPLE_DATA is set, but pickups already exist: nothing seeded.');

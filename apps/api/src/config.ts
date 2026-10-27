@@ -27,6 +27,15 @@ export const config = {
   get trustProxy() {
     return process.env.TRUST_PROXY === 'true' || !!process.env.RAILWAY_ENVIRONMENT || !!process.env.RENDER;
   },
+  /**
+   * Whether the data folder survives a redeploy. Only Railway tells us (it sets the volume's mount
+   * path when one is attached); elsewhere this is null because the folder is simply on the local disk.
+   */
+  get persistent(): boolean | null {
+    if (!process.env.RAILWAY_ENVIRONMENT) return null;
+    const mount = process.env.RAILWAY_VOLUME_MOUNT_PATH;
+    return !!mount && path.resolve(this.dataDir).startsWith(path.resolve(mount));
+  },
   migrationsDir: path.join(API_ROOT, 'drizzle'),
   /** Built Angular app, served by the API in production when present. */
   webDist: process.env.WEB_DIST ?? path.resolve(API_ROOT, '..', 'web', 'dist', 'web', 'browser'),

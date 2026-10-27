@@ -96,6 +96,15 @@
     <section class="card">
       <h2>{{ 'Storage' | t }}</h2>
       @if (storage(); as s) {
+        @if (s.persistent === false) {
+          <div class="warning" role="alert">
+            <mat-icon>warning</mat-icon>
+            <div>
+              <strong>{{ 'Your data is not saved permanently.' | t }}</strong>
+              {{ 'The data folder {dir} is not on a persistent volume, so every deploy wipes it. Add a Railway volume mounted at that path, then download backups meanwhile.' | t: { dir: s.dataDir } }}
+            </div>
+          </div>
+        }
         <div class="row">
           <div class="row-label">{{ 'Files' | t }}</div>
           <div>{{ s.filesBytes | fileSize }} <span class="muted">· {{ '{count} files' | t: { count: s.fileCount } }}</span></div>

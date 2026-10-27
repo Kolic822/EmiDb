@@ -13,6 +13,9 @@ export interface StorageInfo {
   /** Free space on the disk holding the data folder; null when the platform cannot say. */
   freeBytes: number | null;
   totalBytes: number | null;
+  /** False when the data folder is not on a persistent volume and will be wiped by the next deploy. */
+  persistent: boolean | null;
+  dataDir: string;
 }
 
 /** How much room the database and uploaded files take, and how much is left on the disk. */
@@ -33,6 +36,8 @@ export class StorageController {
       }, 0),
       freeBytes: disk ? disk.bavail * disk.bsize : null,
       totalBytes: disk ? disk.blocks * disk.bsize : null,
+      persistent: config.persistent,
+      dataDir: config.dataDir,
     };
   }
 }
