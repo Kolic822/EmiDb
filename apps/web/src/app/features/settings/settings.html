@@ -61,6 +61,7 @@
       <p class="muted">
         {{ 'Which columns each table shows by default. Changes apply immediately; the Columns menu on a table can still show or hide columns for the moment and go back to these defaults.' | t }}
       </p>
+      <mat-accordion>
       @for (table of tables; track table.label) {
         <mat-expansion-panel class="table-panel">
           <mat-expansion-panel-header>
@@ -89,6 +90,7 @@
           </div>
         </mat-expansion-panel>
       }
+      </mat-accordion>
     </section>
 
     @if (version(); as v) {

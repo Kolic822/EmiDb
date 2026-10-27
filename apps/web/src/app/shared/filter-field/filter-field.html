@@ -29,6 +29,12 @@
         @if (searchable()) {
           <app-select-search [(query)]="query" />
         }
+        @if (selected().length) {
+          <div class="panel-actions" (click)="$event.stopPropagation()">
+            <span class="muted">{{ '{count} selected' | t: { count: selected().length } }}</span>
+            <button type="button" class="link-btn" (click)="setSelected([])">{{ 'Clear all' | t }}</button>
+          </div>
+        }
         @for (option of filteredOptions(); track option.value) {
           <mat-option [value]="option.value">{{ option.label | t }}</mat-option>
         }

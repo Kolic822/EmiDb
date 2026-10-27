@@ -392,3 +392,15 @@ mat-icon.material-symbols-outlined {
     margin: 0;
   }
 }
+
+// Action row inside multi-select panels (rendered in the overlay).
+.mat-mdc-select-panel .panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 12px 8px;
+  font: var(--mat-sys-label-medium);
+  border-bottom: var(--app-border);
+  margin-bottom: 4px;
+}

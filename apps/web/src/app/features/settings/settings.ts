@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription } from '@angular/material/expansion';
+import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { type FieldDef, type FieldGroup, fieldLabel, groupLabel, PICKUP_GROUPS, PICKUP_SET_GROUPS, WIRING_DIAGRAM_GROUPS } from '@emidb/shared';
@@ -26,7 +26,7 @@ interface TableSettings {
 
 @Component({
   selector: 'app-settings',
-  imports: [PageHeader, MatButton, MatButtonToggleGroup, MatButtonToggle, MatCheckbox, MatIcon, MatTooltip, TranslatePipe, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription],
+  imports: [PageHeader, MatButton, MatButtonToggleGroup, MatButtonToggle, MatCheckbox, MatIcon, MatTooltip, TranslatePipe, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
