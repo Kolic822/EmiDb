@@ -370,3 +370,25 @@ mat-icon.material-symbols-outlined {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+// "Add new…" row at the end of a dropdown.
+.mat-mdc-option.add-option {
+  color: var(--mat-sys-primary);
+  border-top: var(--app-border);
+  border-radius: 0 0 8px 8px;
+  margin-top: 4px;
+
+  .mdc-list-item__primary-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+  }
+}

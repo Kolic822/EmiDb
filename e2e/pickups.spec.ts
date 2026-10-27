@@ -168,3 +168,23 @@ test.describe('Compare search', () => {
     await expect(box).toHaveValue('');
   });
 });
+
+test.describe('Dropdowns', () => {
+  test('search filters a dropdown and a new manufacturer can be added inline', async ({ page }) => {
+    await page.goto('/pickups/new');
+    await page.locator('mat-label', { hasText: /^Manufacturer$/ }).click();
+    const search = page.getByRole('listbox').getByPlaceholder('Search…');
+    await search.fill('gib');
+    await expect(page.getByRole('option', { name: 'Gibson' })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'Fender' })).toHaveCount(0);
+
+    await search.fill('Lace Sensor');
+    await page.getByRole('option', { name: 'Add “Lace Sensor”' }).click();
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(page.getByText('“Lace Sensor” added')).toBeVisible();
+    await expect(page.getByLabel('Manufacturer')).toContainText('Lace Sensor');
+
+    await page.goto('/manufacturers');
+    await expect(page.locator('tbody tr', { hasText: 'Lace Sensor' })).toBeVisible();
+  });
+});

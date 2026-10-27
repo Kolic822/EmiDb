@@ -72,6 +72,8 @@ export interface FieldDef<T = Record<string, unknown>> {
   showWhen?: { key: keyof T & string; min: number };
   /** Spans the whole section width. */
   fullWidth?: boolean;
+  /** Lookup that offers "Add new…" directly in the dropdown. */
+  creatable?: boolean;
 }
 
 export const PICKUP_GROUPS: FieldGroup[] = [
@@ -84,7 +86,7 @@ export const PICKUP_GROUPS: FieldGroup[] = [
 
 export const PICKUP_FIELDS: FieldDef<Pickup>[] = [
   { key: 'name', label: 'Name', group: 'identity', kind: 'text', required: true, defaultColumn: true },
-  { key: 'manufacturerId', label: 'Manufacturer', group: 'identity', kind: 'manufacturer', defaultColumn: true },
+  { key: 'manufacturerId', label: 'Manufacturer', group: 'identity', kind: 'manufacturer', defaultColumn: true, creatable: true },
   { key: 'year', label: 'Year', group: 'identity', kind: 'integer', min: 1900, max: 2100, defaultColumn: true },
   { key: 'type', label: 'Type', group: 'identity', kind: 'enum', enumDef: PickupType, defaultColumn: true },
   { key: 'position', label: 'Position', group: 'identity', kind: 'enum', enumDef: PickupPosition, defaultColumn: true },
@@ -135,7 +137,7 @@ export const PICKUP_SET_GROUPS: FieldGroup[] = [
 
 export const PICKUP_SET_FIELDS: FieldDef<PickupSet>[] = [
   { key: 'name', label: 'Name', group: 'identity', kind: 'text', required: true, defaultColumn: true },
-  { key: 'manufacturerId', label: 'Manufacturer', group: 'identity', kind: 'manufacturer', defaultColumn: true },
+  { key: 'manufacturerId', label: 'Manufacturer', group: 'identity', kind: 'manufacturer', defaultColumn: true, creatable: true },
   { key: 'neckId', label: 'Neck', group: 'pickups', kind: 'pickup', defaultColumn: true },
   { key: 'middleId', label: 'Middle', group: 'pickups', kind: 'pickup', defaultColumn: true },
   { key: 'bridgeId', label: 'Bridge', group: 'pickups', kind: 'pickup', defaultColumn: true },
@@ -156,6 +158,7 @@ function potFields(
       labelParams: { n },
       group,
       kind: 'potentiometerType',
+      creatable: true,
       showWhen: { key: countKey, min: n },
     },
     {
@@ -181,7 +184,7 @@ export const WIRING_DIAGRAM_GROUPS: FieldGroup[] = [
 
 export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   { key: 'name', label: 'Name', group: 'identity', kind: 'text', required: true, defaultColumn: true },
-  { key: 'manufacturerId', label: 'Manufacturer', group: 'identity', kind: 'manufacturer', defaultColumn: true },
+  { key: 'manufacturerId', label: 'Manufacturer', group: 'identity', kind: 'manufacturer', defaultColumn: true, creatable: true },
   { key: 'wiringType', label: 'Wiring type', group: 'identity', kind: 'enum', enumDef: WiringType, defaultColumn: true },
   { key: 'pickupCount', label: 'Pickups', group: 'pickups', kind: 'integer', min: 1, max: 3, defaultColumn: true },
   { key: 'neck', label: 'Neck', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
@@ -191,7 +194,7 @@ export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   ...potFields('volumePot', 'Volume pot', 'volume', 'volumePotCount'),
   { key: 'tonePotCount', label: 'Tone pots', group: 'tone', kind: 'integer', min: 0, max: 3, defaultColumn: true, fullWidth: true },
   ...potFields('tonePot', 'Tone pot', 'tone', 'tonePotCount'),
-  { key: 'switches', label: 'Switches', group: 'switches', kind: 'switchType', multiple: true, defaultColumn: true },
+  { key: 'switches', label: 'Switches', group: 'switches', kind: 'switchType', multiple: true, creatable: true, defaultColumn: true },
   { key: 'phaseReversible', label: 'Phase reversible', group: 'options', kind: 'boolean' },
   { key: 'splitCoil', label: 'Split coil', group: 'options', kind: 'boolean' },
   { key: 'connection', label: 'Coil connection', group: 'options', kind: 'enum', enumDef: ConnectionType },

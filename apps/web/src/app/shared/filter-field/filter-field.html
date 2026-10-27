@@ -24,8 +24,12 @@
         [placeholder]="compact() ? ('Any of…' | t) : ''"
         [ngModel]="selected()"
         (ngModelChange)="setSelected($event)"
+        (openedChange)="onOpened($event)"
       >
-        @for (option of options(); track option.value) {
+        @if (searchable()) {
+          <app-select-search [(query)]="query" />
+        }
+        @for (option of filteredOptions(); track option.value) {
           <mat-option [value]="option.value">{{ option.label | t }}</mat-option>
         }
       </mat-select>

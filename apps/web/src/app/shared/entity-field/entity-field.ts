@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
 import { type FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatIconButton } from '@angular/material/button';
 import { MatError, MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
@@ -8,8 +8,13 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { type FieldDef, fieldLabel, isNumericField, t } from '@emidb/shared';
 import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
+import { NotifyService } from '../../core/notify';
+import { filterOptions, SEARCH_THRESHOLD, SelectSearch } from '../select-search/select-search';
 
 type Control = 'text' | 'textarea' | 'number' | 'select' | 'select-multi' | 'boolean';
+
+/** Sentinel option value that opens the inline "new entry" input. */
+const ADD_NEW = '__add_new__';
 
 /** Small bounded integers (1–3 pickups, 0–3 pots) are easier to pick from a list. */
 const SELECT_MAX_RANGE = 6;
@@ -17,7 +22,7 @@ const SELECT_MAX_RANGE = 6;
 /** Renders the right Material control for a field definition bound to a FormControl. */
 @Component({
   selector: 'app-entity-field',
-  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatError, MatSuffix, MatInput, MatSelect, MatOption, MatIcon, MatIconButton, TranslatePipe],
+  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatError, MatSuffix, MatInput, MatSelect, MatOption, MatIcon, MatIconButton, TranslatePipe, SelectSearch],
   templateUrl: './entity-field.html',
   styleUrl: './entity-field.scss',
   host: { '[class.wide]': 'control() === "textarea" || control() === "select-multi"' },
@@ -25,6 +30,8 @@ const SELECT_MAX_RANGE = 6;
 })
 export class EntityField {
   private readonly lookups = inject(LookupService);
+  private readonly notify = inject(NotifyService);
+  protected readonly ADD_NEW = ADD_NEW;
 
   readonly field = input.required<FieldDef<any>>();
   readonly formControl = input.required<FormControl<unknown>>();
@@ -53,6 +60,60 @@ export class EntityField {
 
   protected readonly inputType = computed(() => (this.field().kind === 'url' ? 'url' : 'text'));
 
+  // --- searchable panel ---
+  protected readonly query = signal('');
+  protected readonly searchable = computed(() => this.options().length >= SEARCH_THRESHOLD || this.creatable());
+  protected readonly filteredOptions = computed(() =>
+    filterOptions(this.options(), this.query(), this.formControl().value),
+  );
+  private readonly search = viewChild(SelectSearch);
+
+  // --- inline "Add new…" for creatable lookups ---
+  protected readonly creatable = computed(() => !!this.field().creatable && !this.field().multiple);
+  protected readonly creating = signal(false);
+  protected readonly newName = signal('');
+  protected readonly saving = signal(false);
+  private valueBeforeOpen: unknown = null;
+
+  protected onOpened(opened: boolean): void {
+    if (opened) {
+      this.valueBeforeOpen = this.formControl().value;
+      this.search()?.focus();
+    } else {
+      this.query.set('');
+    }
+  }
+
+  /** Selecting the sentinel reverts the value and shows the inline name input instead. */
+  protected onSelection(value: unknown): void {
+    if (value !== ADD_NEW) return;
+    this.formControl().setValue(this.valueBeforeOpen, { emitEvent: false });
+    this.newName.set(this.query().trim());
+    this.creating.set(true);
+  }
+
+  protected cancelCreate(): void {
+    this.creating.set(false);
+    this.newName.set('');
+  }
+
+  protected async saveNew(): Promise<void> {
+    const name = this.newName().trim();
+    if (!name || this.saving()) return;
+    this.saving.set(true);
+    try {
+      const id = await this.lookups.create(this.field(), name);
+      this.formControl().setValue(id);
+      this.formControl().markAsDirty();
+      this.notify.success(t('“{name}” added', { name }));
+      this.cancelCreate();
+    } catch {
+      // Reported by the HTTP interceptor; keep the input so the name is not lost.
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
   /** Values of a repeated lookup (one entry per volume pot…), mirrored from the control. */
   protected readonly items = linkedSignal<(number | null)[]>(
     () => (this.formControl().value as (number | null)[] | null) ?? [],
@@ -60,6 +121,37 @@ export class EntityField {
 
   /** Singular label for the "add" button: "Volume pots" → "volume pot", "Switches" → "switch". */
   protected readonly singular = computed(() => singularise(this.label().toLowerCase()));
+
+  protected readonly multiCreatable = computed(() => !!this.field().creatable && !!this.field().multiple);
+  /** Index of the repeated row whose "Add new…" was chosen. */
+  protected readonly creatingAt = signal<number | null>(null);
+
+  protected onItemSelection(index: number, value: unknown): void {
+    if (value === ADD_NEW) {
+      this.newName.set(this.query().trim());
+      this.creatingAt.set(index);
+      return;
+    }
+    this.setItem(index, value as number | null);
+  }
+
+  protected async saveNewItem(): Promise<void> {
+    const index = this.creatingAt();
+    const name = this.newName().trim();
+    if (index == null || !name || this.saving()) return;
+    this.saving.set(true);
+    try {
+      const id = await this.lookups.create(this.field(), name);
+      this.setItem(index, id);
+      this.notify.success(t('“{name}” added', { name }));
+      this.creatingAt.set(null);
+      this.newName.set('');
+    } catch {
+      // Reported by the HTTP interceptor.
+    } finally {
+      this.saving.set(false);
+    }
+  }
 
   protected addItem(): void {
     this.setItems([...this.items(), null]);

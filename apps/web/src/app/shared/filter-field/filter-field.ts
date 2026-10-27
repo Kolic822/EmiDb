@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, model, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormField, MatLabel, MatPrefix, MatSuffix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -6,6 +6,7 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { type Criterion, type FieldDef, fieldLabel, isNumericField } from '@emidb/shared';
 import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
+import { filterOptions, SEARCH_THRESHOLD, SelectSearch } from '../select-search/select-search';
 
 /**
  * One filter control for a field, chosen by field kind:
@@ -13,7 +14,7 @@ import { LookupService } from '../../core/lookups';
  */
 @Component({
   selector: 'app-filter-field',
-  imports: [FormsModule, MatFormField, MatLabel, MatPrefix, MatSuffix, MatInput, MatSelect, MatOption, TranslatePipe],
+  imports: [FormsModule, MatFormField, MatLabel, MatPrefix, MatSuffix, MatInput, MatSelect, MatOption, TranslatePipe, SelectSearch],
   templateUrl: './filter-field.html',
   styleUrl: './filter-field.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,6 +42,20 @@ export class FilterField {
     if (field.kind === 'enum') return field.enumDef?.options ?? [];
     return this.lookups.options(field);
   });
+
+  protected readonly query = signal('');
+  protected readonly searchable = computed(() => this.options().length >= SEARCH_THRESHOLD);
+  protected readonly filteredOptions = computed(() => {
+    const selected = new Set(this.selected());
+    const q = this.query().trim().toLowerCase();
+    return this.options().filter((o) => !q || selected.has(o.value) || o.label.toLowerCase().includes(q));
+  });
+  private readonly search = viewChild(SelectSearch);
+
+  protected onOpened(opened: boolean): void {
+    if (opened) this.search()?.focus();
+    else this.query.set('');
+  }
 
   protected readonly text = computed(() => {
     const c = this.criterion();

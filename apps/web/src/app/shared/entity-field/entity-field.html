@@ -37,18 +37,53 @@
     </mat-form-field>
   }
   @case ('select') {
-    <mat-form-field appearance="outline">
-      <mat-label>{{ label() }}</mat-label>
-      <mat-select [formControl]="c">
-        <mat-option [value]="null"><span class="none">—</span></mat-option>
-        @for (option of options(); track option.value) {
-          <mat-option [value]="option.value">{{ option.label | t }}</mat-option>
+    @if (creating()) {
+      <div class="inline-create">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'New {item}' | t: { item: label().toLowerCase() } }}</mat-label>
+          <input
+            #newInput
+            matInput
+            type="text"
+            [value]="newName()"
+            (input)="newName.set(newInput.value)"
+            (keydown.enter)="$event.preventDefault(); saveNew()"
+            (keydown.escape)="cancelCreate()"
+            autocomplete="off"
+            cdkFocusInitial
+            autofocus
+          />
+        </mat-form-field>
+        <button mat-icon-button type="button" (click)="saveNew()" [disabled]="!newName().trim() || saving()" [attr.aria-label]="'Save' | t">
+          <mat-icon>check</mat-icon>
+        </button>
+        <button mat-icon-button type="button" (click)="cancelCreate()" [attr.aria-label]="'Cancel' | t">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    } @else {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ label() }}</mat-label>
+        <mat-select [formControl]="c" (openedChange)="onOpened($event)" (selectionChange)="onSelection($event.value)">
+          @if (searchable()) {
+            <app-select-search [(query)]="query" />
+          }
+          <mat-option [value]="null"><span class="none">—</span></mat-option>
+          @for (option of filteredOptions(); track option.value) {
+            <mat-option [value]="option.value">{{ option.label | t }}</mat-option>
+          }
+          @if (creatable()) {
+            <mat-option [value]="ADD_NEW" class="add-option">
+              <mat-icon>add</mat-icon>
+              {{ query().trim() ? ('Add “{name}”' | t: { name: query().trim() }) : ('Add new…' | t) }}
+            </mat-option>
+          }
+        </mat-select>
+        @if (c.invalid && c.touched) {
+          <mat-error>{{ errorText() }}</mat-error>
         }
-      </mat-select>
-      @if (c.invalid && c.touched) {
-        <mat-error>{{ errorText() }}</mat-error>
-      }
-    </mat-form-field>
+      </mat-form-field>
+    }
   }
   @case ('select-multi') {
     <div class="multi">
@@ -59,16 +94,53 @@
       @for (item of items(); track $index) {
         <div class="multi-row">
           <span class="index">{{ $index + 1 }}</span>
-          <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-select [value]="item" (selectionChange)="setItem($index, $event.value)" [placeholder]="'Choose type' | t">
-              @for (option of options(); track option.value) {
-                <mat-option [value]="option.value">{{ option.label | t }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-          <button mat-icon-button type="button" (click)="removeItem($index)" [attr.aria-label]="'Remove' | t">
-            <mat-icon>close</mat-icon>
-          </button>
+          @if (creatingAt() === $index) {
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input
+                #newItemInput
+                matInput
+                type="text"
+                [placeholder]="'New {item}' | t: { item: singular() }"
+                [value]="newName()"
+                (input)="newName.set(newItemInput.value)"
+                (keydown.enter)="$event.preventDefault(); saveNewItem()"
+                (keydown.escape)="creatingAt.set(null)"
+                autocomplete="off"
+                autofocus
+              />
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="saveNewItem()" [disabled]="!newName().trim() || saving()" [attr.aria-label]="'Save' | t">
+              <mat-icon>check</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="creatingAt.set(null)" [attr.aria-label]="'Cancel' | t">
+              <mat-icon>close</mat-icon>
+            </button>
+          } @else {
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-select
+                [value]="item"
+                (openedChange)="onOpened($event)"
+                (selectionChange)="onItemSelection($index, $event.value)"
+                [placeholder]="'Choose type' | t"
+              >
+                @if (searchable()) {
+                  <app-select-search [(query)]="query" />
+                }
+                @for (option of filteredOptions(); track option.value) {
+                  <mat-option [value]="option.value">{{ option.label | t }}</mat-option>
+                }
+                @if (multiCreatable()) {
+                  <mat-option [value]="ADD_NEW" class="add-option">
+                    <mat-icon>add</mat-icon>
+                    {{ query().trim() ? ('Add “{name}”' | t: { name: query().trim() }) : ('Add new…' | t) }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="removeItem($index)" [attr.aria-label]="'Remove' | t">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
         </div>
       }
       <button type="button" class="add" (click)="addItem()">

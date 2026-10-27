@@ -68,3 +68,14 @@
     height: 18px;
   }
 }
+
+.inline-create {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}

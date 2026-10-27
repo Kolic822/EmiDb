@@ -52,4 +52,24 @@ export class LookupService {
   isLookup(field: FieldDef<any>): boolean {
     return field.kind in this.stores;
   }
+
+  /** Creates a lookup entry with just a name (for "Add new…" in dropdowns) and returns its id. */
+  async create(field: FieldDef<any>, name: string): Promise<number> {
+    switch (field.kind as LookupKind) {
+      case 'manufacturer': {
+        const row = await this.stores.manufacturer.create({ name, country: null, website: null, notes: null });
+        return row.id;
+      }
+      case 'potentiometerType': {
+        const row = await this.stores.potentiometerType.create({ name, description: null });
+        return row.id;
+      }
+      case 'switchType': {
+        const row = await this.stores.switchType.create({ name, description: null });
+        return row.id;
+      }
+      default:
+        throw new Error(`Cannot create ${field.kind} inline`);
+    }
+  }
 }
