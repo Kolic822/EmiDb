@@ -207,3 +207,17 @@ test.describe('Duplicate', () => {
     await expect(page.getByLabel('Name')).toHaveValue('SH-2 Jazz (copy)');
   });
 });
+
+test.describe('PDF preview', () => {
+  test('renders pages with pdf.js instead of relying on the browser viewer', async ({ page }) => {
+    await page.goto('/pickups/2');
+    await page.locator('app-attachments-panel input[type=file]').setInputFiles('e2e/fixtures/sample.pdf');
+    const tile = page.locator('app-attachments-panel .tile', { hasText: 'sample.pdf' });
+    await expect(tile.locator('app-pdf-thumbnail canvas')).toBeVisible();
+
+    await tile.locator('.thumb').click();
+    await expect(page.locator('app-pdf-viewer canvas').first()).toBeVisible();
+    await expect(page.locator('app-attachment-preview iframe')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Close' }).click();
+  });
+});

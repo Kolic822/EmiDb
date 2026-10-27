@@ -62,7 +62,10 @@ export class PdfViewer {
       let cancelled = false;
       onCleanup(() => (cancelled = true));
       this.state.set('loading');
-      void this.render(src, () => cancelled).catch(() => this.state.set('failed'));
+      void this.render(src, () => cancelled).catch((error: unknown) => {
+        console.error('PDF preview failed', error);
+        this.state.set('failed');
+      });
     });
   }
 
