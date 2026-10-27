@@ -1,6 +1,6 @@
 import type { PickupSet } from '@emidb/shared';
 import { Inject, Injectable } from '@nestjs/common';
-import { asc, eq, getTableColumns, inArray, or } from 'drizzle-orm';
+import { and, asc, eq, getTableColumns, inArray, isNull, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/sqlite-core';
 import { AttachmentsService } from '../attachments/attachments.service.js';
 import { notFound } from '../common/errors.js';
@@ -28,18 +28,25 @@ export class PickupSetsService {
   ) {}
 
   findAll(): PickupSet[] {
-    return this.attachments.withAttachments('pickupSet', this.query().orderBy(asc(pickupSets.name)).all());
+    return this.attachments.withAttachments(
+      'pickupSet',
+      this.query().where(isNull(pickupSets.deletedAt)).orderBy(asc(pickupSets.name)).all(),
+    );
   }
 
   findOne(id: number): PickupSet {
-    const row = this.query().where(eq(pickupSets.id, id)).get() ?? notFound('Pickup set', id);
+    const row =
+      this.query().where(and(eq(pickupSets.id, id), isNull(pickupSets.deletedAt))).get() ?? notFound('Pickup set', id);
     return this.attachments.withAttachments('pickupSet', [row])[0];
   }
 
   findByPickup(pickupId: number): PickupSet[] {
     const rows = this.query()
       .where(
-        or(eq(pickupSets.neckId, pickupId), eq(pickupSets.middleId, pickupId), eq(pickupSets.bridgeId, pickupId)),
+        and(
+          isNull(pickupSets.deletedAt),
+          or(eq(pickupSets.neckId, pickupId), eq(pickupSets.middleId, pickupId), eq(pickupSets.bridgeId, pickupId)),
+        ),
       )
       .orderBy(asc(pickupSets.name))
       .all();
@@ -61,16 +68,14 @@ export class PickupSetsService {
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
+  remove(id: number): void {
     this.findOne(id);
-    await this.attachments.removeAllFor('pickupSet', id);
-    this.db.delete(pickupSets).where(eq(pickupSets.id, id)).run();
+    this.removeMany([id]);
   }
 
-  async removeMany(ids: number[]): Promise<void> {
-    if (!ids.length) return;
-    await Promise.all(ids.map((id) => this.attachments.removeAllFor('pickupSet', id)));
-    this.db.delete(pickupSets).where(inArray(pickupSets.id, ids)).run();
+  /** Moved to the trash; its files stay until the trash entry is purged. */
+  removeMany(ids: number[]): void {
+    if (ids.length) this.db.update(pickupSets).set({ deletedAt: now() }).where(inArray(pickupSets.id, ids)).run();
   }
 
   private query() {

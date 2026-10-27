@@ -1,6 +1,6 @@
 import { PICKUP_FIELDS, type Pickup } from '@emidb/shared';
 import { Inject, Injectable } from '@nestjs/common';
-import { asc, eq, getTableColumns, inArray } from 'drizzle-orm';
+import { and, asc, eq, getTableColumns, inArray, isNull } from 'drizzle-orm';
 import { AttachmentsService } from '../attachments/attachments.service.js';
 import { notFound } from '../common/errors.js';
 import { DATABASE, type Db, now } from '../database/database.js';
@@ -17,11 +17,14 @@ export class PickupsService {
   ) {}
 
   findAll(): Pickup[] {
-    return this.attachments.withAttachments('pickup', this.query().orderBy(asc(pickups.name)).all()) as Pickup[];
+    return this.attachments.withAttachments(
+      'pickup',
+      this.query().where(isNull(pickups.deletedAt)).orderBy(asc(pickups.name)).all(),
+    ) as Pickup[];
   }
 
   findOne(id: number): Pickup {
-    const row = this.query().where(eq(pickups.id, id)).get() ?? notFound('Pickup', id);
+    const row = this.query().where(and(eq(pickups.id, id), isNull(pickups.deletedAt))).get() ?? notFound('Pickup', id);
     return this.attachments.withAttachments('pickup', [row])[0] as Pickup;
   }
 
@@ -40,16 +43,14 @@ export class PickupsService {
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
+  remove(id: number): void {
     this.findOne(id);
-    await this.attachments.removeAllFor('pickup', id);
-    this.db.delete(pickups).where(eq(pickups.id, id)).run();
+    this.removeMany([id]);
   }
 
-  async removeMany(ids: number[]): Promise<void> {
-    if (!ids.length) return;
-    await Promise.all(ids.map((id) => this.attachments.removeAllFor('pickup', id)));
-    this.db.delete(pickups).where(inArray(pickups.id, ids)).run();
+  /** Moved to the trash; its files stay until the trash entry is purged. */
+  removeMany(ids: number[]): void {
+    if (ids.length) this.db.update(pickups).set({ deletedAt: now() }).where(inArray(pickups.id, ids)).run();
   }
 
   private query() {

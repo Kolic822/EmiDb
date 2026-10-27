@@ -60,7 +60,7 @@ export class PickupDetail {
     const pickup = this.pickup();
     if (!pickup || !(await this.confirm.confirmDelete(1, 'pickup'))) return;
     await this.store.remove([pickup.id]);
-    this.notify.success(t('{noun} deleted', { noun: t('Pickup') }));
+    this.notify.undoable(t('{noun} deleted', { noun: t('Pickup') }), () => this.store.restore([pickup.id]));
     void this.router.navigate(['/pickups']);
   }
 }

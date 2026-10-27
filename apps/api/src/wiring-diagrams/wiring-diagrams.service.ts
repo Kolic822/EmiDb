@@ -1,6 +1,6 @@
 import { isFieldRelevant, WIRING_DIAGRAM_FIELDS, type WiringDiagram } from '@emidb/shared';
 import { Inject, Injectable } from '@nestjs/common';
-import { asc, eq, getTableColumns, inArray } from 'drizzle-orm';
+import { and, asc, eq, getTableColumns, inArray, isNull } from 'drizzle-orm';
 import { AttachmentsService } from '../attachments/attachments.service.js';
 import { notFound } from '../common/errors.js';
 import { DATABASE, type Db, now } from '../database/database.js';
@@ -19,12 +19,14 @@ export class WiringDiagramsService {
   ) {}
 
   findAll(): WiringDiagram[] {
-    const rows = this.query().orderBy(asc(wiringDiagrams.name)).all();
+    const rows = this.query().where(isNull(wiringDiagrams.deletedAt)).orderBy(asc(wiringDiagrams.name)).all();
     return this.withComponents(rows);
   }
 
   findOne(id: number): WiringDiagram {
-    const row = this.query().where(eq(wiringDiagrams.id, id)).get() ?? notFound('Wiring diagram', id);
+    const row =
+      this.query().where(and(eq(wiringDiagrams.id, id), isNull(wiringDiagrams.deletedAt))).get() ??
+      notFound('Wiring diagram', id);
     return this.withComponents([row])[0];
   }
 
@@ -50,16 +52,14 @@ export class WiringDiagramsService {
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
+  remove(id: number): void {
     this.findOne(id);
-    await this.attachments.removeAllFor('wiringDiagram', id);
-    this.db.delete(wiringDiagrams).where(eq(wiringDiagrams.id, id)).run();
+    this.removeMany([id]);
   }
 
-  async removeMany(ids: number[]): Promise<void> {
-    if (!ids.length) return;
-    await Promise.all(ids.map((id) => this.attachments.removeAllFor('wiringDiagram', id)));
-    this.db.delete(wiringDiagrams).where(inArray(wiringDiagrams.id, ids)).run();
+  /** Moved to the trash; its files stay until the trash entry is purged. */
+  removeMany(ids: number[]): void {
+    if (ids.length) this.db.update(wiringDiagrams).set({ deletedAt: now() }).where(inArray(wiringDiagrams.id, ids)).run();
   }
 
   private query() {

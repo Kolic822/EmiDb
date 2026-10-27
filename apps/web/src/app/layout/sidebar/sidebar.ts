@@ -37,6 +37,7 @@ export class Sidebar {
       items: [
         { label: 'Manufacturers', icon: 'factory', link: '/manufacturers' },
         { label: 'Pots & switches', icon: 'tune', link: '/components' },
+        { label: 'Trash', icon: 'delete', link: '/trash' },
       ],
     },
   ];

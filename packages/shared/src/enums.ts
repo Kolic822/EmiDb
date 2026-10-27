@@ -158,3 +158,16 @@ export const AttachmentOwner = defineEnum({
   potLayout: 'Pot layout',
 });
 export type AttachmentOwner = EnumValue<typeof AttachmentOwner>;
+
+/** Everything that can be moved to the trash and restored. */
+export const TrashKind = defineEnum({
+  pickup: 'Pickup',
+  pickupSet: 'Pickup set',
+  wiringDiagram: 'Wiring diagram',
+  manufacturer: 'Manufacturer',
+  potentiometerType: 'Potentiometer type',
+  switchType: 'Switch type',
+  wiringPickupType: 'Pickup type',
+  potLayout: 'Pot layout',
+});
+export type TrashKind = EnumValue<typeof TrashKind>;

@@ -1,0 +1,38 @@
+<div class="page">
+  <app-page-header [title]="'Trash' | t" [subtitle]="'Deleted items stay here for {days} days.' | t: { days: retention }">
+    @if (store.items().length) {
+      <button mat-stroked-button class="danger" (click)="empty()">
+        <mat-icon>delete_sweep</mat-icon>
+        {{ 'Empty trash' | t }}
+      </button>
+    }
+  </app-page-header>
+
+  <div class="page-scroll">
+    @if (store.items().length) {
+      <div class="card list">
+        @for (item of store.items(); track item.kind + item.id) {
+          <div class="row">
+            <span class="kind">{{ kindLabel(item) | t }}</span>
+            <span class="name">{{ item.name }}</span>
+            <span class="when muted">
+              {{ deletedOn(item) }} · {{ 'Removed in {n} days' | t: { n: daysLeft(item) } }}
+            </span>
+            <span class="buttons">
+              <button mat-stroked-button (click)="restore(item)">
+                <mat-icon>restore</mat-icon>
+                {{ 'Restore' | t }}
+              </button>
+              <button mat-button class="danger" (click)="purge(item)">
+                <mat-icon>delete_forever</mat-icon>
+                {{ 'Delete permanently' | t }}
+              </button>
+            </span>
+          </div>
+        }
+      </div>
+    } @else if (store.loaded()) {
+      <app-empty-state icon="delete" [title]="'Trash is empty' | t" [message]="'Deleted items stay here for {days} days.' | t: { days: retention }" />
+    }
+  </div>
+</div>

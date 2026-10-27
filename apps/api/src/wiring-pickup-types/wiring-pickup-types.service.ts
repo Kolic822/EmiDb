@@ -1,6 +1,6 @@
 import type { WiringPickupType } from '@emidb/shared';
 import { Inject, Injectable } from '@nestjs/common';
-import { asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNull } from 'drizzle-orm';
 import { notFound } from '../common/errors.js';
 import { DATABASE, type Db, now } from '../database/database.js';
 import { wiringPickupTypes } from '../database/schema.js';
@@ -11,12 +11,21 @@ export class WiringPickupTypesService {
   constructor(@Inject(DATABASE) private readonly db: Db) {}
 
   findAll(): WiringPickupType[] {
-    return this.db.select().from(wiringPickupTypes).orderBy(asc(wiringPickupTypes.name)).all() as WiringPickupType[];
+    return this.db
+      .select()
+      .from(wiringPickupTypes)
+      .where(isNull(wiringPickupTypes.deletedAt))
+      .orderBy(asc(wiringPickupTypes.name))
+      .all() as WiringPickupType[];
   }
 
   findOne(id: number): WiringPickupType {
     return (
-      (this.db.select().from(wiringPickupTypes).where(eq(wiringPickupTypes.id, id)).get() as WiringPickupType | undefined) ??
+      (this.db
+        .select()
+        .from(wiringPickupTypes)
+        .where(and(eq(wiringPickupTypes.id, id), isNull(wiringPickupTypes.deletedAt)))
+        .get() as WiringPickupType | undefined) ??
       notFound('Pickup type', id)
     );
   }
@@ -37,11 +46,12 @@ export class WiringPickupTypesService {
 
   remove(id: number): void {
     this.findOne(id);
-    this.db.delete(wiringPickupTypes).where(eq(wiringPickupTypes.id, id)).run();
+    this.removeMany([id]);
   }
 
   removeMany(ids: number[]): void {
-    if (ids.length) this.db.delete(wiringPickupTypes).where(inArray(wiringPickupTypes.id, ids)).run();
+    // Moved to the trash; the trash module restores or purges it.
+    if (ids.length) this.db.update(wiringPickupTypes).set({ deletedAt: now() }).where(inArray(wiringPickupTypes.id, ids)).run();
   }
 }
 

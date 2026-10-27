@@ -221,3 +221,39 @@ test.describe('PDF preview', () => {
     await page.getByRole('button', { name: 'Close' }).click();
   });
 });
+
+test.describe('Trash', () => {
+  test('deleted entries can be undone, restored from the trash page and purged', async ({ page }) => {
+    await page.request.post('/api/pickups', { data: { name: 'Trash Test Pickup' } });
+    await page.goto('/pickups');
+    const row = page.locator('app-data-table tbody tr', { hasText: 'Trash Test Pickup' });
+    const deleteIt = async () => {
+      await row.getByRole('checkbox').check();
+      await page.getByRole('button', { name: 'Delete', exact: true }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Delete' }).click();
+      await expect(row).toHaveCount(0);
+    };
+
+    // Undo straight after deleting.
+    await deleteIt();
+    await page.getByRole('button', { name: 'Undo' }).click();
+    await expect(row).toBeVisible();
+
+    // Delete again, find it in the trash and restore it.
+    await deleteIt();
+    await page.getByRole('link', { name: 'Trash' }).click();
+    const entry = page.locator('.row', { hasText: 'Trash Test Pickup' });
+    await expect(entry).toContainText('Pickup');
+    await entry.getByRole('button', { name: 'Restore' }).click();
+    await expect(entry).toHaveCount(0);
+    await page.getByRole('link', { name: 'Pickups' }).click();
+    await expect(row).toBeVisible();
+
+    // Delete once more and remove it for good.
+    await deleteIt();
+    await page.getByRole('link', { name: 'Trash' }).click();
+    await entry.getByRole('button', { name: 'Delete permanently' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete permanently' }).click();
+    await expect(entry).toHaveCount(0);
+  });
+});

@@ -81,10 +81,11 @@ export abstract class EntityListBase<T extends { id: number }, TInput> {
     if (!(await this.confirm.confirmDelete(ids.length, this.noun))) return;
     await this.store.remove(ids);
     this.state.clearSelection();
-    this.notify.success(
+    this.notify.undoable(
       ids.length === 1
         ? t('{noun} deleted', { noun: capitalise(t(this.noun)) })
         : t('{count} {noun}s deleted', { count: ids.length, noun: t(this.nounPlural) }),
+      () => this.store.restore(ids),
     );
   }
 }

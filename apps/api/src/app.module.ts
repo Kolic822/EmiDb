@@ -8,6 +8,7 @@ import { ManufacturersModule } from './manufacturers/manufacturers.module.js';
 import { PickupSetsModule } from './pickup-sets/pickup-sets.module.js';
 import { PickupsModule } from './pickups/pickups.module.js';
 import { PotLayoutsModule } from './pot-layouts/pot-layouts.module.js';
+import { TrashModule } from './trash/trash.module.js';
 import { VersionModule } from './version/version.module.js';
 import { WiringDiagramsModule } from './wiring-diagrams/wiring-diagrams.module.js';
 import { WiringPickupTypesModule } from './wiring-pickup-types/wiring-pickup-types.module.js';
@@ -24,6 +25,7 @@ import { WiringPickupTypesModule } from './wiring-pickup-types/wiring-pickup-typ
     PotLayoutsModule,
     AttachmentsModule,
     VersionModule,
+    TrashModule,
     // In production the API also serves the built Angular app.
     ...(config.serveWeb
       ? [

@@ -14,6 +14,7 @@ import type {
   PotFunction,
   PottingType,
   StringInstrument,
+  TrashKind,
   WindingDirection,
   WindingMethod,
   InstrumentFamily,
@@ -197,3 +198,11 @@ export type WiringPickupTypeInput = Writable<WiringPickupType, never>;
 export type PotLayoutInput = Writable<PotLayout, 'attachments'>;
 export type WiringDiagramInput = Writable<WiringDiagram, 'manufacturerName' | 'attachments'>;
 export type AttachmentInput = Pick<Attachment, 'caption'>;
+
+/** A deleted entry waiting in the trash. */
+export interface TrashItem {
+  kind: TrashKind;
+  id: number;
+  name: string;
+  deletedAt: string;
+}

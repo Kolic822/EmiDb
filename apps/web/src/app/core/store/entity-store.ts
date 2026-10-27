@@ -1,5 +1,8 @@
-import { computed, signal } from '@angular/core';
-import type { CrudApi } from '../http/crud-api';
+import { HttpClient } from '@angular/common/http';
+import { computed, inject, signal } from '@angular/core';
+import type { TrashKind } from '@emidb/shared';
+import { firstValueFrom } from 'rxjs';
+import { API_BASE, type CrudApi } from '../http/crud-api';
 
 export interface Identified {
   id: number;
@@ -13,6 +16,9 @@ export interface Identified {
  */
 export abstract class EntityStore<T extends Identified, TInput> {
   protected abstract readonly api: CrudApi<T, TInput>;
+  /** Which trash category deleted entries of this store belong to. */
+  abstract readonly trashKind: TrashKind;
+  private readonly http = inject(HttpClient);
 
   private readonly _rows = signal<T[]>([]);
   private readonly _loading = signal(false);
@@ -70,6 +76,14 @@ export abstract class EntityStore<T extends Identified, TInput> {
     await this.api.remove(ids);
     const gone = new Set(ids);
     this._rows.update((rows) => rows.filter((row) => !gone.has(row.id)));
+  }
+
+  /** Takes entries back out of the trash and refreshes the list. */
+  async restore(ids: number[]): Promise<void> {
+    for (const id of ids) {
+      await firstValueFrom(this.http.post<void>(`${API_BASE}/trash/${this.trashKind}/${id}/restore`, {}));
+    }
+    await this.load();
   }
 
   protected upsert(row: T): void {

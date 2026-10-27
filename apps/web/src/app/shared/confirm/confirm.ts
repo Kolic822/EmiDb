@@ -72,7 +72,7 @@ export class ConfirmService {
   confirmDelete(count: number, noun: string): Promise<boolean> {
     return this.confirm({
       title: count === 1 ? t('Delete this {noun}?', { noun: t(noun) }) : t('Delete {count} {noun}s?', { count, noun: t(noun) }),
-      message: t('This cannot be undone. Attached files are deleted as well.'),
+      message: t('It moves to the Trash, where you can restore it for 30 days.'),
       confirmLabel: t('Delete'),
       danger: true,
     });

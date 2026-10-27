@@ -104,7 +104,7 @@ export class WiringDiagramDetail {
     const diagram = this.diagram();
     if (!diagram || !(await this.confirm.confirmDelete(1, 'wiring diagram'))) return;
     await this.store.remove([diagram.id]);
-    this.notify.success(t('{noun} deleted', { noun: t('Wiring diagram') }));
+    this.notify.undoable(t('{noun} deleted', { noun: t('Wiring diagram') }), () => this.store.restore([diagram.id]));
     void this.router.navigate(['/wiring-diagrams']);
   }
 }

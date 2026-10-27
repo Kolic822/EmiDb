@@ -84,7 +84,7 @@ export class PickupSetDetail {
     const set = this.set();
     if (!set || !(await this.confirm.confirmDelete(1, 'set'))) return;
     await this.store.remove([set.id]);
-    this.notify.success(t('{noun} deleted', { noun: t('Set') }));
+    this.notify.undoable(t('{noun} deleted', { noun: t('Set') }), () => this.store.restore([set.id]));
     void this.router.navigate(['/sets']);
   }
 }

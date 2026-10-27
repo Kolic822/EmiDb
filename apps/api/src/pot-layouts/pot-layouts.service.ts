@@ -1,6 +1,6 @@
 import type { PotLayout } from '@emidb/shared';
 import { Inject, Injectable } from '@nestjs/common';
-import { asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNull } from 'drizzle-orm';
 import { AttachmentsService } from '../attachments/attachments.service.js';
 import { notFound } from '../common/errors.js';
 import { DATABASE, type Db, now } from '../database/database.js';
@@ -15,12 +15,17 @@ export class PotLayoutsService {
   ) {}
 
   findAll(): PotLayout[] {
-    const rows = this.db.select().from(potLayouts).orderBy(asc(potLayouts.name)).all();
+    const rows = this.db.select().from(potLayouts).where(isNull(potLayouts.deletedAt)).orderBy(asc(potLayouts.name)).all();
     return this.attachments.withAttachments('potLayout', rows) as PotLayout[];
   }
 
   findOne(id: number): PotLayout {
-    const row = this.db.select().from(potLayouts).where(eq(potLayouts.id, id)).get() ?? notFound('Pot layout', id);
+    const row =
+      this.db
+        .select()
+        .from(potLayouts)
+        .where(and(eq(potLayouts.id, id), isNull(potLayouts.deletedAt)))
+        .get() ?? notFound('Pot layout', id);
     return this.attachments.withAttachments('potLayout', [row])[0] as PotLayout;
   }
 
@@ -39,16 +44,14 @@ export class PotLayoutsService {
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
+  remove(id: number): void {
     this.findOne(id);
-    await this.attachments.removeAllFor('potLayout', id);
-    this.db.delete(potLayouts).where(eq(potLayouts.id, id)).run();
+    this.removeMany([id]);
   }
 
-  async removeMany(ids: number[]): Promise<void> {
-    if (!ids.length) return;
-    await Promise.all(ids.map((id) => this.attachments.removeAllFor('potLayout', id)));
-    this.db.delete(potLayouts).where(inArray(potLayouts.id, ids)).run();
+  /** Moved to the trash; its files stay until the trash entry is purged. */
+  removeMany(ids: number[]): void {
+    if (ids.length) this.db.update(potLayouts).set({ deletedAt: now() }).where(inArray(potLayouts.id, ids)).run();
   }
 }
 

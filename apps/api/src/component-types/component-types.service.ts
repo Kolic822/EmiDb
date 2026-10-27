@@ -17,11 +17,17 @@ export abstract class ComponentTypesService {
   ) {}
 
   findAll(): ComponentType[] {
-    return this.db.select().from(this.table).orderBy(asc(this.table.name)).all();
+    return this.db.select().from(this.table).where(isNull(this.table.deletedAt)).orderBy(asc(this.table.name)).all();
   }
 
   findOne(id: number): ComponentType {
-    return this.db.select().from(this.table).where(eq(this.table.id, id)).get() ?? notFound(this.label, id);
+    return (
+      this.db
+        .select()
+        .from(this.table)
+        .where(and(eq(this.table.id, id), isNull(this.table.deletedAt)))
+        .get() ?? notFound(this.label, id)
+    );
   }
 
   create(dto: ComponentTypeDto): ComponentType {
@@ -40,11 +46,12 @@ export abstract class ComponentTypesService {
 
   remove(id: number): void {
     this.findOne(id);
-    this.db.delete(this.table).where(eq(this.table.id, id)).run();
+    this.removeMany([id]);
   }
 
   removeMany(ids: number[]): void {
-    if (ids.length) this.db.delete(this.table).where(inArray(this.table.id, ids)).run();
+    // Moved to the trash; the trash module restores or purges it.
+    if (ids.length) this.db.update(this.table).set({ deletedAt: now() }).where(inArray(this.table.id, ids)).run();
   }
 
   protected toRow(dto: ComponentTypeDto): Record<string, unknown> {
@@ -86,7 +93,14 @@ export class SwitchTypesService extends ComponentTypesService {
     const clash = this.db
       .select({ id: switchTypes.id })
       .from(switchTypes)
-      .where(and(eq(switchTypes.name, dto.name), sameManufacturer, exceptId == null ? undefined : ne(switchTypes.id, exceptId)))
+      .where(
+        and(
+          eq(switchTypes.name, dto.name),
+          sameManufacturer,
+          isNull(switchTypes.deletedAt),
+          exceptId == null ? undefined : ne(switchTypes.id, exceptId),
+        ),
+      )
       .get();
     if (clash) throw new ConflictException('An entry with that name already exists');
   }

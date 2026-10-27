@@ -50,6 +50,13 @@
       "when": 1793105838546,
       "tag": "0006_big_squadron_sinister",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1793127216935,
+      "tag": "0007_glamorous_silver_sable",
+      "breakpoints": true
     }
   ]
 }
