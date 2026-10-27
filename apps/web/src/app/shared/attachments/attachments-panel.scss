@@ -45,8 +45,10 @@ section {
   overflow: hidden;
   background: var(--mat-sys-surface-container-low);
 
-  &:hover .tile-actions {
-    opacity: 1;
+  @media (hover: hover) {
+    &:hover .tile-actions {
+      opacity: 1;
+    }
   }
 }
 

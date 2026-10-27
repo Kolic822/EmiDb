@@ -2,13 +2,13 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { DomSanitizer } from '@angular/platform-browser';
 import type { Attachment } from '@emidb/shared';
 import { TranslatePipe } from '../../core/i18n';
+import { PdfViewer } from './pdf-viewer';
 
 @Component({
   selector: 'app-attachment-preview',
-  imports: [MatIcon, MatIconButton, MatDialogClose, TranslatePipe],
+  imports: [MatIcon, MatIconButton, MatDialogClose, TranslatePipe, PdfViewer],
   template: `
     <header>
       <span class="title">{{ data.caption || data.fileName }}</span>
@@ -19,7 +19,7 @@ import { TranslatePipe } from '../../core/i18n';
     </header>
     <div class="body">
       @if (data.mimeType === 'application/pdf') {
-        <iframe [src]="pdfUrl" [title]="'PDF preview' | t"></iframe>
+        <app-pdf-viewer [src]="data.url" />
       } @else {
         <img [src]="data.url" [alt]="data.caption || data.fileName" />
       }
@@ -56,12 +56,6 @@ import { TranslatePipe } from '../../core/i18n';
       background: var(--mat-sys-surface-container);
     }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-
     img {
       max-width: 100%;
       max-height: 100%;
@@ -72,6 +66,4 @@ import { TranslatePipe } from '../../core/i18n';
 })
 export class AttachmentPreview {
   protected readonly data = inject<Attachment>(MAT_DIALOG_DATA);
-  /** Same-origin API URL, so it is safe to embed. */
-  protected readonly pdfUrl = inject(DomSanitizer).bypassSecurityTrustResourceUrl(`${this.data.url}#toolbar=1`);
 }

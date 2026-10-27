@@ -420,3 +420,35 @@ mat-icon.material-symbols-outlined {
   border-bottom: var(--app-border);
   margin-bottom: 4px;
 }
+
+// ---------------------------------------------------------------------------
+// Touch devices (tablets): nothing may depend on hover, and targets are larger.
+// ---------------------------------------------------------------------------
+button,
+a,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+@media (hover: none) {
+  // Controls that are revealed on hover for mouse users are simply visible.
+  .mat-mdc-icon-button.filter-btn,
+  app-data-table .actions .mat-mdc-icon-button,
+  app-attachments-panel .tile-actions {
+    opacity: 1 !important;
+  }
+
+  // Comfortable hit targets for small icon buttons in dense places.
+  app-data-table .actions .mat-mdc-icon-button,
+  app-attachments-panel .tile-actions .mat-mdc-icon-button,
+  app-attachment-button button[mat-icon-button] {
+    --mat-icon-button-state-layer-size: 40px;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+  }
+
+  td {
+    height: 46px;
+  }
+}

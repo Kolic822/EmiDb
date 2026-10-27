@@ -13,7 +13,14 @@
       <mat-icon>upload</mat-icon>
       {{ (isPending() ? 'Add files' : 'Upload') | t }}
     </button>
-    <input #picker type="file" multiple hidden (change)="onFilesPicked($event)" />
+    <input
+      #picker
+      type="file"
+      multiple
+      hidden
+      accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.txt,.csv,.md,.rtf,.dxf,.dwg"
+      (change)="onFilesPicked($event)"
+    />
   </div>
   @if (busy()) {
     <mat-progress-bar mode="indeterminate" />
@@ -74,7 +81,7 @@
   } @else {
     <button type="button" class="dropzone" (click)="picker.click()">
       <mat-icon>cloud_upload</mat-icon>
-      <span>{{ 'Drop images, PDFs or documents here, or click to choose' | t }}</span>
+      <span>{{ 'Drop images, PDFs or documents here, or tap to choose' | t }}</span>
     </button>
   }
 </section>

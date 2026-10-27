@@ -192,7 +192,7 @@ export const hr: Dictionary = {
   'Upload': 'Učitaj',
   'Add files': 'Dodaj datoteke',
   'Uploaded when you save': 'Učitava se pri spremanju',
-  'Drop images, PDFs or documents here, or click to choose': 'Ovdje ispustite slike, PDF-ove ili dokumente ili kliknite za odabir',
+  'Drop images, PDFs or documents here, or tap to choose': 'Ovdje ispustite slike, PDF-ove ili dokumente ili dodirnite za odabir',
   'Add caption': 'Dodaj opis',
   'Caption': 'Opis',
   'Not uploaded yet': 'Još nije učitano',
@@ -204,6 +204,7 @@ export const hr: Dictionary = {
   'Open {name}': 'Otvori {name}',
   '{count} attachments': 'Priloga: {count}',
   'PDF preview': 'Pregled PDF-a',
+  'This PDF could not be displayed. Use Download to open it.': 'PDF se ne može prikazati. Otvorite ga putem Preuzmi.',
 
   // Settings
   'Saved in this browser': 'Spremljeno u ovom pregledniku',

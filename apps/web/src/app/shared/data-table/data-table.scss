@@ -120,19 +120,23 @@ thead th {
   }
 }
 
-th:hover .filter-btn {
-  opacity: 0.8;
+@media (hover: hover) {
+  th:hover .filter-btn {
+    opacity: 0.8;
+  }
 }
 
 tbody tr {
   cursor: pointer;
 
-  &:hover td {
-    background: var(--app-row-hover);
-  }
-
   &.selected td {
     background: var(--app-row-selected);
+  }
+}
+
+@media (hover: hover) {
+  tbody tr:hover td {
+    background: var(--app-row-hover);
   }
 }
 
@@ -218,9 +222,11 @@ td {
   }
 }
 
-tbody tr:hover .actions .mat-mdc-icon-button,
-tbody tr:focus-within .actions .mat-mdc-icon-button {
-  opacity: 1;
+@media (hover: hover) {
+  tbody tr:hover .actions .mat-mdc-icon-button,
+  tbody tr:focus-within .actions .mat-mdc-icon-button {
+    opacity: 1;
+  }
 }
 
 .files {
@@ -248,8 +254,10 @@ thead .files {
   opacity: 0.7;
 }
 
-tbody tr:hover td.files {
-  background: color-mix(in srgb, var(--mat-sys-surface-container-lowest) 90%, var(--mat-sys-on-surface));
+@media (hover: hover) {
+  tbody tr:hover td.files {
+    background: color-mix(in srgb, var(--mat-sys-surface-container-lowest) 90%, var(--mat-sys-on-surface));
+  }
 }
 
 tbody tr.selected td.files {

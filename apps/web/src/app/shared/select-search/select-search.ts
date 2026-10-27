@@ -84,7 +84,9 @@ export class SelectSearch {
   readonly query = model('');
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('input');
 
+  /** Focuses the box for keyboard users; on touch devices the keyboard would cover the list. */
   focus(): void {
+    if (window.matchMedia('(pointer: coarse)').matches) return;
     setTimeout(() => this.input().nativeElement.focus());
   }
 
