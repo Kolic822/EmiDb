@@ -130,8 +130,10 @@ export class AttachmentsService {
   }
 
   /** Streams the stored file; the caller sets headers from the returned metadata. */
-  openFile(id: number) {
+  openFile(id: number, version?: string) {
     const row = this.row(id);
+    // An address minted for a different file under the same id must not return this one.
+    if (version && version !== path.parse(row.storedName).name) notFound('Attachment file', id);
     const filePath = path.join(config.uploadsDir, row.storedName);
     if (!existsSync(filePath)) notFound('Attachment file', id);
     return { attachment: toModel(row), stream: createReadStream(filePath) };
@@ -187,6 +189,8 @@ function toModel(row: AttachmentRow): Attachment {
     size: row.size,
     caption: row.caption,
     createdAt: row.createdAt,
-    url: `/api/attachments/${row.id}/file`,
+    // The stored name is a random id, so the address changes whenever the id is reused for another file
+    // (after a restore, say) and a browser can never show an old picture from its cache.
+    url: `/api/attachments/${row.id}/file/${path.parse(row.storedName).name}`,
   };
 }

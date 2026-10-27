@@ -53,13 +53,14 @@ export class AttachmentsController {
     }
   }
 
-  @Get(':id/file')
+  @Get([':id/file', ':id/file/:version'])
   file(
     @Param('id', ParseIntPipe) id: number,
+    @Param('version') version: string | undefined,
     @Query('download') download: string | undefined,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { attachment, stream } = this.service.openFile(id);
+    const { attachment, stream } = this.service.openFile(id, version);
     const disposition = download != null ? 'attachment' : 'inline';
     res.setHeader('Cache-Control', 'private, max-age=31536000, immutable');
     return new StreamableFile(stream, {

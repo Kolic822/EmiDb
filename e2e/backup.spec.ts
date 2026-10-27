@@ -54,3 +54,24 @@ test('a file that is not a backup is refused and nothing changes', async ({ requ
 
   expect(((await (await request.get('/api/manufacturers')).json()) as unknown[]).length).toBe(before);
 });
+
+test('a file address is unique to the file, so a reused id can never show a cached old picture', async ({ request }) => {
+  const maker = await (await request.post('/api/manufacturers', { data: { name: 'Address Probe' } })).json();
+  const upload = async () =>
+    (await (
+      await request.post('/api/attachments', {
+        multipart: { owner: 'manufacturer', ownerId: String(maker.id), file: { name: 'a.png', mimeType: 'image/png', buffer: PNG } },
+      })
+    ).json()) as { id: number; url: string };
+
+  const first = await upload();
+  expect(first.url).toMatch(new RegExp(`^/api/attachments/${first.id}/file/[0-9a-f-]{36}$`));
+  expect((await request.get(first.url)).ok()).toBe(true);
+  expect((await request.get(`${first.url}?download`)).ok()).toBe(true);
+  // The old id-only address still works, but a wrong token for the same id does not.
+  expect((await request.get(`/api/attachments/${first.id}/file`)).ok()).toBe(true);
+  expect((await request.get(`/api/attachments/${first.id}/file/00000000-0000-0000-0000-000000000000`)).status()).toBe(404);
+
+  const second = await upload();
+  expect(second.url).not.toBe(first.url);
+});
