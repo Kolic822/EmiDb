@@ -363,3 +363,10 @@ mat-icon.material-symbols-outlined {
   font: var(--mat-sys-label-small);
   font-weight: 600;
 }
+
+// Used by the appTruncate directive.
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -15,6 +15,7 @@ import { storedSignal } from '../../core/storage';
 import { PickupsStore } from '../../core/store/stores';
 import { EmptyState } from '../../shared/empty-state/empty-state';
 import { PageHeader } from '../../shared/page-header/page-header';
+import { Truncate } from '../../shared/truncate/truncate';
 
 interface CompareCell {
   text: string;
@@ -38,7 +39,7 @@ const MAX_COMPARED = 8;
 
 @Component({
   selector: 'app-pickup-compare',
-  imports: [FormsModule, PageHeader, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, MatSlideToggle, MatFormField, MatPrefix, MatInput, MatAutocomplete, MatAutocompleteTrigger, MatOption, RouterLink],
+  imports: [FormsModule, PageHeader, EmptyState, MatAnchor, MatIconButton, MatIcon, MatTooltip, MatSlideToggle, MatFormField, MatPrefix, MatInput, MatAutocomplete, MatAutocompleteTrigger, MatOption, RouterLink, Truncate],
   templateUrl: './pickup-compare.html',
   styleUrl: './pickup-compare.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

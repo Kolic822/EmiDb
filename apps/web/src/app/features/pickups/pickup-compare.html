@@ -40,8 +40,8 @@
               @for (pickup of pickups(); track pickup.id) {
                 <th>
                   <div class="head">
-                    <a [routerLink]="['/pickups', pickup.id]" class="name">{{ pickup.name }}</a>
-                    <span class="muted">{{ manufacturer(pickup) || '—' }}</span>
+                    <a [routerLink]="['/pickups', pickup.id]" class="name" appTruncate [truncateText]="pickup.name">{{ pickup.name }}</a>
+                    <span class="muted" appTruncate [truncateText]="manufacturer(pickup)">{{ manufacturer(pickup) || '—' }}</span>
                     <button mat-icon-button class="remove" (click)="remove(pickup.id)" matTooltip="Remove from comparison">
                       <mat-icon>close</mat-icon>
                     </button>
@@ -65,7 +65,9 @@
                   </td>
                   @for (cell of row.cells; track $index) {
                     <td
-                      [class.num]="cell.extreme !== undefined && (row.field.kind === 'number' || row.field.kind === 'integer')"
+                      appTruncate
+                      [truncateText]="cell.text"
+                      [class.num]="row.field.kind === 'number' || row.field.kind === 'integer'"
                       [class.high]="cell.extreme === 'high'"
                       [class.low]="cell.extreme === 'low'"
                     >

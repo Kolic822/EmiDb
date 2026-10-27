@@ -10,8 +10,11 @@
   min-height: 0;
 }
 
+// Fixed layout: the label column has a set width and every pickup column
+// shares the rest equally; cells truncate instead of stretching the table.
 table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   font: var(--mat-sys-body-medium);
@@ -35,12 +38,11 @@ thead th {
   height: auto;
   padding: 12px 14px;
   vertical-align: top;
-  min-width: 160px;
 }
 
 .head {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 0 6px;
   align-items: start;
 
@@ -48,11 +50,13 @@ thead th {
     font: var(--mat-sys-title-small);
     font-weight: 600;
     grid-row: 1;
+    display: block;
   }
 
   .muted {
     font: var(--mat-sys-label-medium);
     grid-column: 1;
+    display: block;
   }
 
   .remove {
@@ -78,7 +82,7 @@ thead th {
   background: var(--mat-sys-surface-container-lowest);
   color: var(--mat-sys-on-surface-variant);
   font: var(--mat-sys-label-large);
-  min-width: 180px;
+  width: 200px;
 
   .muted {
     margin-left: 4px;
