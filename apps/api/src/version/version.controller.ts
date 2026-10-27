@@ -34,7 +34,11 @@ function readVersion(): string {
 
 function readCommit(): string | null {
   const repo = path.resolve(API_ROOT, '..', '..');
-  if (!existsSync(path.join(repo, '.git'))) return process.env.GIT_COMMIT ?? null;
+  if (!existsSync(path.join(repo, '.git'))) {
+    // Hosted builds have no .git; Railway and Render expose the commit through an env variable.
+    const sha = process.env.GIT_COMMIT ?? process.env.RAILWAY_GIT_COMMIT_SHA ?? process.env.RENDER_GIT_COMMIT;
+    return sha ? sha.slice(0, 7) : null;
+  }
   try {
     return execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
   } catch {

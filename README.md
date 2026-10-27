@@ -92,6 +92,12 @@ docker run -p 3210:3210 -v emidb-data:/data emidb
 
 Any Node host works as well: `npm ci && npm run build && npm start`.
 
+**Railway:** the repository contains `railway.json` (Dockerfile build, health check on
+`/api/version`). In Railway: *New Project → Deploy from GitHub repo → EmiDb*. Then on the service:
+*Variables* → add `DATA_DIR=/data`; *Volume* → mount path `/data` (keeps the database and uploads);
+*Settings → Networking → Generate Domain*. Railway injects `PORT` itself. Every push to `main`
+redeploys; the volume survives deploys.
+
 **Render:** the repository contains `render.yaml`. In Render choose *New → Blueprint*, pick this
 repository, and it creates a Docker web service with a 1 GB persistent disk at `/data`. Every push to
 `main` redeploys. Render provides `PORT` itself; the app reads it.
