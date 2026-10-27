@@ -72,7 +72,10 @@ export class PdfViewer {
     const pdf = await pdfjs.getDocument({ url: src }).promise;
     const container = this.pages().nativeElement;
     container.replaceChildren();
-    const width = Math.min(container.clientWidth - 24, 1200);
+    // The dialog may not be laid out yet when the effect runs; measure after a frame.
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const available = container.clientWidth || container.parentElement?.clientWidth || 800;
+    const width = Math.max(320, Math.min(available - 24, 1200));
     const ratio = window.devicePixelRatio || 1;
 
     for (let n = 1; n <= Math.min(pdf.numPages, MAX_PAGES); n++) {
