@@ -68,6 +68,7 @@ export const hr: Dictionary = {
   'Clear selection': 'Poništi odabir',
   '{count} selected': 'Odabrano: {count}',
   'Active filters': 'Aktivni filtri',
+  '{count} active': 'Aktivno: {count}',
   'Remove {label} filter': 'Ukloni filtar {label}',
   'Select all': 'Odaberi sve',
   'entry': 'zapis',

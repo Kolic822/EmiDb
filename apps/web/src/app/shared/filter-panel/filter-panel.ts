@@ -1,25 +1,52 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import type { FieldGroup } from '@emidb/shared';
+import { MatIcon } from '@angular/material/icon';
+import { type FieldDef, type FieldGroup, groupLabel, isEmptyCriterion } from '@emidb/shared';
+import { TranslatePipe } from '../../core/i18n';
 import { FilterField } from '../filter-field/filter-field';
 import { ListState } from '../list-state/list-state';
 
-/** All filterable fields of an entity, grouped, bound to the shared ListState criteria. */
+interface Section {
+  id: string;
+  label: string;
+  fields: FieldDef<any>[];
+  /** Fields in this section with an active criterion. */
+  active: number;
+  collapsed: boolean;
+}
+
+/**
+ * All filterable fields of an entity, grouped into collapsible sections,
+ * bound to the shared ListState criteria. Collapsed state is remembered per table.
+ */
 @Component({
   selector: 'app-filter-panel',
-  imports: [FilterField],
+  imports: [FilterField, MatIcon, TranslatePipe],
   template: `
     @for (section of sections(); track section.id) {
-      <section>
-        <h3>{{ section.label }}</h3>
-        <div class="fields">
-          @for (field of section.fields; track field.key) {
-            <app-filter-field
-              [field]="field"
-              [criterion]="state().criteria()[field.key]"
-              (criterionChange)="state().setCriterion(field.key, $event)"
-            />
+      <section [class.collapsed]="section.collapsed">
+        <button
+          type="button"
+          class="head"
+          (click)="state().toggleFilterGroup(section.id)"
+          [attr.aria-expanded]="!section.collapsed"
+        >
+          <span class="title">{{ section.label }}</span>
+          @if (section.active) {
+            <span class="badge" [attr.aria-label]="'{count} active' | t: { count: section.active }">{{ section.active }}</span>
           }
-        </div>
+          <mat-icon>{{ section.collapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
+        </button>
+        @if (!section.collapsed) {
+          <div class="fields">
+            @for (field of section.fields; track field.key) {
+              <app-filter-field
+                [field]="field"
+                [criterion]="state().criteria()[field.key]"
+                (criterionChange)="state().setCriterion(field.key, $event)"
+              />
+            }
+          </div>
+        }
       </section>
     }
   `,
@@ -27,21 +54,71 @@ import { ListState } from '../list-state/list-state';
     :host {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 6px;
     }
 
-    h3 {
-      margin: 0 0 10px;
+    section {
+      border-bottom: 1px solid var(--mat-sys-surface-container-high);
+      padding-bottom: 10px;
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      &.collapsed {
+        padding-bottom: 0;
+      }
+    }
+
+    .head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 2px;
+      border: 0;
+      background: none;
+      cursor: pointer;
+      color: var(--mat-sys-on-surface-variant);
       font: var(--mat-sys-label-small);
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--mat-sys-on-surface-variant);
+      text-align: left;
+
+      &:hover {
+        color: var(--mat-sys-on-surface);
+      }
+
+      .title {
+        flex: 1;
+      }
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .badge {
+      display: inline-grid;
+      place-items: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 9px;
+      background: var(--mat-sys-primary);
+      color: var(--mat-sys-on-primary);
+      font: var(--mat-sys-label-small);
+      font-weight: 600;
+      letter-spacing: 0;
     }
 
     .fields {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      padding-top: 4px;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,9 +127,21 @@ export class FilterPanel<T extends { id: number }> {
   readonly state = input.required<ListState<T>>();
   readonly groups = input.required<readonly FieldGroup[]>();
 
-  protected readonly sections = computed(() =>
-    this.groups()
-      .map((group) => ({ ...group, fields: this.state().filterableFields.filter((f) => f.group === group.id) }))
-      .filter((group) => group.fields.length),
-  );
+  protected readonly sections = computed<Section[]>(() => {
+    const state = this.state();
+    const criteria = state.criteria();
+    const collapsed = new Set(state.collapsedFilterGroups());
+    return this.groups()
+      .map((group) => {
+        const fields = state.filterableFields.filter((f) => f.group === group.id);
+        return {
+          id: group.id,
+          label: groupLabel(group),
+          fields,
+          active: fields.filter((f) => !isEmptyCriterion(criteria[f.key])).length,
+          collapsed: collapsed.has(group.id),
+        };
+      })
+      .filter((section) => section.fields.length);
+  });
 }

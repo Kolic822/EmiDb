@@ -31,6 +31,8 @@ export class ListState<T extends { id: number }> {
   readonly selection = signal<ReadonlySet<number>>(new Set());
   readonly visibleKeys: WritableSignal<string[]>;
   readonly visibleFields: Signal<FieldDef<T>[]>;
+  /** Filter view sections the user has folded away. */
+  readonly collapsedFilterGroups: WritableSignal<string[]>;
   readonly activeCriteriaCount = computed(() => countActiveCriteria(this.criteria()));
   private readonly defaults = inject(ColumnDefaults);
 
@@ -41,6 +43,7 @@ export class ListState<T extends { id: number }> {
     private readonly resolver: Signal<LookupResolver>,
   ) {
     this.visibleKeys = storedSignal<string[]>(`${storageKey}.columns`, this.defaultKeys());
+    this.collapsedFilterGroups = storedSignal<string[]>(`${storageKey}.filterCollapsed`, []);
     this.visibleFields = computed(() => {
       const visible = new Set(this.visibleKeys());
       return this.columnFields.filter((field) => visible.has(field.key));
@@ -109,6 +112,12 @@ export class ListState<T extends { id: number }> {
 
   clearSelection(): void {
     this.selection.set(new Set());
+  }
+
+  toggleFilterGroup(groupId: string): void {
+    this.collapsedFilterGroups.update((ids) =>
+      ids.includes(groupId) ? ids.filter((id) => id !== groupId) : [...ids, groupId],
+    );
   }
 
   /** Back to the user's saved default (Settings), or the built-in one. */
