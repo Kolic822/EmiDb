@@ -79,8 +79,8 @@ html {
   @include mat.form-field-overrides(
     (
       outlined-container-shape: 10px,
-      outlined-outline-color: transparent,
-      outlined-hover-outline-color: var(--mat-sys-outline-variant),
+      outlined-outline-color: var(--mat-sys-outline-variant),
+      outlined-hover-outline-color: var(--mat-sys-outline),
       outlined-focus-outline-color: var(--mat-sys-primary),
       outlined-focus-outline-width: 2px,
       outlined-label-text-color: var(--mat-sys-on-surface-variant),
@@ -249,15 +249,11 @@ mat-icon.material-symbols-outlined {
   width: 100%;
 }
 
-// Tinted field background; the outline only shows on hover / focus.
+// Soft fields: light border and a faint fill at rest, white when focused.
 .mat-mdc-form-field-appearance-outline .mdc-text-field--outlined {
-  background: var(--mat-sys-surface-container-low);
+  background: color-mix(in srgb, var(--mat-sys-surface-container-low) 70%, var(--mat-sys-surface-container-lowest));
   border-radius: 10px;
   transition: background-color 120ms;
-
-  &:hover {
-    background: var(--mat-sys-surface-container);
-  }
 
   &.mdc-text-field--focused {
     background: var(--mat-sys-surface-container-lowest);
