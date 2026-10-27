@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('wiring diagram shows pots, switches and can be created with components', async ({ page }) => {
   await page.goto('/wiring-diagrams');
-  await expect(page.getByText('5 wiring diagrams')).toBeVisible();
+  await expect(page.getByText('11 wiring diagrams')).toBeVisible();
   await page.locator('tbody tr', { hasText: 'Les Paul standard' }).click();
   await expect(page.getByRole('heading', { name: 'Les Paul standard' })).toBeVisible();
   await expect(page.locator('app-entity-details')).toContainText('Pot 4');

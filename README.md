@@ -25,7 +25,8 @@ npm run build -w @emidb/shared     # once, and after changing packages/shared
 npm run dev                         # API on :3210, web on :4200 (proxied to the API)
 ```
 
-Seed sample data into an empty database:
+Seed sample data (at least ten entries of every kind, varied so every filter has something to match) into a
+database without pickups:
 
 ```bash
 npm run build -w api && npm run seed -w api
@@ -91,6 +92,10 @@ docker run -p 3210:3210 -v emidb-data:/data emidb
 ```
 
 Any Node host works as well: `npm ci && npm run build && npm start`.
+
+**Sample data on a hosted database:** set the variable `SEED_SAMPLE_DATA=true` and redeploy; on start the app
+loads the sample data once, and only while there are no pickups. Remove the variable afterwards (otherwise
+the sample data returns if every pickup is ever deleted).
 
 **Railway:** the repository contains `railway.json` (Dockerfile build, health check on
 `/api/version`). In Railway: *New Project → Deploy from GitHub repo → EmiDb*. Then on the service:

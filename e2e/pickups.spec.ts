@@ -6,7 +6,7 @@ test.describe('Pickups table', () => {
   test('lists seeded pickups with default columns', async ({ page }) => {
     await page.goto('/pickups');
     await expect(page.getByRole('heading', { name: 'Pickups' })).toBeVisible();
-    await expect(page.getByText('17 pickups')).toBeVisible();
+    await expect(page.getByText('21 pickups')).toBeVisible();
     await expect(row(page, 'SH-4 JB')).toContainText('Seymour Duncan');
     await expect(page.locator('app-data-table thead')).toContainText('Resistance');
     await expect(page.locator('app-data-table thead')).not.toContainText('Gauss');
@@ -16,14 +16,14 @@ test.describe('Pickups table', () => {
     await page.goto('/pickups');
     await page.getByPlaceholder('Search pickups…').fill('dimarzio');
     await expect(page.locator('app-data-table tbody tr')).toHaveCount(3);
-    await expect(page.getByText('3 of 17 pickups')).toBeVisible();
+    await expect(page.getByText('3 of 21 pickups')).toBeVisible();
   });
 
   test('sorts by clicking a column header', async ({ page }) => {
     await page.goto('/pickups');
     await page.getByRole('button', { name: /^Resistance/ }).click();
     const first = page.locator('app-data-table tbody tr').first();
-    await expect(first).toContainText('Vintage Blackface Strat');
+    await expect(first).toContainText('Fluence Modern Humbucker');
     await page.getByRole('button', { name: /^Resistance/ }).click();
     await expect(first).toContainText('SH-4 JB');
   });
@@ -55,7 +55,7 @@ test.describe('Pickups table', () => {
     await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
     await expect(page.getByText('Type: Single coil')).toBeVisible();
-    await expect(page.locator('app-data-table tbody tr')).toHaveCount(5);
+    await expect(page.locator('app-data-table tbody tr')).toHaveCount(7);
   });
 });
 
@@ -65,7 +65,7 @@ test.describe('Filter view', () => {
     const resistance = page.locator('app-filter-field', { hasText: 'Resistance' });
     await resistance.getByRole('spinbutton').first().fill('8');
     await resistance.getByRole('spinbutton').last().fill('0.5');
-    await expect(page.getByText('6 of 17 pickups match')).toBeVisible();
+    await expect(page.getByText('6 of 21 pickups match')).toBeVisible();
 
     await page.getByRole('link', { name: 'Show in table' }).click();
     await expect(page).toHaveURL(/\/pickups$/);
@@ -73,7 +73,7 @@ test.describe('Filter view', () => {
     await expect(page.locator('app-data-table tbody tr')).toHaveCount(6);
 
     await page.getByRole('button', { name: 'Clear all' }).click();
-    await expect(page.getByText('17 pickups')).toBeVisible();
+    await expect(page.getByText('21 pickups')).toBeVisible();
   });
 });
 
