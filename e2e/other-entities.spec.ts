@@ -48,13 +48,18 @@ test('wiring diagrams filter by the function of a specific pot position', async 
   await page.goto('/wiring-diagrams/filter');
   // Pot positions only appear for as many pots as the Pots filter asks for, and a count has no tolerance.
   await expect(page.locator('mat-label', { hasText: /^Pot 1 function$/ })).toHaveCount(0);
-  const pots = page.locator('app-filter-field', { hasText: /^\s*No. of pots\s*$/ }).or(page.locator('app-filter-field').filter({ has: page.locator('mat-label', { hasText: /^No. of pots$/ }) }));
+  const pots = page.locator('app-filter-field').filter({ has: page.locator('mat-label', { hasText: /^No. of pots$/ }) });
+  const potCount = pots.getByRole('combobox');
   await expect(pots.getByLabel('tol.')).toHaveCount(0);
-  await page.getByLabel('No. of pots', { exact: true }).fill('2');
+  // A dropdown of 1 to 6, nothing more.
+  await potCount.click();
+  await expect(page.getByRole('option')).toHaveText(['Any', '1', '2', '3', '4', '5', '6']);
+  await page.getByRole('option', { name: '2', exact: true }).click();
   await expect(page.locator('mat-label', { hasText: /^Pot 2 function$/ })).toBeVisible();
   await expect(page.locator('mat-label', { hasText: /^Pot 3 function$/ })).toHaveCount(0);
 
-  await page.getByLabel('No. of pots', { exact: true }).fill('4');
+  await potCount.click();
+  await page.getByRole('option', { name: '4', exact: true }).click();
   await expect(page.locator('mat-label', { hasText: /^Pot 4 function$/ })).toBeVisible();
   await expect(page.locator('mat-label', { hasText: /^Pot 5 function$/ })).toHaveCount(0);
   await page.locator('mat-label', { hasText: /^Pot 2 function$/ }).click();
@@ -64,9 +69,11 @@ test('wiring diagrams filter by the function of a specific pot position', async 
   await expect(page.locator('app-data-table tbody')).toContainText('HH coil split push-pull');
 
   // Lowering the count drops the filters of the positions that are gone.
-  await page.getByLabel('No. of pots', { exact: true }).fill('1');
+  await potCount.click();
+  await page.getByRole('option', { name: '1', exact: true }).click();
   await expect(page.locator('mat-label', { hasText: /^Pot 2 function$/ })).toHaveCount(0);
-  await page.getByLabel('No. of pots', { exact: true }).fill('3');
+  await potCount.click();
+  await page.getByRole('option', { name: '3', exact: true }).click();
   await expect(page.locator('mat-label', { hasText: /^Pot 3 function$/ })).toBeVisible();
   await expect(page.locator('.subtitle')).toHaveText(/^[1-9]\d* of \d+ diagrams match$/);
 });

@@ -31,6 +31,8 @@ export class FilterField {
 
   protected readonly kind = computed(() => {
     const field = this.field();
+    // An exact count with a small range (1–6 pots) is picked from a list.
+    if (field.exact && field.kind === 'integer' && field.min != null && field.max != null) return 'choice';
     if (isNumericField(field)) return 'number';
     if (field.kind === 'enum' || this.lookups.isLookup(field)) return 'in';
     if (field.kind === 'boolean') return 'boolean';
@@ -41,6 +43,12 @@ export class FilterField {
     const field = this.field();
     if (field.kind === 'enum') return field.enumDef?.options ?? [];
     return this.lookups.options(field);
+  });
+
+  /** The whole numbers a 'choice' field can take. */
+  protected readonly choices = computed(() => {
+    const { min = 0, max = 0 } = this.field();
+    return Array.from({ length: Math.max(0, max - min + 1) }, (_, i) => min + i);
   });
 
   protected readonly query = signal('');

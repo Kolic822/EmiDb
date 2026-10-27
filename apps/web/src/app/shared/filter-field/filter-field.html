@@ -58,6 +58,19 @@
       }
     </mat-form-field>
   }
+  @case ('choice') {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      @if (!compact()) {
+        <mat-label>{{ label() }}</mat-label>
+      }
+      <mat-select [placeholder]="compact() ? ('Any' | t) : ''" [ngModel]="near()" (ngModelChange)="setNear($event, null)">
+        <mat-option [value]="null">{{ 'Any' | t }}</mat-option>
+        @for (choice of choices(); track choice) {
+          <mat-option [value]="choice">{{ choice }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
   @case ('number') {
     <div class="number-row">
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="value">
