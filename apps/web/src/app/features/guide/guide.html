@@ -1,0 +1,55 @@
+<div class="page">
+  <app-page-header [title]="text.title | t" [subtitle]="text.subtitle | t" />
+
+  <div class="page-scroll">
+    <div class="guide">
+      <nav class="contents" [attr.aria-label]="text.onThisPage | t">
+        <div class="contents-title">{{ text.onThisPage | t }}</div>
+        @for (section of sections; track section.id) {
+          <button type="button" class="contents-item" [class.active]="current() === section.id" (click)="goTo(section.id)">
+            <mat-icon>{{ section.icon }}</mat-icon>
+            <span>{{ section.title | t }}</span>
+          </button>
+        }
+      </nav>
+
+      <div class="sections">
+        @for (section of sections; track section.id; let i = $index) {
+          <section #section class="card" [id]="section.id">
+            <h2>
+              <span class="number">{{ i + 1 }}</span>
+              {{ section.title | t }}
+            </h2>
+            <p class="intro">{{ section.intro | t }}</p>
+            <ul>
+              @for (point of section.points; track point) {
+                <li>{{ point | t }}</li>
+              }
+            </ul>
+            @if (section.tip; as tip) {
+              <div class="tip">
+                <mat-icon>lightbulb</mat-icon>
+                <div>
+                  <strong>{{ text.tip | t }}</strong>
+                  {{ tip | t }}
+                </div>
+              </div>
+            }
+            @if (section.images.length) {
+              <div class="shots">
+                @for (image of section.images; track image.file) {
+                  <figure>
+                    <button type="button" class="shot" (click)="enlarge(image)" [attr.aria-label]="text.enlarge | t">
+                      <img [src]="imageUrl(image)" [alt]="image.caption | t" loading="lazy" />
+                    </button>
+                    <figcaption>{{ image.caption | t }}</figcaption>
+                  </figure>
+                }
+              </div>
+            }
+          </section>
+        }
+      </div>
+    </div>
+  </div>
+</div>

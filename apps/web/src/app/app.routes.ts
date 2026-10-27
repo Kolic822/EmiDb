@@ -27,6 +27,11 @@ export const routes: Routes = [
     title: pageTitle('Pots & switches'),
   },
   {
+    path: 'guide',
+    loadComponent: () => import('./features/guide/guide').then((m) => m.Guide),
+    title: pageTitle('Guide'),
+  },
+  {
     path: 'library',
     loadComponent: () => import('./features/library/library').then((m) => m.Library),
     title: pageTitle('Library'),

@@ -35,15 +35,17 @@
   }
 
   <div class="footer">
-    <a
-      class="nav-item"
-      [routerLink]="settings.link"
-      routerLinkActive="active"
-      [matTooltip]="layout.collapsed() ? (settings.label | t) : ''"
-      matTooltipPosition="right"
-    >
-      <mat-icon>{{ settings.icon }}</mat-icon>
-      <span class="label">{{ settings.label | t }}</span>
-    </a>
+    @for (item of footerItems; track item.link) {
+      <a
+        class="nav-item"
+        [routerLink]="item.link"
+        routerLinkActive="active"
+        [matTooltip]="layout.collapsed() ? (item.label | t) : ''"
+        matTooltipPosition="right"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span class="label">{{ item.label | t }}</span>
+      </a>
+    }
   </div>
 </nav>

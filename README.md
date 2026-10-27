@@ -86,6 +86,18 @@ On phones and tablets the file panel has a **Take photo** button that opens the 
 are scaled to at most 2400 px on the longest side before they are uploaded. **Settings → Storage** shows
 how much space the files and the database take and how much is free on the disk.
 
+### Guide
+
+**Guide** in the sidebar explains every page with screenshots, in English and Croatian. The text lives in
+`packages/shared/src/guide.ts` (with its Croatian translation in `i18n/hr-guide.ts`, checked by a unit test)
+and the pictures in `apps/web/public/guide/<language>/`. After changing how a page looks, regenerate the pictures
+(they are taken from the sample data on a throw-away database):
+
+```bash
+npm run build
+GUIDE_SHOTS=1 npx playwright test e2e/guide-screenshots.spec.ts --project=chromium
+```
+
 ## Workshop setup: one Windows laptop, tablets on the same Wi-Fi
 
 The laptop runs emidb; everything else on the Wi-Fi uses it in a browser. Node.js 22+ must be

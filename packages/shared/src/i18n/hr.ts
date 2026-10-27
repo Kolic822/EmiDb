@@ -1,7 +1,11 @@
+import { hrGuide } from './hr-guide.js';
 import type { Dictionary } from './i18n.js';
 
 /** Croatian. Keys are the English source strings. */
 export const hr: Dictionary = {
+  // The guide's text first, so the regular labels below win where a title is also a label.
+  ...hrGuide,
+
   // Navigation & pages
   'Database': 'Baza',
   'Reference': 'Šifrarnici',

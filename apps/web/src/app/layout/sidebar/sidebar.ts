@@ -43,5 +43,9 @@ export class Sidebar {
     },
   ];
 
-  protected readonly settings: NavItem = { label: 'Settings', icon: 'settings', link: '/settings' };
+  /** Pinned at the bottom: the guide sits just above the settings. */
+  protected readonly footerItems: NavItem[] = [
+    { label: 'Guide', icon: 'menu_book', link: '/guide' },
+    { label: 'Settings', icon: 'settings', link: '/settings' },
+  ];
 }
