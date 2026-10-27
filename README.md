@@ -58,6 +58,23 @@ The database file and uploaded files are **not** part of the git repository (`ap
 ignored); they live in `DATA_DIR` on whatever machine runs the API, so storage is limited only by
 that disk. Back them up by copying `DATA_DIR`.
 
+## Running it on a workshop computer
+
+The simplest deployment is a folder and a double-click, with Node.js 22+ installed on that machine:
+
+```bash
+npm run package          # builds and assembles release/emidb (API, UI, runtime deps, start scripts)
+```
+
+Copy `release/emidb` anywhere on the target machine and double-click `start.bat` (Windows) or
+`start.command` (macOS). The first run downloads the runtime dependencies (internet needed once);
+after that it starts the server on port 3000 and opens the app in the browser. Closing the
+window stops it. Data lives in `apps/api/data` inside that folder, so backing up
+means copying the folder. Other devices on the same network can use it at `http://<that-pc>:3000`.
+
+Double-clicking `start.bat` / `start.command` in a plain checkout works too: the first run
+installs and builds (a few minutes), later runs start immediately.
+
 ## Deploying
 
 ```bash
