@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { config } from '../config.js';
 
@@ -12,8 +12,14 @@ const FAILURE_WINDOW_MS = 60_000;
  * signed, expiring cookie; changing the password or SESSION_SECRET signs everyone out.
  */
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
   private readonly failures = new Map<string, { count: number; resetAt: number }>();
+
+  onModuleInit(): void {
+    // Length only, never the value: enough to spot a password that was pasted with extra characters.
+    if (this.required) new Logger('Auth').log(`Password protection is on (password is ${config.appPassword.length} characters)`);
+    else new Logger('Auth').warn('No APP_PASSWORD set: anyone who can reach this server can read and change the data');
+  }
 
   get required(): boolean {
     return config.appPassword.length > 0;
@@ -24,7 +30,7 @@ export class AuthService {
   }
 
   checkPassword(candidate: string): boolean {
-    return timingSafeEqual(digest(candidate), digest(config.appPassword));
+    return timingSafeEqual(digest(candidate.trim()), digest(config.appPassword));
   }
 
   /** True when this client has failed too often recently and must wait. */

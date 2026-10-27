@@ -40,6 +40,11 @@ test('signing out returns to the password screen', async ({ page }) => {
   expect((await page.request.get('/api/pickups')).status()).toBe(401);
 });
 
+test('stray spaces around the password are ignored', async ({ request }) => {
+  const response = await request.post('/api/auth/login', { data: { password: '  workshop-secret \n' } });
+  expect(response.status()).toBe(200);
+});
+
 test('too many wrong passwords lock the sign-in for a minute', async ({ request }) => {
   let status = 0;
   for (let i = 0; i < 7; i++) {

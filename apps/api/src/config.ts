@@ -17,7 +17,8 @@ export const config = {
   },
   /** When set, the whole API needs this password (shared by everyone who uses the workshop database). */
   get appPassword() {
-    return process.env.APP_PASSWORD ?? '';
+    // Pasting into a hosting dashboard often adds a trailing space/newline or quotes; ignore those.
+    return (process.env.APP_PASSWORD ?? '').trim().replace(/^(["'])(.*)\1$/, '$2');
   },
   /** Signs session cookies; derived from the password unless given, so a new password signs everyone out. */
   get sessionSecret() {
