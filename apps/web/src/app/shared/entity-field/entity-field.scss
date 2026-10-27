@@ -20,7 +20,8 @@
 .multi {
   border: var(--app-border);
   border-radius: var(--app-radius);
-  padding: 10px 12px 8px;
+  padding: 12px 12px 12px;
+  margin-bottom: 16px;
 }
 
 .multi-header {
@@ -34,7 +35,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 
   mat-form-field {
     flex: 1;
@@ -55,7 +56,8 @@
   gap: 4px;
   background: none;
   border: 0;
-  padding: 6px 4px;
+  padding: 4px 4px 0;
+  margin-left: 26px;
   color: var(--mat-sys-primary);
   font: var(--mat-sys-label-large);
   cursor: pointer;
