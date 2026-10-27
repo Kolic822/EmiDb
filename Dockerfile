@@ -31,6 +31,5 @@ COPY --from=build /app/node_modules/better-sqlite3/build node_modules/better-sql
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY --from=build /app/apps/api/drizzle apps/api/drizzle
 COPY --from=build /app/apps/web/dist apps/web/dist
-VOLUME ["/data"]
 EXPOSE 3210
 CMD ["node", "apps/api/dist/main.js"]
