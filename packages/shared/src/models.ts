@@ -136,8 +136,8 @@ export interface WiringDiagram extends Timestamps {
   switches: number[];
   phaseReversible: boolean | null;
   splitCoil: boolean | null;
-  serial: boolean | null;
-  parallel: boolean | null;
+  /** How the coils are wired together. */
+  connection: ConnectionType | null;
   description: string | null;
   attachments: Attachment[];
 }

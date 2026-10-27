@@ -120,8 +120,7 @@ export const wiringDiagrams = sqliteTable('wiring_diagrams', {
   tonePot3Function: text(),
   phaseReversible: bool(),
   splitCoil: bool(),
-  serial: bool(),
-  parallel: bool(),
+  connection: text(),
   description: text(),
   ...timestamps,
 });

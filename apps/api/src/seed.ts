@@ -220,7 +220,7 @@ const diagrams = db
   .values([
     {
       name: 'Les Paul standard', manufacturerId: maker('Gibson'), wiringType: 'GUITAR_WIRING', pickupCount: 2,
-      neck: 'HUMBUCKER', bridge: 'HUMBUCKER', phaseReversible: false, splitCoil: false, serial: false, parallel: false,
+      neck: 'HUMBUCKER', bridge: 'HUMBUCKER', phaseReversible: false, splitCoil: false, connection: 'SERIAL',
       volumePotCount: 2, volumePot1TypeId: pot('500k audio'), volumePot1Function: 'NORMAL',
       volumePot2TypeId: pot('500k audio'), volumePot2Function: 'NORMAL',
       tonePotCount: 2, tonePot1TypeId: pot('500k audio'), tonePot1Function: 'NORMAL',
@@ -230,7 +230,7 @@ const diagrams = db
     {
       name: 'Stratocaster SSS', manufacturerId: maker('Fender'), wiringType: 'GUITAR_WIRING', pickupCount: 3,
       neck: 'SINGLE_COIL', middle: 'SINGLE_COIL', bridge: 'SINGLE_COIL', phaseReversible: false, splitCoil: false,
-      serial: false, parallel: true,
+      connection: 'PARALLEL',
       volumePotCount: 1, volumePot1TypeId: pot('250k audio'), volumePot1Function: 'NORMAL',
       tonePotCount: 2, tonePot1TypeId: pot('250k audio'), tonePot1Function: 'NORMAL',
       tonePot2TypeId: pot('250k audio'), tonePot2Function: 'NORMAL',
@@ -238,14 +238,14 @@ const diagrams = db
     },
     {
       name: 'Telecaster 4-way', manufacturerId: maker('Fender'), wiringType: 'GUITAR_WIRING', pickupCount: 2,
-      neck: 'SINGLE_COIL', bridge: 'SINGLE_COIL', phaseReversible: false, splitCoil: false, serial: true, parallel: true,
+      neck: 'SINGLE_COIL', bridge: 'SINGLE_COIL', phaseReversible: false, splitCoil: false, connection: 'PARALLEL',
       volumePotCount: 1, volumePot1TypeId: pot('250k audio'), volumePot1Function: 'NORMAL',
       tonePotCount: 1, tonePot1TypeId: pot('250k audio'), tonePot1Function: 'NORMAL',
       description: 'Adds a series position to the standard Tele wiring.',
     },
     {
       name: 'HH coil split push-pull', wiringType: 'GUITAR_WIRING', pickupCount: 2, neck: 'HUMBUCKER', bridge: 'HUMBUCKER',
-      phaseReversible: false, splitCoil: true, serial: true, parallel: false,
+      phaseReversible: false, splitCoil: true, connection: 'SERIAL',
       volumePotCount: 2, volumePot1TypeId: pot('500k audio'), volumePot1Function: 'NORMAL',
       volumePot2TypeId: pot('500k push-pull'), volumePot2Function: 'PUSH_PULL',
       tonePotCount: 2, tonePot1TypeId: pot('500k push-pull'), tonePot1Function: 'PUSH_PULL',
@@ -254,7 +254,7 @@ const diagrams = db
     },
     {
       name: 'Precision Bass', manufacturerId: maker('Fender'), wiringType: 'BASS_WIRING', pickupCount: 1,
-      middle: 'HUMBUCKER', phaseReversible: false, splitCoil: false, serial: true, parallel: false,
+      middle: 'HUMBUCKER', phaseReversible: false, splitCoil: false, connection: 'SERIAL',
       volumePotCount: 1, volumePot1TypeId: pot('250k audio'), volumePot1Function: 'NORMAL',
       tonePotCount: 1, tonePot1TypeId: pot('250k audio'), tonePot1Function: 'NORMAL',
       description: 'Volume and tone only.',

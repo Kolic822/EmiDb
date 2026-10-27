@@ -1,4 +1,4 @@
-import { PotFunction, type WiringDiagramInput, WiringPickupType, WiringType } from '@emidb/shared';
+import { ConnectionType, PotFunction, type WiringDiagramInput, WiringPickupType, WiringType } from '@emidb/shared';
 import {
   ArrayMaxSize,
   IsArray,
@@ -87,11 +87,8 @@ export class WiringDiagramDto implements WiringDiagramInput {
   @IsOptional() @IsBoolean()
   splitCoil: boolean | null = null;
 
-  @IsOptional() @IsBoolean()
-  serial: boolean | null = null;
-
-  @IsOptional() @IsBoolean()
-  parallel: boolean | null = null;
+  @IsOptional() @IsIn(ConnectionType.values)
+  connection: ConnectionType | null = null;
 
   @Trimmed() @IsOptional() @IsString() @MaxLength(10000)
   description: string | null = null;

@@ -189,8 +189,7 @@ export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   { key: 'switches', label: 'Switches', group: 'switches', kind: 'switchType', multiple: true, defaultColumn: true },
   { key: 'phaseReversible', label: 'Phase reversible', group: 'options', kind: 'boolean' },
   { key: 'splitCoil', label: 'Split coil', group: 'options', kind: 'boolean' },
-  { key: 'serial', label: 'Serial', group: 'options', kind: 'boolean' },
-  { key: 'parallel', label: 'Parallel', group: 'options', kind: 'boolean' },
+  { key: 'connection', label: 'Coil connection', group: 'options', kind: 'enum', enumDef: ConnectionType },
   { key: 'description', label: 'Description', group: 'identity', kind: 'textarea', column: false, filterable: false },
 ];
 

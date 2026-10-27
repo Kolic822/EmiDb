@@ -15,6 +15,13 @@
       "when": 1793092274545,
       "tag": "0001_tired_rocket_racer",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793093938101,
+      "tag": "0002_next_psylocke",
+      "breakpoints": true
     }
   ]
 }
