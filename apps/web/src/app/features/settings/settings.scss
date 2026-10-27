@@ -119,6 +119,12 @@ mat-checkbox {
 }
 
 .version {
-  font: var(--mat-sys-label-medium);
-  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.update-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }

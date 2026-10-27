@@ -1,3 +1,4 @@
+import { networkInterfaces } from 'node:os';
 import { expect, test } from '@playwright/test';
 
 test('wiring diagram shows pots, switches and can be created with components', async ({ page }) => {
@@ -121,4 +122,60 @@ test('a pot layout can be created with positions and a sketch', async ({ page })
   const row = page.locator('tbody tr', { hasText: 'Test 1V 1T' });
   await expect(row).toContainText('Volume, Tone');
   await expect(row.getByRole('button', { name: 'Open sketch.png' })).toBeVisible();
+});
+
+// A non-loopback address is not a secure context, so no service worker: the same situation as
+// a tablet using the workshop laptop over plain http.
+const lanAddress = Object.values(networkInterfaces())
+  .flat()
+  .find((net) => net && net.family === 'IPv4' && !net.internal)?.address;
+
+test('offers a reload over plain http when the server reports a newer build', async ({ browser }) => {
+  test.skip(!lanAddress, 'needs a non-loopback network address');
+  const context = await browser.newContext({ baseURL: `http://${lanAddress}:3100` });
+  const page = await context.newPage();
+  let calls = 0;
+  await page.route('**/api/version', async (route) => {
+    calls += 1;
+    await route.fulfill({ json: { version: '0.1.0', commit: null, build: calls === 1 ? 'old-build' : 'new-build' } });
+  });
+  await page.goto('/pickups');
+  await expect(page.getByText('A new version of emidb is available')).toHaveCount(0);
+
+  // Waking the tablet triggers a check.
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+  await expect(page.getByText('A new version of emidb is available')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Reload' })).toBeVisible();
+  await context.close();
+});
+
+test('settings show the version and let the user check for updates', async ({ page }) => {
+  await page.goto('/settings');
+  await expect(page.getByText(/emidb v\d/)).toBeVisible();
+  await page.getByRole('button', { name: 'Check for updates' }).click();
+  await expect(page.getByText('You have the latest version.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Reload app' })).toBeVisible();
+});
+
+test('the diagram column on the wiring diagram page can be resized by dragging', async ({ page }) => {
+  await page.goto('/wiring-diagrams/1');
+  const layout = page.locator('.layout');
+  const handle = page.getByRole('separator', { name: 'Resize columns' });
+  const detailsWidth = async () => (await page.locator('app-entity-details').boundingBox())!.width;
+
+  const before = await detailsWidth();
+  const box = (await handle.boundingBox())!;
+  const layoutBox = (await layout.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + 40);
+  await page.mouse.down();
+  await page.mouse.move(layoutBox.x + layoutBox.width * 0.45, box.y + 40, { steps: 6 });
+  await page.mouse.up();
+  await expect.poll(detailsWidth).toBeLessThan(before - 100);
+  const after = await detailsWidth();
+
+  // Remembered after a reload, and double-click restores the default.
+  await page.reload();
+  await expect.poll(detailsWidth).toBeCloseTo(after, -1);
+  await page.getByRole('separator', { name: 'Resize columns' }).dblclick();
+  await expect.poll(detailsWidth).toBeGreaterThan(after + 100);
 });

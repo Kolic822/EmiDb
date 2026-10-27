@@ -26,7 +26,19 @@ import { WiringPickupTypesModule } from './wiring-pickup-types/wiring-pickup-typ
     VersionModule,
     // In production the API also serves the built Angular app.
     ...(config.serveWeb
-      ? [ServeStaticModule.forRoot({ rootPath: config.webDist, exclude: ['/api/{*path}'] })]
+      ? [
+          ServeStaticModule.forRoot({
+            rootPath: config.webDist,
+            exclude: ['/api/{*path}'],
+            serveStaticOptions: {
+              setHeaders: (res, filePath) => {
+                // Hashed bundles never change; everything else is revalidated on every load.
+                const hashed = /-[A-Za-z0-9]{8}\.(js|css)$/.test(filePath);
+                res.setHeader('Cache-Control', hashed ? 'public, max-age=31536000, immutable' : 'no-cache');
+              },
+            },
+          }),
+        ]
       : []),
   ],
 })

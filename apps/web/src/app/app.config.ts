@@ -12,6 +12,7 @@ import { routes } from './app.routes';
 import { errorInterceptor } from './core/http/error.interceptor';
 import { LanguageService } from './core/i18n';
 import { ThemeService } from './core/theme';
+import { Updates } from './core/updates';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,6 +24,7 @@ export const appConfig: ApplicationConfig = {
       inject(MatIconRegistry).setDefaultFontSetClass('material-symbols-outlined');
       inject(LanguageService).init();
       inject(ThemeService).init();
+      inject(Updates).init();
     }),
   ],
 };

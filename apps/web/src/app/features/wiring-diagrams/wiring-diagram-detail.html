@@ -15,8 +15,21 @@
     </app-page-header>
 
     <div class="page-scroll">
-      <div class="layout">
+      <div class="layout" #layout [style.--split]="split()" [class.dragging]="dragging()">
         <app-entity-details [fields]="fields" [groups]="groups" [row]="diagram" />
+        <div
+          class="splitter"
+          role="separator"
+          aria-orientation="vertical"
+          tabindex="0"
+          [attr.aria-label]="'Resize columns' | t"
+          [attr.aria-valuenow]="split()"
+          aria-valuemin="30"
+          aria-valuemax="78"
+          (pointerdown)="startDrag($event, layout)"
+          (dblclick)="resetSplit()"
+          (keydown)="onSplitKey($event)"
+        ></div>
         <aside class="files">
           <app-attachments-panel owner="wiringDiagram" [ownerId]="diagram.id" [inlinePreview]="true" />
         </aside>

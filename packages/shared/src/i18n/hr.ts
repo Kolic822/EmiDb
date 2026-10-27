@@ -198,6 +198,7 @@ export const hr: Dictionary = {
   'Not uploaded yet': 'Još nije učitano',
   'Download': 'Preuzmi',
   'Open full size': 'Otvori u punoj veličini',
+  'Resize columns': 'Promijeni širinu stupaca',
   'Close': 'Zatvori',
   'File uploaded': 'Datoteka učitana',
   '{count} files uploaded': 'Učitano datoteka: {count}',
@@ -228,12 +229,22 @@ export const hr: Dictionary = {
     'Koje stupce svaka tablica prikazuje zadano. Promjene vrijede odmah; izbornik Stupci na tablici i dalje može privremeno prikazati ili sakriti stupce i vratiti se na ove zadane.',
   '{count} columns': 'Stupaca: {count}',
   'Use built-in defaults': 'Koristi ugrađene zadane',
-  'To update, run update.bat on the computer that hosts emidb, or simply restart it.': 'Za ažuriranje pokrenite update.bat na računalu koje poslužuje emidb ili ga jednostavno ponovno pokrenite.',
 
   // Errors
   'Unexpected error': 'Neočekivana pogreška',
   'Cannot reach the server': 'Poslužitelj nije dostupan',
   'Dismiss': 'Zatvori',
+  'A new version of emidb is available': 'Dostupna je nova verzija aplikacije emidb',
+  'Reload': 'Osvježi',
+  'About': 'O aplikaciji',
+  'Version': 'Verzija',
+  'Updates': 'Ažuriranja',
+  'Check for updates': 'Provjeri ažuriranja',
+  'Reload to update': 'Osvježi za ažuriranje',
+  'Reload app': 'Ponovno učitaj aplikaciju',
+  'Checking…': 'Provjera…',
+  'You have the latest version.': 'Imate najnoviju verziju.',
+  'Could not check for updates.': 'Provjera ažuriranja nije uspjela.',
   'An entry with that name already exists': 'Zapis s tim imenom već postoji',
 
   // Field groups

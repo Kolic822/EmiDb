@@ -10,6 +10,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { type FieldDef, type FieldGroup, fieldLabel, groupLabel, PICKUP_GROUPS, PICKUP_SET_GROUPS, WIRING_DIAGRAM_GROUPS } from '@emidb/shared';
 import { LanguageService, TranslatePipe } from '../../core/i18n';
 import { ColumnDefaults } from '../../core/column-defaults';
+import { Updates } from '../../core/updates';
 import { API_BASE } from '../../core/http/crud-api';
 import { ACCENTS, THEME_MODES, ThemeService } from '../../core/theme';
 import type { ListState } from '../../shared/list-state/list-state';
@@ -37,6 +38,7 @@ export class Settings {
   protected readonly accents = ACCENTS;
   protected readonly modes = THEME_MODES;
   private readonly defaults = inject(ColumnDefaults);
+  protected readonly updates = inject(Updates);
   protected readonly version = toSignal(
     inject(HttpClient).get<{ version: string; commit: string | null }>(`${API_BASE}/version`),
   );

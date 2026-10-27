@@ -71,7 +71,8 @@ installed on the laptop (https://nodejs.org, default options).
 2. Double-click `start.bat`. The first run installs and builds (a few minutes) and opens the app.
    Every later start checks GitHub and, if there is a newer version, pulls and rebuilds it first
    (skipped when offline). `update.bat` does the same on demand. Settings shows the running
-   version and commit. Windows asks once whether Node.js may accept
+   version and commit. Open apps notice a new deploy on their own (every few minutes and when
+   the tablet wakes) and offer a reload. Windows asks once whether Node.js may accept
    connections; allow it on **private** networks. `allow-firewall.bat` (run as administrator)
    does the same without the prompt.
 3. The black window prints two addresses. On the tablet open the **"On this network"** one,

@@ -1,8 +1,49 @@
+// Details left, diagram right, with a draggable divider between them.
 .layout {
+  --split: 66;
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, calc((100% - 16px) * var(--split) / 100)) 16px minmax(0, 1fr);
   align-items: start;
+}
+
+.layout.dragging {
+  user-select: none;
+  cursor: col-resize;
+}
+
+.splitter {
+  position: sticky;
+  top: 0;
+  align-self: stretch;
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+
+  // The visible grip; the whole 16px strip is the touch target.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: transparent;
+    transition: background-color 120ms;
+  }
+
+  &:hover::before,
+  &:focus-visible::before,
+  .dragging &::before {
+    background: var(--mat-sys-primary);
+  }
+}
+
+@media (hover: none) {
+  .splitter::before {
+    background: var(--mat-sys-outline-variant);
+  }
 }
 
 // The diagram stays on screen while the details scroll.
@@ -13,10 +54,14 @@
   overflow: auto;
 }
 
-// Portrait tablets: diagram first, details below.
+// Portrait tablets: diagram first, details below; nothing to resize.
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
+  }
+
+  .splitter {
+    display: none;
   }
 
   .files {

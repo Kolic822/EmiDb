@@ -93,11 +93,44 @@
       </mat-accordion>
     </section>
 
-    @if (version(); as v) {
-      <p class="version muted">
-        emidb v{{ v.version }}@if (v.commit) { ({{ v.commit }})}
-        · {{ 'To update, run update.bat on the computer that hosts emidb, or simply restart it.' | t }}
-      </p>
-    }
+    <section class="card">
+      <h2>{{ 'About' | t }}</h2>
+      <div class="row">
+        <div class="row-label">{{ 'Version' | t }}</div>
+        <div class="version">
+          @if (version(); as v) {
+            emidb v{{ v.version }}@if (v.commit) { <span class="muted">({{ v.commit }})</span> }
+          }
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-label">{{ 'Updates' | t }}</div>
+        <div class="update-row">
+          @if (updates.status() === 'ready') {
+            <button mat-flat-button (click)="updates.reload()">
+              <mat-icon>refresh</mat-icon>
+              {{ 'Reload to update' | t }}
+            </button>
+          } @else {
+            <button mat-stroked-button (click)="updates.check()" [disabled]="updates.status() === 'checking'">
+              <mat-icon>system_update_alt</mat-icon>
+              {{ 'Check for updates' | t }}
+            </button>
+          }
+          <button mat-stroked-button (click)="updates.reload()">
+            <mat-icon>refresh</mat-icon>
+            {{ 'Reload app' | t }}
+          </button>
+          <span class="muted">
+            @switch (updates.status()) {
+              @case ('checking') { {{ 'Checking…' | t }} }
+              @case ('uptodate') { {{ 'You have the latest version.' | t }} }
+              @case ('ready') { {{ 'A new version of emidb is available' | t }} }
+              @case ('error') { {{ 'Could not check for updates.' | t }} }
+            }
+          </span>
+        </div>
+      </div>
+    </section>
   </div>
 </div>

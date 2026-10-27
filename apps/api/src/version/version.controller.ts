@@ -1,25 +1,26 @@
 import { Controller, Get } from '@nestjs/common';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { API_ROOT } from '../config.js';
+import { API_ROOT, config } from '../config.js';
 
 export interface VersionInfo {
   version: string;
   commit: string | null;
+  /** Identifies the web build being served; changes with every deploy, so open apps can offer a reload. */
+  build: string | null;
 }
 
 /** Which build is running, so an update can be confirmed from Settings. */
 @Controller('version')
 export class VersionController {
-  private readonly info: VersionInfo = {
-    version: readVersion(),
-    commit: readCommit(),
-  };
+  private readonly version = readVersion();
+  private readonly commit = readCommit();
 
   @Get()
   get(): VersionInfo {
-    return this.info;
+    return { version: this.version, commit: this.commit, build: readBuild() };
   }
 }
 
@@ -41,6 +42,15 @@ function readCommit(): string | null {
   }
   try {
     return execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+  } catch {
+    return null;
+  }
+}
+
+/** Hash of the served index.html: it names the hashed bundles, so it changes whenever the app does. */
+function readBuild(): string | null {
+  try {
+    return createHash('sha1').update(readFileSync(path.join(config.webDist, 'index.html'))).digest('hex').slice(0, 10);
   } catch {
     return null;
   }
