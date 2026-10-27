@@ -9,6 +9,7 @@ import { PickupSetsModule } from './pickup-sets/pickup-sets.module.js';
 import { PickupsModule } from './pickups/pickups.module.js';
 import { VersionModule } from './version/version.module.js';
 import { WiringDiagramsModule } from './wiring-diagrams/wiring-diagrams.module.js';
+import { WiringPickupTypesModule } from './wiring-pickup-types/wiring-pickup-types.module.js';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { WiringDiagramsModule } from './wiring-diagrams/wiring-diagrams.module.j
     PickupsModule,
     PickupSetsModule,
     WiringDiagramsModule,
+    WiringPickupTypesModule,
     AttachmentsModule,
     VersionModule,
     // In production the API also serves the built Angular app.

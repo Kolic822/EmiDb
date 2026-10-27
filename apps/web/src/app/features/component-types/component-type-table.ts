@@ -6,11 +6,17 @@ import {
   COMPONENT_TYPE_GROUPS,
   type ComponentType,
   type ComponentTypeInput,
+  type FieldDef,
+  type FieldGroup,
+  t,
+  WIRING_PICKUP_TYPE_FIELDS,
+  WIRING_PICKUP_TYPE_GROUPS,
+  type WiringPickupType,
+  type WiringPickupTypeInput,
 } from '@emidb/shared';
-import { t } from '@emidb/shared';
 import { TranslatePipe } from '../../core/i18n';
 import { LookupService } from '../../core/lookups';
-import { PotentiometerTypesStore, SwitchTypesStore } from '../../core/store/stores';
+import { PotentiometerTypesStore, SwitchTypesStore, WiringPickupTypesStore } from '../../core/store/stores';
 import { DataTable } from '../../shared/data-table/data-table';
 import { EntityDialogService } from '../../shared/entity-dialog/entity-dialog';
 import { capitalise, EntityListBase } from '../../shared/entity-page/entity-list-base';
@@ -19,27 +25,31 @@ import { ListToolbar } from '../../shared/list-toolbar/list-toolbar';
 
 /** Lookup tables are edited inline through a dialog instead of dedicated pages. */
 @Directive()
-abstract class ComponentTypeTableBase extends EntityListBase<ComponentType, ComponentTypeInput> {
-  protected readonly groups = COMPONENT_TYPE_GROUPS;
+abstract class ComponentTypeTableBase<
+  T extends { id: number; name: string } = ComponentType,
+  TInput = ComponentTypeInput,
+> extends EntityListBase<T, TInput> {
+  protected readonly fields: readonly FieldDef<T>[] = COMPONENT_TYPE_FIELDS as unknown as FieldDef<T>[];
+  protected readonly groups: readonly FieldGroup[] = COMPONENT_TYPE_GROUPS;
   protected readonly basePath = '/components';
   private readonly dialogs = inject(EntityDialogService);
 
   protected override async create(): Promise<void> {
-    const saved = await this.dialogs.open<ComponentType, ComponentTypeInput>({
+    const saved = await this.dialogs.open<T, TInput>({
       title: t(this.createLabel),
-      fields: COMPONENT_TYPE_FIELDS,
-      groups: COMPONENT_TYPE_GROUPS,
+      fields: this.fields,
+      groups: this.groups,
       submitLabel: 'Create',
       save: (input) => this.store.create(input),
     });
     if (saved) this.notify.success(t('{noun} created', { noun: capitalise(t(this.noun)) }));
   }
 
-  protected override async open(row: ComponentType): Promise<void> {
-    const saved = await this.dialogs.open<ComponentType, ComponentTypeInput>({
+  protected override async open(row: T): Promise<void> {
+    const saved = await this.dialogs.open<T, TInput>({
       title: t('Edit {name}', { name: row.name }),
-      fields: COMPONENT_TYPE_FIELDS,
-      groups: COMPONENT_TYPE_GROUPS,
+      fields: this.fields,
+      groups: this.groups,
       value: row,
       save: (input) => this.store.update(row.id, input),
     });
@@ -84,6 +94,33 @@ export class SwitchTypeTable extends ComponentTypeTableBase {
   protected readonly nounPlural = 'switch types';
   protected readonly title = 'Switch types';
   protected readonly createLabel = 'New switch type';
+
+  constructor() {
+    super();
+    this.init();
+  }
+}
+
+@Component({
+  selector: 'app-wiring-pickup-type-table',
+  imports: IMPORTS,
+  templateUrl: './component-type-table.html',
+  styleUrl: './component-type-table.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class WiringPickupTypeTable extends ComponentTypeTableBase<WiringPickupType, WiringPickupTypeInput> {
+  protected readonly store = inject(WiringPickupTypesStore);
+  protected override readonly fields = WIRING_PICKUP_TYPE_FIELDS;
+  protected override readonly groups = WIRING_PICKUP_TYPE_GROUPS;
+  protected readonly state = new ListState<WiringPickupType>(
+    WIRING_PICKUP_TYPE_FIELDS,
+    'wiring-pickup-types',
+    inject(LookupService).resolver,
+  );
+  protected readonly noun = 'pickup type';
+  protected readonly nounPlural = 'pickup types';
+  protected readonly title = 'Pickup types';
+  protected readonly createLabel = 'New pickup type';
 
   constructor() {
     super();

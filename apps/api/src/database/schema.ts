@@ -95,15 +95,23 @@ export const switchTypes = sqliteTable('switch_types', {
   ...timestamps,
 });
 
+export const wiringPickupTypes = sqliteTable('wiring_pickup_types', {
+  id: id(),
+  name: text().notNull().unique(),
+  instrument: text(),
+  description: text(),
+  ...timestamps,
+});
+
 export const wiringDiagrams = sqliteTable('wiring_diagrams', {
   id: id(),
   name: text().notNull(),
   manufacturerId: integer().references(() => manufacturers.id, { onDelete: 'set null' }),
   wiringType: text(),
   pickupCount: integer(),
-  neck: text(),
-  middle: text(),
-  bridge: text(),
+  neckTypeId: integer().references(() => wiringPickupTypes.id, { onDelete: 'set null' }),
+  middleTypeId: integer().references(() => wiringPickupTypes.id, { onDelete: 'set null' }),
+  bridgeTypeId: integer().references(() => wiringPickupTypes.id, { onDelete: 'set null' }),
   volumePotCount: integer(),
   volumePot1TypeId: integer().references(() => potentiometerTypes.id, { onDelete: 'set null' }),
   volumePot1Function: text(),

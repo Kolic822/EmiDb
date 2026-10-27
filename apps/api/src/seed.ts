@@ -16,6 +16,7 @@ import {
   switchTypes,
   wiringDiagrams,
   wiringDiagramSwitches,
+  wiringPickupTypes,
 } from './database/schema.js';
 
 mkdirSync(path.dirname(config.databaseFile), { recursive: true });
@@ -219,12 +220,33 @@ const sws = db
   .all();
 const sw = (name: string) => sws.find((s) => s.name === name)!.id;
 
+const GUITAR_TYPES = [
+  'Active Single Coil', 'Duckbucker', 'Humbucker', 'Single Coil', 'Single Coil Humbucker', 'Stack',
+  'Strat Lipstick Tube', 'Strat Lipstick Plus', 'Blackouts', 'Mandolin', 'P-Rails', 'Phat Cat', 'Danelectro',
+  'Dave Mustaine', 'Duo Sonic', 'Jaguar', 'Jazzmaster', 'Mini Humbucker', 'Mustang', 'P90', 'P90 Stack',
+  'Tele Humbucker', 'Piezo',
+];
+const BASS_TYPES = [
+  'Active P-Bass', 'MusicMan', 'P-Bass', 'Active Jazz Bass', 'Active Soapbar', 'Blackouts Soapbar', 'Jazz Bass',
+  'Jazz Bass Stack', 'Passive Soapbar', 'Rickenbacker',
+];
+// The migration already inserts these; keep the seed self-sufficient for older databases.
+db.insert(wiringPickupTypes)
+  .values([
+    ...GUITAR_TYPES.map((name) => ({ name, instrument: 'GUITAR' })),
+    ...BASS_TYPES.map((name) => ({ name, instrument: 'BASS' })),
+  ])
+  .onConflictDoNothing()
+  .run();
+const pickupTypes = db.select({ id: wiringPickupTypes.id, name: wiringPickupTypes.name }).from(wiringPickupTypes).all();
+const pickupType = (name: string) => pickupTypes.find((p) => p.name === name)!.id;
+
 const diagrams = db
   .insert(wiringDiagrams)
   .values([
     {
       name: 'Les Paul standard', manufacturerId: maker('Gibson'), wiringType: 'GUITAR_WIRING', pickupCount: 2,
-      neck: 'HUMBUCKER', bridge: 'HUMBUCKER', phaseReversible: false, splitCoil: false, connection: 'SERIAL',
+      neckTypeId: pickupType('Humbucker'), bridgeTypeId: pickupType('Humbucker'), phaseReversible: false, splitCoil: false, connection: 'SERIAL',
       volumePotCount: 2, volumePot1TypeId: pot('500k audio'), volumePot1Function: 'NORMAL',
       volumePot2TypeId: pot('500k audio'), volumePot2Function: 'NORMAL',
       tonePotCount: 2, tonePot1TypeId: pot('500k audio'), tonePot1Function: 'NORMAL',
@@ -233,8 +255,8 @@ const diagrams = db
     },
     {
       name: 'Stratocaster SSS', manufacturerId: maker('Fender'), wiringType: 'GUITAR_WIRING', pickupCount: 3,
-      neck: 'SINGLE_COIL', middle: 'SINGLE_COIL', bridge: 'SINGLE_COIL', phaseReversible: false, splitCoil: false,
-      connection: 'PARALLEL',
+      neckTypeId: pickupType('Single Coil'), middleTypeId: pickupType('Single Coil'), bridgeTypeId: pickupType('Single Coil'),
+      phaseReversible: false, splitCoil: false, connection: 'PARALLEL',
       volumePotCount: 1, volumePot1TypeId: pot('250k audio'), volumePot1Function: 'NORMAL',
       tonePotCount: 2, tonePot1TypeId: pot('250k audio'), tonePot1Function: 'NORMAL',
       tonePot2TypeId: pot('250k audio'), tonePot2Function: 'NORMAL',
@@ -242,13 +264,14 @@ const diagrams = db
     },
     {
       name: 'Telecaster 4-way', manufacturerId: maker('Fender'), wiringType: 'GUITAR_WIRING', pickupCount: 2,
-      neck: 'SINGLE_COIL', bridge: 'SINGLE_COIL', phaseReversible: false, splitCoil: false, connection: 'PARALLEL',
+      neckTypeId: pickupType('Single Coil'), bridgeTypeId: pickupType('Single Coil'), phaseReversible: false, splitCoil: false, connection: 'PARALLEL',
       volumePotCount: 1, volumePot1TypeId: pot('250k audio'), volumePot1Function: 'NORMAL',
       tonePotCount: 1, tonePot1TypeId: pot('250k audio'), tonePot1Function: 'NORMAL',
       description: 'Adds a series position to the standard Tele wiring.',
     },
     {
-      name: 'HH coil split push-pull', wiringType: 'GUITAR_WIRING', pickupCount: 2, neck: 'HUMBUCKER', bridge: 'HUMBUCKER',
+      name: 'HH coil split push-pull', wiringType: 'GUITAR_WIRING', pickupCount: 2,
+      neckTypeId: pickupType('Humbucker'), bridgeTypeId: pickupType('Humbucker'),
       phaseReversible: false, splitCoil: true, connection: 'SERIAL',
       volumePotCount: 2, volumePot1TypeId: pot('500k audio'), volumePot1Function: 'NORMAL',
       volumePot2TypeId: pot('500k push-pull'), volumePot2Function: 'PUSH_PULL',
@@ -258,7 +281,7 @@ const diagrams = db
     },
     {
       name: 'Precision Bass', manufacturerId: maker('Fender'), wiringType: 'BASS_WIRING', pickupCount: 1,
-      middle: 'HUMBUCKER', phaseReversible: false, splitCoil: false, connection: 'SERIAL',
+      middleTypeId: pickupType('P-Bass'), phaseReversible: false, splitCoil: false, connection: 'SERIAL',
       volumePotCount: 1, volumePot1TypeId: pot('250k audio'), volumePot1Function: 'NORMAL',
       tonePotCount: 1, tonePot1TypeId: pot('250k audio'), tonePot1Function: 'NORMAL',
       description: 'Volume and tone only.',
@@ -278,6 +301,6 @@ db.insert(wiringDiagramSwitches)
   .run();
 
 console.log(
-  `Seeded ${makers.length} manufacturers, ${pickupRows.length} pickups, 3 sets, ${pots.length} pot types, ${sws.length} switch types, ${diagrams.length} wiring diagrams.`,
+  `Seeded ${makers.length} manufacturers, ${pickupRows.length} pickups, 3 sets, ${pots.length} pot types, ${sws.length} switch types, ${pickupTypes.length} pickup types, ${diagrams.length} wiring diagrams.`,
 );
 closeDatabase();

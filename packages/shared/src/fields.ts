@@ -15,10 +15,10 @@ import {
   StringInstrument,
   WindingDirection,
   WindingMethod,
-  WiringPickupType,
+  InstrumentFamily,
   WiringType,
 } from './enums.js';
-import type { ComponentType, Manufacturer, Pickup, PickupSet, WiringDiagram } from './models.js';
+import type { ComponentType, Manufacturer, Pickup, PickupSet, WiringDiagram, WiringPickupType } from './models.js';
 import { t } from './i18n/i18n.js';
 
 /**
@@ -36,7 +36,8 @@ export type FieldKind =
   | 'manufacturer'
   | 'pickup'
   | 'potentiometerType'
-  | 'switchType';
+  | 'switchType'
+  | 'wiringPickupType';
 
 export interface FieldGroup {
   id: string;
@@ -76,6 +77,8 @@ export interface FieldDef<T = Record<string, unknown>> {
   creatable?: boolean;
   /** Filter by one value instead of "any of" (e.g. the type at one pot position). */
   filterSingle?: boolean;
+  /** Lookup options are narrowed by another field of the same record (see `lookupMatches`). */
+  dependsOn?: keyof T & string;
 }
 
 export const PICKUP_GROUPS: FieldGroup[] = [
@@ -191,9 +194,9 @@ export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   { key: 'manufacturerId', label: 'Manufacturer', group: 'identity', kind: 'manufacturer', defaultColumn: true, creatable: true },
   { key: 'wiringType', label: 'Wiring type', group: 'identity', kind: 'enum', enumDef: WiringType, defaultColumn: true },
   { key: 'pickupCount', label: 'Pickups', group: 'pickups', kind: 'integer', min: 1, max: 3, defaultColumn: true },
-  { key: 'neck', label: 'Neck', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
-  { key: 'middle', label: 'Middle', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
-  { key: 'bridge', label: 'Bridge', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
+  { key: 'neckTypeId', label: 'Neck', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
+  { key: 'middleTypeId', label: 'Middle', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
+  { key: 'bridgeTypeId', label: 'Bridge', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
   { key: 'volumePotCount', label: 'Volume pots', group: 'volume', kind: 'integer', min: 0, max: 3, defaultColumn: true, fullWidth: true },
   ...potFields('volumePot', 'Volume pot', 'volume', 'volumePotCount'),
   { key: 'tonePotCount', label: 'Tone pots', group: 'tone', kind: 'integer', min: 0, max: 3, defaultColumn: true, fullWidth: true },
@@ -238,6 +241,35 @@ export function isFieldRelevant<T extends object>(field: FieldDef<T>, row: Parti
   return typeof value === 'number' && value >= field.showWhen.min;
 }
 
+export const WIRING_PICKUP_TYPE_GROUPS: FieldGroup[] = [{ id: 'main', label: 'Pickup type' }];
+
+export const WIRING_PICKUP_TYPE_FIELDS: FieldDef<WiringPickupType>[] = [
+  { key: 'name', label: 'Name', group: 'main', kind: 'text', required: true, defaultColumn: true },
+  { key: 'instrument', label: 'Instrument', group: 'main', kind: 'enum', enumDef: InstrumentFamily, defaultColumn: true },
+  { key: 'description', label: 'Description', group: 'main', kind: 'text', defaultColumn: true },
+];
+
+/** Instrument family a wiring type applies to; null means any. */
+export function instrumentForWiringType(wiringType: unknown): InstrumentFamily | null {
+  if (wiringType === 'GUITAR_WIRING') return 'GUITAR';
+  if (wiringType === 'BASS_WIRING') return 'BASS';
+  return null;
+}
+
+/**
+ * Whether a lookup entry fits the record being edited: wiring pickup types
+ * are narrowed to the diagram's instrument family (guitar or bass).
+ */
+export function lookupMatches(
+  field: FieldDef<any>,
+  entry: { instrument?: InstrumentFamily | null },
+  record: Partial<Record<string, unknown>> | null | undefined,
+): boolean {
+  if (field.kind !== 'wiringPickupType' || !field.dependsOn) return true;
+  const family = instrumentForWiringType(record?.[field.dependsOn]);
+  return family == null || entry.instrument == null || entry.instrument === family;
+}
+
 export function isNumericField(field: FieldDef<any>): boolean {
   return field.kind === 'number' || field.kind === 'integer';
 }
@@ -247,6 +279,7 @@ export function isLookupField(field: FieldDef<any>): boolean {
     field.kind === 'manufacturer' ||
     field.kind === 'pickup' ||
     field.kind === 'potentiometerType' ||
-    field.kind === 'switchType'
+    field.kind === 'switchType' ||
+    field.kind === 'wiringPickupType'
   );
 }

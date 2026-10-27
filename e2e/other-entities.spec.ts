@@ -19,6 +19,12 @@ test('wiring diagram shows pots, switches and can be created with components', a
   await page.getByRole('option', { name: '2', exact: true }).click();
   await expect(page.getByLabel('Volume pot 2', { exact: true })).toBeVisible();
   await expect(page.getByLabel('Volume pot 3', { exact: true })).toHaveCount(0);
+  // Guitar wiring narrows the pickup type list to guitar types.
+  await page.locator('mat-label', { hasText: /^Neck$/ }).click();
+  await page.getByRole('listbox').getByPlaceholder('Search…').fill('bass');
+  await expect(page.getByRole('option', { name: 'Jazz Bass', exact: true })).toHaveCount(0);
+  await page.getByRole('listbox').getByPlaceholder('Search…').fill('P90');
+  await page.getByRole('option', { name: 'P90', exact: true }).click();
   await page.locator('mat-label', { hasText: /^Volume pot 1$/ }).click();
   await page.getByRole('option', { name: '250k audio' }).click();
   await page.locator('mat-label', { hasText: /^Volume pot 2 function$/ }).click();
@@ -30,6 +36,7 @@ test('wiring diagram shows pots, switches and can be created with components', a
 
   await expect(page.getByRole('heading', { name: 'Test HSS' })).toBeVisible();
   await expect(page.locator('app-entity-details')).toContainText('250k audio');
+  await expect(page.locator('app-entity-details')).toContainText('P90');
   await expect(page.locator('app-entity-details')).toContainText('Push-push');
   await expect(page.locator('app-entity-details')).toContainText('Five Way Blade');
 });

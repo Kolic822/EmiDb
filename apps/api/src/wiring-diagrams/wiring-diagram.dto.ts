@@ -1,4 +1,4 @@
-import { ConnectionType, PotFunction, type WiringDiagramInput, WiringPickupType, WiringType } from '@emidb/shared';
+import { ConnectionType, PotFunction, type WiringDiagramInput, WiringType } from '@emidb/shared';
 import {
   ArrayMaxSize,
   IsArray,
@@ -27,14 +27,14 @@ export class WiringDiagramDto implements WiringDiagramInput {
   @IsOptional() @IsInt() @Min(1) @Max(3)
   pickupCount: number | null = null;
 
-  @IsOptional() @IsIn(WiringPickupType.values)
-  neck: WiringPickupType | null = null;
+  @IsOptional() @IsInt() @Min(1)
+  neckTypeId: number | null = null;
 
-  @IsOptional() @IsIn(WiringPickupType.values)
-  middle: WiringPickupType | null = null;
+  @IsOptional() @IsInt() @Min(1)
+  middleTypeId: number | null = null;
 
-  @IsOptional() @IsIn(WiringPickupType.values)
-  bridge: WiringPickupType | null = null;
+  @IsOptional() @IsInt() @Min(1)
+  bridgeTypeId: number | null = null;
 
   @IsOptional() @IsInt() @Min(0) @Max(3)
   volumePotCount: number | null = null;

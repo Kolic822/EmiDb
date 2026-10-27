@@ -122,17 +122,12 @@ export const WiringType = defineEnum({
 });
 export type WiringType = EnumValue<typeof WiringType>;
 
-export const WiringPickupType = defineEnum({
-  UNKNOWN: 'Unknown',
-  SINGLE_COIL: 'Single coil',
-  HUMBUCKER: 'Humbucker',
-  SINGLE_COIL_HUMBUCKER: 'Single coil humbucker',
-  ACTIVE_SINGLE_COIL: 'Active single coil',
-  STACK: 'Stack',
-  STRAT_LIPSTICK_TUBE: 'Strat lipstick tube',
-  STRAT_STACK_PLUS: 'Strat stack plus',
+/** Which instrument family a wiring pickup type belongs to. */
+export const InstrumentFamily = defineEnum({
+  GUITAR: 'Guitar',
+  BASS: 'Bass',
 });
-export type WiringPickupType = EnumValue<typeof WiringPickupType>;
+export type InstrumentFamily = EnumValue<typeof InstrumentFamily>;
 
 /** What a potentiometer does besides turning: pull-up switch, blend, … */
 export const PotFunction = defineEnum({

@@ -1,13 +1,14 @@
 import { computed, inject, Injectable } from '@angular/core';
-import type { FieldDef, FieldKind, LookupResolver } from '@emidb/shared';
+import { type FieldDef, type FieldKind, type LookupResolver, lookupMatches } from '@emidb/shared';
 import {
   ManufacturersStore,
   PickupsStore,
   PotentiometerTypesStore,
   SwitchTypesStore,
+  WiringPickupTypesStore,
 } from './store/stores';
 
-type LookupKind = Extract<FieldKind, 'manufacturer' | 'pickup' | 'potentiometerType' | 'switchType'>;
+type LookupKind = Extract<FieldKind, 'manufacturer' | 'pickup' | 'potentiometerType' | 'switchType' | 'wiringPickupType'>;
 
 export interface LookupOption {
   value: number;
@@ -22,6 +23,7 @@ export class LookupService {
     pickup: inject(PickupsStore),
     potentiometerType: inject(PotentiometerTypesStore),
     switchType: inject(SwitchTypesStore),
+    wiringPickupType: inject(WiringPickupTypesStore),
   } satisfies Record<LookupKind, unknown>;
 
   /** Recomputed whenever any lookup collection changes. */
@@ -31,6 +33,7 @@ export class LookupService {
       pickup: this.stores.pickup.byId(),
       potentiometerType: this.stores.potentiometerType.byId(),
       switchType: this.stores.switchType.byId(),
+      wiringPickupType: this.stores.wiringPickupType.byId(),
     };
     return (field, id) => maps[field.kind as LookupKind]?.get(id)?.name;
   });
@@ -39,12 +42,15 @@ export class LookupService {
     return Promise.all(Object.values(this.stores).map((store) => store.ensureLoaded())).then(() => undefined);
   }
 
-  /** Select options for a lookup field, sorted by name. */
-  options(field: FieldDef<any>): LookupOption[] {
+  /**
+   * Select options for a lookup field, sorted by name. `record` (the row being
+   * edited) narrows dependent lookups, e.g. pickup types to the diagram's instrument.
+   */
+  options(field: FieldDef<any>, record?: Partial<Record<string, unknown>> | null): LookupOption[] {
     const store = this.stores[field.kind as LookupKind];
     if (!store) return [];
-    return store
-      .rows()
+    return (store.rows() as { id: number; name: string; instrument?: any }[])
+      .filter((row) => lookupMatches(field, row, record))
       .map((row) => ({ value: row.id, label: row.name }))
       .sort((a, b) => a.label.localeCompare(b.label));
   }
@@ -66,6 +72,10 @@ export class LookupService {
       }
       case 'switchType': {
         const row = await this.stores.switchType.create({ name, description: null });
+        return row.id;
+      }
+      case 'wiringPickupType': {
+        const row = await this.stores.wiringPickupType.create({ name, instrument: null, description: null });
         return row.id;
       }
       default:

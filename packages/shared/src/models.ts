@@ -15,7 +15,7 @@ import type {
   StringInstrument,
   WindingDirection,
   WindingMethod,
-  WiringPickupType,
+  InstrumentFamily,
   WiringType,
 } from './enums.js';
 
@@ -107,6 +107,14 @@ export interface ComponentType extends Timestamps {
 export type PotentiometerType = ComponentType;
 export type SwitchType = ComponentType;
 
+/** Pickup shape/kind used in wiring diagram slots, e.g. "Humbucker", "P90", "Jazz Bass". */
+export interface WiringPickupType extends Timestamps {
+  id: number;
+  name: string;
+  instrument: InstrumentFamily | null;
+  description: string | null;
+}
+
 export interface WiringDiagram extends Timestamps {
   id: number;
   name: string;
@@ -114,9 +122,9 @@ export interface WiringDiagram extends Timestamps {
   manufacturerName: string | null;
   wiringType: WiringType | null;
   pickupCount: number | null;
-  neck: WiringPickupType | null;
-  middle: WiringPickupType | null;
-  bridge: WiringPickupType | null;
+  neckTypeId: number | null;
+  middleTypeId: number | null;
+  bridgeTypeId: number | null;
   /** How many volume / tone pots the diagram has (1–3); the positional fields below follow. */
   volumePotCount: number | null;
   volumePot1TypeId: number | null;
@@ -164,5 +172,6 @@ export type PickupSetInput = Writable<
   'manufacturerName' | 'neckName' | 'middleName' | 'bridgeName' | 'attachments'
 >;
 export type ComponentTypeInput = Writable<ComponentType, never>;
+export type WiringPickupTypeInput = Writable<WiringPickupType, never>;
 export type WiringDiagramInput = Writable<WiringDiagram, 'manufacturerName' | 'attachments'>;
 export type AttachmentInput = Pick<Attachment, 'caption'>;

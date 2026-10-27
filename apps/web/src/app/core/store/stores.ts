@@ -10,6 +10,8 @@ import type {
   PickupSetInput,
   WiringDiagram,
   WiringDiagramInput,
+  WiringPickupType,
+  WiringPickupTypeInput,
 } from '@emidb/shared';
 import { CrudApi } from '../http/crud-api';
 import { EntityStore } from './entity-store';
@@ -37,6 +39,11 @@ export class PickupSetsStore extends EntityStore<PickupSet, PickupSetInput> {
 @Injectable({ providedIn: 'root' })
 export class WiringDiagramsStore extends EntityStore<WiringDiagram, WiringDiagramInput> {
   protected readonly api = new CrudApi<WiringDiagram, WiringDiagramInput>('wiring-diagrams');
+}
+
+@Injectable({ providedIn: 'root' })
+export class WiringPickupTypesStore extends EntityStore<WiringPickupType, WiringPickupTypeInput> {
+  protected readonly api = new CrudApi<WiringPickupType, WiringPickupTypeInput>('wiring-pickup-types');
 }
 
 @Injectable({ providedIn: 'root' })

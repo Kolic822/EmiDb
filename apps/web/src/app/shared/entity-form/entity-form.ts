@@ -17,7 +17,7 @@ import type { EntityFormGroup } from './form-builder';
         <h2>{{ groupName(section) }}</h2>
         <div class="grid" [style.grid-template-columns]="columnsOf(section)">
           @for (field of section.fields; track field.key) {
-            <app-entity-field [field]="field" [formControl]="controlFor(field.key)" [class.wide]="field.fullWidth" />
+            <app-entity-field [field]="field" [formControl]="controlFor(field.key)" [record]="value()" [class.wide]="field.fullWidth" />
           }
         </div>
       </section>
@@ -66,7 +66,7 @@ export class EntityForm {
   readonly form = input.required<EntityFormGroup>();
 
   /** Current raw form value, so conditional fields (`showWhen`) appear and disappear as the user types. */
-  private readonly value: Signal<Record<string, unknown>> = toSignal(
+  protected readonly value: Signal<Record<string, unknown>> = toSignal(
     toObservable(this.form).pipe(
       switchMap((form) => form.valueChanges.pipe(startWith(form.getRawValue()), map(() => form.getRawValue()))),
     ),

@@ -101,7 +101,8 @@ export function displayValue(
     case 'manufacturer':
     case 'pickup':
     case 'potentiometerType':
-    case 'switchType': {
+    case 'switchType':
+    case 'wiringPickupType': {
       const ids = Array.isArray(value) ? (value as number[]) : [value as number];
       return ids.map((id) => resolve?.(field, id) ?? `#${id}`).join(', ');
     }

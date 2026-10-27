@@ -35,6 +35,8 @@ export class EntityField {
 
   readonly field = input.required<FieldDef<any>>();
   readonly formControl = input.required<FormControl<unknown>>();
+  /** Current values of the whole record, for lookups that depend on another field. */
+  readonly record = input<Partial<Record<string, unknown>> | null>(null);
 
   protected readonly label = computed(() => fieldLabel(this.field()));
 
@@ -52,6 +54,7 @@ export class EntityField {
   protected readonly options = computed<readonly { value: string | number; label: string }[]>(() => {
     const field = this.field();
     if (field.kind === 'enum') return field.enumDef?.options ?? [];
+    if (this.lookups.isLookup(field)) return this.lookups.options(field, this.record());
     if (isSmallRange(field)) {
       return Array.from({ length: field.max! - field.min! + 1 }, (_, i) => ({ value: field.min! + i, label: String(field.min! + i) }));
     }
