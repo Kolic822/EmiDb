@@ -5,7 +5,7 @@
       "name": "emidb-api",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "/Users/teokolic/Documents/Development/emidb", "run", "start:dev", "-w", "api"],
-      "port": 3000
+      "port": 3210
     },
     {
       "name": "emidb-web",

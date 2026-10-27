@@ -11,7 +11,8 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "watch": "tsc -p tsconfig.json --watch --preserveWatchOutput"
+    "watch": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "prepare": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "typescript": "~6.0.2"

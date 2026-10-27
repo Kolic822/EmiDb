@@ -19,7 +19,7 @@ if not exist "apps\api\dist\main.js" (
   call npm install --omit=dev --no-audit --no-fund || goto :fail
 )
 
-if "%PORT%"=="" set PORT=3000
+if "%PORT%"=="" set PORT=3210
 echo.
 echo emidb is starting on http://localhost:%PORT%
 echo Keep this window open while you use the app. Close it to stop.

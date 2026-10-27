@@ -3,6 +3,13 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# Terminal runs this without the usual shell setup, so look where Node is normally installed.
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+if ! command -v node >/dev/null 2>&1 && [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]; then
+  # shellcheck disable=SC1091
+  . "${NVM_DIR:-$HOME/.nvm}/nvm.sh" >/dev/null 2>&1 || true
+fi
+
 if ! command -v node >/dev/null 2>&1; then
   echo "Node.js 22 or newer is required. Download it from https://nodejs.org and run this file again."
   read -r -p "Press Enter to close."
@@ -18,7 +25,7 @@ elif [ ! -d node_modules ]; then
   npm install --omit=dev --no-audit --no-fund
 fi
 
-PORT="${PORT:-3000}"
+PORT="${PORT:-3210}"
 echo
 echo "emidb is starting on http://localhost:$PORT"
 echo "Keep this window open while you use the app. Close it (or press Ctrl+C) to stop."

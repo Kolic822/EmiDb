@@ -22,7 +22,7 @@ process plus a data directory (`emidb.db` + `uploads/`).
 ```bash
 npm install
 npm run build -w @emidb/shared     # once, and after changing packages/shared
-npm run dev                         # API on :3000, web on :4200 (proxied to the API)
+npm run dev                         # API on :3210, web on :4200 (proxied to the API)
 ```
 
 Seed sample data into an empty database:
@@ -37,7 +37,7 @@ npm run build -w api && npm run seed -w api
 | --- | --- |
 | `npm run dev` | Runs API (watch) and Angular dev server together |
 | `npm run build` | Production build of shared, web and api |
-| `npm start` | Serves the production build on `PORT` (default 3000) |
+| `npm start` | Serves the production build on `PORT` (default 3210) |
 | `npm test` | Unit tests for the shared filter/format logic |
 | `npm run e2e` | Playwright tests against the production build (`npm run build` first) |
 | `npm run lint` | oxlint for the API |
@@ -49,7 +49,7 @@ Migrations in `apps/api/drizzle` run automatically when the API starts.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `PORT` | `3000` | API (and UI) port |
+| `PORT` | `3210` | API (and UI) port |
 | `DATA_DIR` | `apps/api/data` | SQLite file and uploaded files |
 | `WEB_DIST` | `apps/web/dist/web/browser` | Built UI to serve; skipped when missing |
 | `MAX_UPLOAD_MB` | `25` | Largest single file that can be attached |
@@ -68,9 +68,9 @@ npm run package          # builds and assembles release/emidb (API, UI, runtime 
 
 Copy `release/emidb` anywhere on the target machine and double-click `start.bat` (Windows) or
 `start.command` (macOS). The first run downloads the runtime dependencies (internet needed once);
-after that it starts the server on port 3000 and opens the app in the browser. Closing the
+after that it starts the server on port 3210 and opens the app in the browser. Closing the
 window stops it. Data lives in `apps/api/data` inside that folder, so backing up
-means copying the folder. Other devices on the same network can use it at `http://<that-pc>:3000`.
+means copying the folder. Other devices on the same network can use it at `http://<that-pc>:3210`.
 
 Double-clicking `start.bat` / `start.command` in a plain checkout works too: the first run
 installs and builds (a few minutes), later runs start immediately.
@@ -79,7 +79,7 @@ installs and builds (a few minutes), later runs start immediately.
 
 ```bash
 docker build -t emidb .
-docker run -p 3000:3000 -v emidb-data:/data emidb
+docker run -p 3000:3210 -v emidb-data:/data emidb
 ```
 
 Any Node host works as well: `npm ci && npm run build && npm start`.

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 export const API_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export const config = {
-  port: Number(process.env.PORT ?? 3000),
+  port: Number(process.env.PORT ?? 3210),
   dataDir: process.env.DATA_DIR ?? path.join(API_ROOT, 'data'),
   get databaseFile() {
     return process.env.DATABASE_FILE ?? path.join(this.dataDir, 'emidb.db');
