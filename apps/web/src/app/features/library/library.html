@@ -36,7 +36,7 @@
       </div>
     } @else if (loaded()) {
       <app-empty-state
-        icon="folder_open"
+        icon="folder"
         [title]="(items().length ? 'No files match' : 'No reference files yet') | t"
         [message]="(items().length ? 'Try clearing the search.' : 'Attach files to a manufacturer, switch type or pot layout and they show up here.') | t"
       />

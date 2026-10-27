@@ -107,8 +107,10 @@ export class AttachmentsPanel {
 
   protected onFilesPicked(event: Event): void {
     const input = event.target as HTMLInputElement;
-    void this.add(Array.from(input.files ?? []));
-    input.value = '';
+    const picked = Array.from(input.files ?? []);
+    // Reset only after the files have been read: on Android a camera photo is a lazy handle
+    // that can stop pointing at the right file once the input is cleared.
+    void this.add(picked).finally(() => (input.value = ''));
   }
 
   protected onDragOver(event: DragEvent): void {
@@ -177,7 +179,7 @@ export class AttachmentsPanel {
   private async add(picked: File[]): Promise<void> {
     if (!picked.length) return;
     this.busy.set(true);
-    const files = await Promise.all(picked.map((file) => shrinkImage(file)));
+    const files = await Promise.all(picked.map(async (file) => shrinkImage(await snapshot(file))));
     this.busy.set(false);
     if (this.isPending()) {
       this.pending.update((current) => [...current, ...files]);
@@ -240,5 +242,14 @@ export class AttachmentsPanel {
     const url = this.objectUrls.get(file);
     if (url) URL.revokeObjectURL(url);
     this.objectUrls.delete(file);
+  }
+}
+
+/** A copy of the file held in memory, so later changes to the picker or camera cannot affect it. */
+async function snapshot(file: File): Promise<File> {
+  try {
+    return new File([await file.arrayBuffer()], file.name, { type: file.type, lastModified: file.lastModified });
+  } catch {
+    return file;
   }
 }

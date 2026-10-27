@@ -210,6 +210,8 @@ mat-icon.material-symbols-outlined {
   width: 22px;
   height: 22px;
   line-height: 22px;
+  // Some filled glyphs (e.g. folder_open) are wider than their box; do not clip them.
+  overflow: visible;
 }
 
 // Shared page layout primitives.
