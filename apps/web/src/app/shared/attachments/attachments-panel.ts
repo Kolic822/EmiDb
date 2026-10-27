@@ -13,6 +13,7 @@ import { ConfirmService } from '../confirm/confirm';
 import { FileSizePipe } from '../pipes/file-size.pipe';
 import { AttachmentPreview } from './attachment-preview';
 import { PdfThumbnail } from './pdf-thumbnail';
+import { PdfViewer } from './pdf-viewer';
 
 /** One card in the grid: a stored attachment, or a file waiting for the first save. */
 interface Tile {
@@ -35,11 +36,12 @@ interface Tile {
  */
 @Component({
   selector: 'app-attachments-panel',
-  imports: [FormsModule, MatButton, MatIconButton, MatIcon, MatProgressBar, MatTooltip, FileSizePipe, PdfThumbnail, TranslatePipe],
+  imports: [FormsModule, MatButton, MatIconButton, MatIcon, MatProgressBar, MatTooltip, FileSizePipe, PdfThumbnail, PdfViewer, TranslatePipe],
   templateUrl: './attachments-panel.html',
   styleUrl: './attachments-panel.scss',
   host: {
     '[class.dragging]': 'dragging()',
+    '[class.inline]': 'inlinePreview()',
     '(dragover)': 'onDragOver($event)',
     '(dragleave)': 'dragging.set(false)',
     '(drop)': 'onDrop($event)',
@@ -56,6 +58,9 @@ export class AttachmentsPanel {
   readonly ownerId = input<number | null>();
   /** Files chosen before the owner exists. */
   readonly pending = model<File[]>([]);
+  /** Shows the selected image or PDF large inside the panel instead of only as thumbnails. */
+  readonly inlinePreview = input(false);
+  private readonly selectedKey = signal<string | null>(null);
 
   protected readonly items = signal<Attachment[]>([]);
   protected readonly busy = signal(false);
@@ -71,6 +76,13 @@ export class AttachmentsPanel {
       ? this.pending().map((file, index) => this.fileTile(file, index))
       : this.items().map((item) => this.attachmentTile(item)),
   );
+
+  /** The tile shown large: the chosen one, else the first image or PDF. */
+  protected readonly selected = computed<Tile | null>(() => {
+    if (!this.inlinePreview()) return null;
+    const previewable = this.tiles().filter((tile) => tile.attachment && (tile.isImage || tile.isPdf));
+    return previewable.find((tile) => tile.key === this.selectedKey()) ?? previewable[0] ?? null;
+  });
 
   constructor() {
     effect(() => {
@@ -110,6 +122,17 @@ export class AttachmentsPanel {
   }
 
   protected open(tile: Tile): void {
+    const item = tile.attachment;
+    if (!item) return;
+    if (this.inlinePreview() && (tile.isImage || tile.isPdf)) {
+      this.selectedKey.set(tile.key);
+      return;
+    }
+    this.expand(tile);
+  }
+
+  /** Full-size preview in a dialog. */
+  protected expand(tile: Tile): void {
     const item = tile.attachment;
     if (!item) return;
     if (tile.isImage || tile.isPdf) {

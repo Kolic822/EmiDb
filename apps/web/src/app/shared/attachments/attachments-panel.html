@@ -27,10 +27,25 @@
   }
 
   @if (tiles().length) {
-    <div class="grid">
+    @if (selected(); as current) {
+      <div class="inline-preview">
+        @if (current.isPdf) {
+          <app-pdf-viewer [src]="current.attachment!.url" />
+        } @else {
+          <img [src]="current.attachment!.url" [alt]="current.caption || current.name" />
+        }
+        <button type="button" mat-icon-button class="expand" (click)="expand(current)" [matTooltip]="'Open full size' | t" [attr.aria-label]="'Open full size' | t">
+          <mat-icon>open_in_full</mat-icon>
+        </button>
+      </div>
+      @if (current.caption) {
+        <div class="inline-caption">{{ current.caption }}</div>
+      }
+    }
+    <div class="grid" [class.compact]="inlinePreview()">
       @for (tile of tiles(); track tile.key) {
         <div class="tile">
-          <button type="button" class="thumb" (click)="open(tile)" [matTooltip]="tile.name" [disabled]="!tile.attachment">
+          <button type="button" class="thumb" [class.current]="tile.key === selected()?.key" (click)="open(tile)" [matTooltip]="tile.name" [disabled]="!tile.attachment">
             @if (tile.isPdf && tile.src) {
               <app-pdf-thumbnail [src]="tile.src" />
             } @else if (tile.src) {

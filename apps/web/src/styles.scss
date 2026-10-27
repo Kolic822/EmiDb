@@ -86,10 +86,13 @@ html {
       outlined-label-text-color: var(--mat-sys-on-surface-variant),
       outlined-hover-label-text-color: var(--mat-sys-on-surface-variant),
       outlined-input-text-placeholder-color: var(--mat-sys-outline),
-      container-text-size: 14px,
-      container-text-line-height: 20px,
-      container-height: 44px,
-      container-vertical-padding: 12px,
+      container-text-size: 13px,
+      container-text-line-height: 18px,
+      container-height: 38px,
+      container-vertical-padding: 7px,
+      outlined-label-text-size: 13px,
+      outlined-label-text-populated-size: 11px,
+      subscript-text-size: 11px,
     )
   );
   @include mat.select-overrides(
@@ -97,6 +100,14 @@ html {
       panel-background-color: var(--mat-sys-surface-container-lowest),
       container-elevation-shadow: (0 10px 30px -10px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.08)),
       enabled-arrow-color: var(--mat-sys-on-surface-variant),
+      trigger-text-size: 13px,
+      trigger-text-line-height: 18px,
+    )
+  );
+  @include mat.core-overrides(
+    (
+      option-label-text-size: 13px,
+      option-label-text-line-height: 18px,
     )
   );
   @include mat.autocomplete-overrides(
@@ -281,7 +292,7 @@ mat-icon.material-symbols-outlined {
 .mat-mdc-option,
 .mat-mdc-menu-item {
   border-radius: 8px;
-  min-height: 40px !important;
+  min-height: 38px !important;
 }
 
 .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
@@ -290,7 +301,7 @@ mat-icon.material-symbols-outlined {
 
 .mat-mdc-option .mdc-list-item__primary-text,
 .mat-mdc-menu-item .mat-mdc-menu-item-text {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 // Text-style action button (used inside overlays too, so it lives here).

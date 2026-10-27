@@ -197,6 +197,7 @@ export const hr: Dictionary = {
   'Caption': 'Opis',
   'Not uploaded yet': 'Još nije učitano',
   'Download': 'Preuzmi',
+  'Open full size': 'Otvori u punoj veličini',
   'Close': 'Zatvori',
   'File uploaded': 'Datoteka učitana',
   '{count} files uploaded': 'Učitano datoteka: {count}',

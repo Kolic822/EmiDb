@@ -46,7 +46,7 @@ import { TranslatePipe } from '../../core/i18n';
       align-items: center;
       gap: 6px;
       padding: 0 8px;
-      height: 36px;
+      height: 34px;
       border-radius: 8px;
       background: var(--mat-sys-surface-container-low);
       color: var(--mat-sys-on-surface-variant);
@@ -64,7 +64,8 @@ import { TranslatePipe } from '../../core/i18n';
       border: 0;
       background: transparent;
       outline: none;
-      font: var(--mat-sys-body-medium);
+      font: var(--mat-sys-body-small);
+      font-size: 13px;
       color: var(--mat-sys-on-surface);
     }
 

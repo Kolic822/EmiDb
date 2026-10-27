@@ -1,6 +1,27 @@
 .layout {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 16px;
-  max-width: 1200px;
+  align-items: start;
+}
+
+// The diagram stays on screen while the details scroll.
+.files {
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 140px);
+  overflow: auto;
+}
+
+// Portrait tablets: diagram first, details below.
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .files {
+    position: static;
+    max-height: none;
+    order: -1;
+  }
 }
