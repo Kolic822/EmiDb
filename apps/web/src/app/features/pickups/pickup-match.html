@@ -1,0 +1,85 @@
+<div class="page">
+  <app-page-header [title]="'Find closest match' | t" [subtitle]="subtitle()" backLink="/pickups">
+    @if (entered().length) {
+      <button mat-button (click)="clear()">{{ 'Clear all' | t }}</button>
+    }
+    <button mat-stroked-button (click)="compareTop()" [disabled]="results().length < 2">
+      <mat-icon>compare_arrows</mat-icon>
+      {{ 'Compare top matches' | t }}
+    </button>
+    <a mat-flat-button routerLink="/pickups">
+      <mat-icon>table_rows</mat-icon>
+      {{ 'Show in table' | t }}
+    </a>
+  </app-page-header>
+
+  <div class="page-body split">
+    <aside class="card measures">
+      <h2>{{ 'Your measurements' | t }}</h2>
+      <p class="hint">{{ 'Fill in whatever you have measured. Blank values are ignored.' | t }}</p>
+      @for (measure of measures; track measure.key) {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ measure.label | t }}</mat-label>
+          <input
+            matInput
+            type="text"
+            inputmode="decimal"
+            autocomplete="off"
+            [value]="targets()[measure.key] ?? ''"
+            (input)="set(measure.key, $any($event.target).value)"
+          />
+          <span matSuffix class="unit">{{ measure.unit }}</span>
+        </mat-form-field>
+      }
+    </aside>
+
+    <div class="card results">
+      @if (results().length) {
+        <table>
+          <thead>
+            <tr>
+              <th class="rank">#</th>
+              <th>{{ 'Pickup' | t }}</th>
+              @for (measure of entered(); track measure.key) {
+                <th class="num">{{ measure.label | t }} <span class="unit">{{ measure.unit }}</span></th>
+              }
+              <th class="score">{{ 'Match' | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (result of results(); track result.pickup.id; let i = $index) {
+              <tr (click)="open(result)" tabindex="0" (keydown.enter)="open(result)">
+                <td class="rank">{{ i + 1 }}</td>
+                <td class="name">
+                  <span class="primary">{{ result.pickup.name }}</span>
+                  <span class="sub">{{ result.pickup.manufacturerName }}</span>
+                </td>
+                @for (measure of entered(); track measure.key) {
+                  <td class="num">
+                    @let diff = deviation(result, measure.key);
+                    @if (diff !== undefined) {
+                      {{ value(result, measure.key) | number: '1.0-3' }}
+                      <span class="diff" [class.exact]="diff === 0">{{ diff > 0 ? '+' : '' }}{{ diff * 100 | number: '1.0-1' }}%</span>
+                    } @else {
+                      <span class="empty">—</span>
+                    }
+                  </td>
+                }
+                <td class="score">
+                  <span class="badge-score" [class]="tier(result.score)">{{ result.score }}%</span>
+                  @if (result.compared < entered().length) {
+                    <span class="partial">{{ '{n} of {total} compared' | t: { n: result.compared, total: entered().length } }}</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else if (entered().length) {
+        <app-empty-state icon="search_off" [title]="'No pickup has these measurements' | t" [message]="'Pickups without a value for them cannot be compared.' | t" />
+      } @else {
+        <app-empty-state icon="straighten" [title]="'Start with a measurement' | t" [message]="'Resistance is the usual first one; add inductance to narrow it down.' | t" />
+      }
+    </div>
+  </div>
+</div>

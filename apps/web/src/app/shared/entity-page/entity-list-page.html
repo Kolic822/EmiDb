@@ -9,6 +9,12 @@
         }
       </a>
     }
+    @if (supportsMatch) {
+      <a mat-stroked-button routerLink="match">
+        <mat-icon>straighten</mat-icon>
+        {{ 'Find match' | t }}
+      </a>
+    }
     <app-column-picker [state]="state" [groups]="groups" />
     <button mat-flat-button (click)="create()">
       <mat-icon>add</mat-icon>

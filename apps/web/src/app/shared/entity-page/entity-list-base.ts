@@ -24,6 +24,8 @@ export abstract class EntityListBase<T extends { id: number }, TInput> {
   protected abstract readonly basePath: string;
   protected readonly supportsFilter: boolean = false;
   protected readonly supportsCompare: boolean = false;
+  /** Pickups only: link to the "find closest match" page. */
+  protected readonly supportsMatch: boolean = false;
   /** Entities that can have files attached get a pinned files column. */
   protected readonly supportsAttachments: boolean = false;
   /** Edit / duplicate buttons on each row (entities with their own pages). */

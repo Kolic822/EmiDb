@@ -257,3 +257,23 @@ test.describe('Trash', () => {
     await expect(entry).toHaveCount(0);
   });
 });
+
+test('closest match ranks pickups by what was measured', async ({ page }) => {
+  await page.goto('/pickups');
+  await page.getByRole('link', { name: 'Find match' }).click();
+  await expect(page.getByText('Start with a measurement')).toBeVisible();
+
+  await page.getByLabel('Resistance').fill('16,4');
+  await page.getByLabel('Inductance').fill('8.1');
+  const first = page.locator('tbody tr').first();
+  await expect(first).toContainText('SH-4 JB');
+  await expect(first).toContainText('100%');
+
+  // A pickup missing the inductance is still ranked, flagged as partly compared.
+  await page.getByLabel('Inductance').fill('');
+  await page.getByLabel('Resistance').fill('8.3');
+  await expect(page.locator('tbody tr').first()).toContainText('100%');
+
+  await page.locator('tbody tr').first().click();
+  await expect(page).toHaveURL(/\/pickups\/\d+$/);
+});

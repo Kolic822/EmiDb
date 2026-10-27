@@ -5,3 +5,4 @@ export * from './fields.js';
 export * from './filtering.js';
 export * from './i18n/i18n.js';
 export { hr } from './i18n/hr.js';
+export * from './matching.js';

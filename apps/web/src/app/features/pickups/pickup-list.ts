@@ -24,6 +24,7 @@ export class PickupList extends EntityListBase<Pickup, PickupInput> {
   protected readonly basePath = '/pickups';
   protected override readonly supportsFilter = true;
   protected override readonly supportsCompare = true;
+  protected override readonly supportsMatch = true;
 
   constructor() {
     super();
