@@ -14,6 +14,7 @@ import { FileSizePipe } from '../pipes/file-size.pipe';
 import { AttachmentPreview } from './attachment-preview';
 import { PdfThumbnail } from './pdf-thumbnail';
 import { PdfViewer } from './pdf-viewer';
+import { shrinkImage } from './shrink-image';
 
 /** One card in the grid: a stored attachment, or a file waiting for the first save. */
 interface Tile {
@@ -173,8 +174,11 @@ export class AttachmentsPanel {
     this.items.update((items) => items.filter((i) => i.id !== item.id));
   }
 
-  private async add(files: File[]): Promise<void> {
-    if (!files.length) return;
+  private async add(picked: File[]): Promise<void> {
+    if (!picked.length) return;
+    this.busy.set(true);
+    const files = await Promise.all(picked.map((file) => shrinkImage(file)));
+    this.busy.set(false);
     if (this.isPending()) {
       this.pending.update((current) => [...current, ...files]);
       return;

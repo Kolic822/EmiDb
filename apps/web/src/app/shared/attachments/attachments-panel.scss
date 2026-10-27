@@ -235,3 +235,14 @@ section {
     outline-offset: -2px;
   }
 }
+
+// "Take photo" only makes sense where there is a camera to open: phones and tablets.
+.camera-btn {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .camera-btn {
+    display: inline-flex;
+  }
+}

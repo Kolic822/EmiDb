@@ -9,6 +9,11 @@
     @if (isPending() && tiles().length) {
       <span class="hint muted">{{ 'Uploaded when you save' | t }}</span>
     }
+    <button mat-stroked-button type="button" class="camera-btn" (click)="camera.click()" [disabled]="busy()">
+      <mat-icon>photo_camera</mat-icon>
+      {{ 'Take photo' | t }}
+    </button>
+    <input #camera type="file" accept="image/*" capture="environment" hidden (change)="onFilesPicked($event)" />
     <button mat-stroked-button type="button" (click)="picker.click()" [disabled]="busy()">
       <mat-icon>upload</mat-icon>
       {{ (isPending() ? 'Add files' : 'Upload') | t }}

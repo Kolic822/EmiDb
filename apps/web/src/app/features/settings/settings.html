@@ -94,6 +94,29 @@
     </section>
 
     <section class="card">
+      <h2>{{ 'Storage' | t }}</h2>
+      @if (storage(); as s) {
+        <div class="row">
+          <div class="row-label">{{ 'Files' | t }}</div>
+          <div>{{ s.filesBytes | fileSize }} <span class="muted">· {{ '{count} files' | t: { count: s.fileCount } }}</span></div>
+        </div>
+        <div class="row">
+          <div class="row-label">{{ 'Database' | t }}</div>
+          <div>{{ s.databaseBytes | fileSize }}</div>
+        </div>
+        @if (s.freeBytes !== null && s.totalBytes) {
+          <div class="row">
+            <div class="row-label">{{ 'Disk' | t }}</div>
+            <div class="disk">
+              <progress [value]="s.totalBytes - s.freeBytes" [max]="s.totalBytes"></progress>
+              <span class="muted">{{ '{free} free of {total}' | t: { free: (s.freeBytes | fileSize), total: (s.totalBytes | fileSize) } }}</span>
+            </div>
+          </div>
+        }
+      }
+    </section>
+
+    <section class="card">
       <h2>{{ 'About' | t }}</h2>
       <div class="row">
         <div class="row-label">{{ 'Version' | t }}</div>

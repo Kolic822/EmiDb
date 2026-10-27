@@ -14,6 +14,7 @@ import { Updates } from '../../core/updates';
 import { API_BASE } from '../../core/http/crud-api';
 import { ACCENTS, THEME_MODES, ThemeService } from '../../core/theme';
 import type { ListState } from '../../shared/list-state/list-state';
+import { FileSizePipe } from '../../shared/pipes/file-size.pipe';
 import { PageHeader } from '../../shared/page-header/page-header';
 import { PickupSetListState } from '../pickup-sets/pickup-set-list-state';
 import { PickupListState } from '../pickups/pickup-list-state';
@@ -27,7 +28,7 @@ interface TableSettings {
 
 @Component({
   selector: 'app-settings',
-  imports: [PageHeader, MatButton, MatButtonToggleGroup, MatButtonToggle, MatCheckbox, MatIcon, MatTooltip, TranslatePipe, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription],
+  imports: [PageHeader, FileSizePipe, MatButton, MatButtonToggleGroup, MatButtonToggle, MatCheckbox, MatIcon, MatTooltip, TranslatePipe, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,6 +42,16 @@ export class Settings {
   protected readonly updates = inject(Updates);
   protected readonly version = toSignal(
     inject(HttpClient).get<{ version: string; commit: string | null }>(`${API_BASE}/version`),
+  );
+
+  protected readonly storage = toSignal(
+    inject(HttpClient).get<{
+      fileCount: number;
+      filesBytes: number;
+      databaseBytes: number;
+      freeBytes: number | null;
+      totalBytes: number | null;
+    }>(`${API_BASE}/storage`),
   );
 
   protected readonly tables: TableSettings[] = [

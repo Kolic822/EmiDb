@@ -101,6 +101,57 @@ test('files attached to a manufacturer show up in the library', async ({ page })
   await expect(page.getByRole('dialog').getByRole('img', { name: 'colour-codes.png' })).toBeVisible();
 });
 
+test('a large photo is shrunk before upload and storage usage is shown in settings', async ({ page }) => {
+  await page.goto('/manufacturers');
+  await page.getByRole('button', { name: 'New manufacturer' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Name', { exact: true }).fill('Photo Test Maker');
+
+  // A noisy 3600x2400 JPEG, the size of a phone photo, made in the browser.
+  const photo = await page.evaluate(async () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 3600;
+    canvas.height = 2400;
+    const context = canvas.getContext('2d')!;
+    const image = context.createImageData(3600, 2400);
+    for (let i = 0; i < image.data.length; i += 4) {
+      image.data[i] = Math.random() * 255;
+      image.data[i + 1] = Math.random() * 255;
+      image.data[i + 2] = Math.random() * 255;
+      image.data[i + 3] = 255;
+    }
+    context.putImageData(image, 0, 0);
+    const blob = await new Promise<Blob>((resolve) => canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.95));
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    let binary = '';
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary);
+  });
+  const original = Buffer.from(photo, 'base64');
+  await dialog.locator('app-attachments-panel input[capture]').setInputFiles({
+    name: 'bench.jpg',
+    mimeType: 'image/jpeg',
+    buffer: original,
+  });
+  // Shrinking takes a moment; the file shows up as a tile once it is ready.
+  await expect(dialog.locator('app-attachments-panel .tile', { hasText: 'bench.jpg' })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Create' }).click();
+  await expect(page.locator('tbody tr', { hasText: 'Photo Test Maker' }).getByRole('button', { name: 'Open bench.jpg' })).toBeVisible();
+
+  const stored = await page.evaluate(async () => {
+    const list = (await (await fetch('/api/library')).json()) as { ownerName: string; url: string; size: number }[];
+    const item = list.find((entry) => entry.ownerName === 'Photo Test Maker')!;
+    const bitmap = await createImageBitmap(await (await fetch(item.url)).blob());
+    return { size: item.size, width: bitmap.width, height: bitmap.height };
+  });
+  expect(Math.max(stored.width, stored.height)).toBeLessThanOrEqual(2400);
+  expect(stored.size).toBeLessThan(original.length);
+
+  await page.goto('/settings');
+  await expect(page.getByRole('heading', { name: 'Storage' })).toBeVisible();
+  await expect(page.getByText(/\d+ files/)).toBeVisible();
+});
+
 test('settings switch dark mode and accent, and define default columns', async ({ page }) => {
   await page.goto('/settings');
   await page.getByRole('radio', { name: 'Dark' }).click();
