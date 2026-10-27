@@ -98,7 +98,7 @@ export class WiringDiagramsService {
 function toRow(dto: WiringDiagramDto): typeof wiringDiagrams.$inferInsert {
   const row: Record<string, unknown> = {};
   for (const field of WIRING_DIAGRAM_FIELDS) {
-    if (field.key === 'switches') continue;
+    if (field.key === 'switches' || field.transient) continue;
     const value = dto[field.key as keyof WiringDiagramDto] ?? null;
     row[field.key] = isFieldRelevant(field, dto as Partial<WiringDiagram>) ? value : null;
   }

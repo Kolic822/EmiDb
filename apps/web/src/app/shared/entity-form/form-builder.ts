@@ -31,6 +31,7 @@ export function formToInput<TInput>(fields: readonly FieldDef<any>[], form: Enti
   const raw = form.getRawValue();
   const input: Record<string, unknown> = {};
   for (const field of fields) {
+    if (field.transient) continue;
     input[field.key] = normalise(field, raw[field.key]);
   }
   return input as TInput;

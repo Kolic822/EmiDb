@@ -52,11 +52,11 @@ export class ListState<T extends { id: number }> {
 
   /** Fields that can be shown as table columns. */
   get columnFields(): FieldDef<T>[] {
-    return this.fields.filter((field) => field.column !== false);
+    return this.fields.filter((field) => field.column !== false && !field.transient);
   }
 
   get filterableFields(): FieldDef<T>[] {
-    return this.fields.filter((field) => field.filterable !== false);
+    return this.fields.filter((field) => field.filterable !== false && !field.transient);
   }
 
   /** Rows filtered by criteria + quick search and sorted. */

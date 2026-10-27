@@ -1,0 +1,18 @@
+# Render blueprint: connect the repository in Render and it creates this service.
+# The disk keeps the SQLite database and uploaded files across deploys.
+services:
+  - type: web
+    name: emidb
+    runtime: docker
+    plan: starter
+    autoDeploy: true
+    healthCheckPath: /api/version
+    envVars:
+      - key: DATA_DIR
+        value: /data
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: emidb-data
+      mountPath: /data
+      sizeGB: 1

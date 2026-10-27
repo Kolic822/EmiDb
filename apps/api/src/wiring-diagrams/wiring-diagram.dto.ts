@@ -1,4 +1,4 @@
-import { ConnectionType, PotFunction, type WiringDiagramInput, WiringType } from '@emidb/shared';
+import { ConnectionType, ControlRole, PotFunction, type WiringDiagramInput, WiringType } from '@emidb/shared';
 import {
   ArrayMaxSize,
   IsArray,
@@ -36,47 +36,62 @@ export class WiringDiagramDto implements WiringDiagramInput {
   @IsOptional() @IsInt() @Min(1)
   bridgeTypeId: number | null = null;
 
-  @IsOptional() @IsInt() @Min(0) @Max(3)
-  volumePotCount: number | null = null;
+  @IsOptional() @IsInt() @Min(0) @Max(6)
+  controlCount: number | null = null;
+
+  @IsOptional() @IsIn(ControlRole.values)
+  control1Role: ControlRole | null = null;
 
   @IsOptional() @IsInt() @Min(1)
-  volumePot1TypeId: number | null = null;
+  control1TypeId: number | null = null;
 
   @IsOptional() @IsIn(PotFunction.values)
-  volumePot1Function: PotFunction | null = null;
+  control1Function: PotFunction | null = null;
+
+  @IsOptional() @IsIn(ControlRole.values)
+  control2Role: ControlRole | null = null;
 
   @IsOptional() @IsInt() @Min(1)
-  volumePot2TypeId: number | null = null;
+  control2TypeId: number | null = null;
 
   @IsOptional() @IsIn(PotFunction.values)
-  volumePot2Function: PotFunction | null = null;
+  control2Function: PotFunction | null = null;
+
+  @IsOptional() @IsIn(ControlRole.values)
+  control3Role: ControlRole | null = null;
 
   @IsOptional() @IsInt() @Min(1)
-  volumePot3TypeId: number | null = null;
+  control3TypeId: number | null = null;
 
   @IsOptional() @IsIn(PotFunction.values)
-  volumePot3Function: PotFunction | null = null;
+  control3Function: PotFunction | null = null;
 
-  @IsOptional() @IsInt() @Min(0) @Max(3)
-  tonePotCount: number | null = null;
+  @IsOptional() @IsIn(ControlRole.values)
+  control4Role: ControlRole | null = null;
 
   @IsOptional() @IsInt() @Min(1)
-  tonePot1TypeId: number | null = null;
+  control4TypeId: number | null = null;
 
   @IsOptional() @IsIn(PotFunction.values)
-  tonePot1Function: PotFunction | null = null;
+  control4Function: PotFunction | null = null;
+
+  @IsOptional() @IsIn(ControlRole.values)
+  control5Role: ControlRole | null = null;
 
   @IsOptional() @IsInt() @Min(1)
-  tonePot2TypeId: number | null = null;
+  control5TypeId: number | null = null;
 
   @IsOptional() @IsIn(PotFunction.values)
-  tonePot2Function: PotFunction | null = null;
+  control5Function: PotFunction | null = null;
+
+  @IsOptional() @IsIn(ControlRole.values)
+  control6Role: ControlRole | null = null;
 
   @IsOptional() @IsInt() @Min(1)
-  tonePot3TypeId: number | null = null;
+  control6TypeId: number | null = null;
 
   @IsOptional() @IsIn(PotFunction.values)
-  tonePot3Function: PotFunction | null = null;
+  control6Function: PotFunction | null = null;
 
   @IsArray() @ArrayMaxSize(8) @IsIdArray()
   switches: number[] = [];

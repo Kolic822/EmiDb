@@ -17,7 +17,7 @@ type Control = 'text' | 'textarea' | 'number' | 'select' | 'select-multi' | 'boo
 const ADD_NEW = '__add_new__';
 
 /** Small bounded integers (1–3 pickups, 0–3 pots) are easier to pick from a list. */
-const SELECT_MAX_RANGE = 6;
+const SELECT_MAX_RANGE = 8;
 
 /** Renders the right Material control for a field definition bound to a FormControl. */
 @Component({
@@ -187,7 +187,7 @@ export class EntityField {
 }
 
 function isSmallRange(field: FieldDef<any>): boolean {
-  return field.kind === 'integer' && field.min != null && field.max != null && field.max - field.min < SELECT_MAX_RANGE;
+  return field.kind === 'integer' && field.min != null && field.max != null && field.max - field.min <= SELECT_MAX_RANGE;
 }
 
 function singularise(plural: string): string {

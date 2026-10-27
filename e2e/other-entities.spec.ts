@@ -5,29 +5,31 @@ test('wiring diagram shows pots, switches and can be created with components', a
   await expect(page.getByText('5 wiring diagrams')).toBeVisible();
   await page.locator('tbody tr', { hasText: 'Les Paul standard' }).click();
   await expect(page.getByRole('heading', { name: 'Les Paul standard' })).toBeVisible();
-  await expect(page.locator('app-entity-details')).toContainText('Volume pot 2');
-  await expect(page.locator('app-entity-details')).not.toContainText('Volume pot 3');
+  await expect(page.locator('app-entity-details')).toContainText('Pot 4');
+  await expect(page.locator('app-entity-details')).not.toContainText('Pot 5');
   await expect(page.getByText('Three Way Toggle', { exact: true })).toBeVisible();
 
   await page.goto('/wiring-diagrams/new');
   await page.getByLabel('Name').fill('Test HSS');
   await page.getByLabel('Wiring type').click();
   await page.getByRole('option', { name: 'Guitar wiring' }).click();
-  await expect(page.getByLabel('Volume pot 1', { exact: true })).toHaveCount(0);
-  // Clicking a field's label is how Material opens an (empty) select.
-  await page.locator('mat-label', { hasText: /^Volume pots$/ }).click();
-  await page.getByRole('option', { name: '2', exact: true }).click();
-  await expect(page.getByLabel('Volume pot 2', { exact: true })).toBeVisible();
-  await expect(page.getByLabel('Volume pot 3', { exact: true })).toHaveCount(0);
+  await expect(page.getByLabel('Pot 1', { exact: true })).toHaveCount(0);
+  // Clicking a field's label is how Material opens an (empty) select. A layout preset fills count and roles.
+  await page.locator('mat-label', { hasText: /^Layout$/ }).click();
+  await page.getByRole('option', { name: 'Volume + tone', exact: true }).click();
+  await expect(page.getByLabel('Pots', { exact: true })).toContainText('2');
+  await expect(page.getByLabel('Pot 1', { exact: true })).toContainText('Volume');
+  await expect(page.getByLabel('Pot 2', { exact: true })).toContainText('Tone');
+  await expect(page.getByLabel('Pot 3', { exact: true })).toHaveCount(0);
   // Guitar wiring narrows the pickup type list to guitar types.
   await page.locator('mat-label', { hasText: /^Neck$/ }).click();
   await page.getByRole('listbox').getByPlaceholder('Search…').fill('bass');
   await expect(page.getByRole('option', { name: 'Jazz Bass', exact: true })).toHaveCount(0);
   await page.getByRole('listbox').getByPlaceholder('Search…').fill('P90');
   await page.getByRole('option', { name: 'P90', exact: true }).click();
-  await page.locator('mat-label', { hasText: /^Volume pot 1$/ }).click();
+  await page.locator('mat-label', { hasText: /^Pot 1 type$/ }).click();
   await page.getByRole('option', { name: '250k audio' }).click();
-  await page.locator('mat-label', { hasText: /^Volume pot 2 function$/ }).click();
+  await page.locator('mat-label', { hasText: /^Pot 2 function$/ }).click();
   await page.getByRole('option', { name: 'Push-push' }).click();
   await page.getByRole('button', { name: 'Add switch' }).click();
   await page.locator('.multi', { hasText: 'Switches' }).getByRole('combobox').click();
@@ -43,7 +45,7 @@ test('wiring diagram shows pots, switches and can be created with components', a
 
 test('wiring diagrams filter by the function of a specific pot position', async ({ page }) => {
   await page.goto('/wiring-diagrams/filter');
-  await page.locator('mat-label', { hasText: /^Volume pot 2 function$/ }).click();
+  await page.locator('mat-label', { hasText: /^Pot 2 function$/ }).click();
   await page.getByRole('option', { name: 'Push-pull' }).click();
   await page.keyboard.press('Escape');
   await expect(page.getByText(/^1 of \d+ diagrams match$/)).toBeVisible();

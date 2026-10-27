@@ -131,7 +131,7 @@ export class EntityDetails {
     return this.groups()
       .map((group) => ({
         ...group,
-        fields: this.fields().filter((field) => field.group === group.id && isFieldRelevant(field, row)),
+        fields: this.fields().filter((field) => field.group === group.id && !field.transient && isFieldRelevant(field, row)),
       }))
       .filter((group) => group.fields.length);
   });

@@ -122,6 +122,24 @@ export const WiringType = defineEnum({
 });
 export type WiringType = EnumValue<typeof WiringType>;
 
+/** What a control position on the instrument is used for. */
+export const ControlRole = defineEnum({
+  VOLUME: 'Volume',
+  TONE: 'Tone',
+});
+export type ControlRole = EnumValue<typeof ControlRole>;
+
+/** Common pot layouts, used to fill the positions of a wiring diagram quickly. */
+export const ControlLayout = defineEnum({
+  V: '1 volume',
+  VT: 'Volume + tone',
+  VTT: 'Volume + 2 tones (Strat)',
+  VVT: '2 volumes + tone (Jazz Bass)',
+  VVTT: '2 volumes + 2 tones (Les Paul)',
+  VVVT: '3 volumes + tone',
+});
+export type ControlLayout = EnumValue<typeof ControlLayout>;
+
 /** Which instrument family a wiring pickup type belongs to. */
 export const InstrumentFamily = defineEnum({
   GUITAR: 'Guitar',

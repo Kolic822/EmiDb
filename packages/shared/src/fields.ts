@@ -3,6 +3,8 @@ import {
   CapMaterial,
   CarrierType,
   ConnectionType,
+  ControlLayout,
+  ControlRole,
   InformationSource,
   InsulationColor,
   MagneticDirection,
@@ -79,6 +81,8 @@ export interface FieldDef<T = Record<string, unknown>> {
   filterSingle?: boolean;
   /** Lookup options are narrowed by another field of the same record (see `lookupMatches`). */
   dependsOn?: keyof T & string;
+  /** Form-only helper that is never stored, shown as a column or filtered. */
+  transient?: boolean;
 }
 
 export const PICKUP_GROUPS: FieldGroup[] = [
@@ -149,42 +153,58 @@ export const PICKUP_SET_FIELDS: FieldDef<PickupSet>[] = [
   { key: 'description', label: 'Description', group: 'identity', kind: 'textarea', column: false, filterable: false },
 ];
 
-/** Type + function fields for pot positions 1–3, shown while the count covers the position. */
-function potFields(
-  prefix: 'volumePot' | 'tonePot',
-  label: string,
-  group: 'volume' | 'tone',
-  countKey: 'volumePotCount' | 'tonePotCount',
-): FieldDef<WiringDiagram>[] {
-  return [1, 2, 3].flatMap((n): FieldDef<WiringDiagram>[] => [
+export const MAX_CONTROLS = 6;
+
+/** Role + type + function for pot positions 1–6, shown while the count covers the position. */
+function controlFields(): FieldDef<WiringDiagram>[] {
+  return Array.from({ length: MAX_CONTROLS }, (_, i) => i + 1).flatMap((n): FieldDef<WiringDiagram>[] => [
     {
-      key: `${prefix}${n}TypeId` as keyof WiringDiagram & string,
-      label: `${label} {n}`,
+      key: `control${n}Role` as keyof WiringDiagram & string,
+      label: 'Pot {n}',
       labelParams: { n },
-      group,
+      group: 'controls',
+      kind: 'enum',
+      enumDef: ControlRole,
+      filterSingle: true,
+      showWhen: { key: 'controlCount', min: n },
+    },
+    {
+      key: `control${n}TypeId` as keyof WiringDiagram & string,
+      label: 'Pot {n} type',
+      labelParams: { n },
+      group: 'controls',
       kind: 'potentiometerType',
       creatable: true,
       filterSingle: true,
-      showWhen: { key: countKey, min: n },
+      showWhen: { key: 'controlCount', min: n },
     },
     {
-      key: `${prefix}${n}Function` as keyof WiringDiagram & string,
-      label: `${label} {n} function`,
+      key: `control${n}Function` as keyof WiringDiagram & string,
+      label: 'Pot {n} function',
       labelParams: { n },
-      group,
+      group: 'controls',
       kind: 'enum',
       enumDef: PotFunction,
       filterSingle: true,
-      showWhen: { key: countKey, min: n },
+      showWhen: { key: 'controlCount', min: n },
     },
   ]);
 }
 
+/** Pot roles for each layout preset, position 1 first. */
+export const CONTROL_LAYOUTS: Record<ControlLayout, ControlRole[]> = {
+  V: ['VOLUME'],
+  VT: ['VOLUME', 'TONE'],
+  VTT: ['VOLUME', 'TONE', 'TONE'],
+  VVT: ['VOLUME', 'VOLUME', 'TONE'],
+  VVTT: ['VOLUME', 'VOLUME', 'TONE', 'TONE'],
+  VVVT: ['VOLUME', 'VOLUME', 'VOLUME', 'TONE'],
+};
+
 export const WIRING_DIAGRAM_GROUPS: FieldGroup[] = [
   { id: 'identity', label: 'Diagram' },
   { id: 'pickups', label: 'Pickups' },
-  { id: 'volume', label: 'Volume pots', width: 'half', columns: 2 },
-  { id: 'tone', label: 'Tone pots', width: 'half', columns: 2 },
+  { id: 'controls', label: 'Pots', columns: 3 },
   { id: 'switches', label: 'Switches' },
   { id: 'options', label: 'Wiring options' },
 ];
@@ -197,10 +217,9 @@ export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   { key: 'neckTypeId', label: 'Neck', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
   { key: 'middleTypeId', label: 'Middle', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
   { key: 'bridgeTypeId', label: 'Bridge', group: 'pickups', kind: 'wiringPickupType', creatable: true, dependsOn: 'wiringType', defaultColumn: true },
-  { key: 'volumePotCount', label: 'Volume pots', group: 'volume', kind: 'integer', min: 0, max: 3, defaultColumn: true, fullWidth: true },
-  ...potFields('volumePot', 'Volume pot', 'volume', 'volumePotCount'),
-  { key: 'tonePotCount', label: 'Tone pots', group: 'tone', kind: 'integer', min: 0, max: 3, defaultColumn: true, fullWidth: true },
-  ...potFields('tonePot', 'Tone pot', 'tone', 'tonePotCount'),
+  { key: 'layout' as keyof WiringDiagram & string, label: 'Layout', group: 'controls', kind: 'enum', enumDef: ControlLayout, transient: true },
+  { key: 'controlCount', label: 'Pots', group: 'controls', kind: 'integer', min: 0, max: MAX_CONTROLS, defaultColumn: true },
+  ...controlFields(),
   { key: 'switches', label: 'Switches', group: 'switches', kind: 'switchType', multiple: true, creatable: true, defaultColumn: true },
   { key: 'phaseReversible', label: 'Phase reversible', group: 'options', kind: 'boolean' },
   { key: 'splitCoil', label: 'Split coil', group: 'options', kind: 'boolean' },

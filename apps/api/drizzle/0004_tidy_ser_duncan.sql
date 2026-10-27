@@ -1,0 +1,51 @@
+PRAGMA foreign_keys=OFF;--> statement-breakpoint
+CREATE TABLE `__new_wiring_diagrams` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text NOT NULL,
+	`manufacturer_id` integer,
+	`wiring_type` text,
+	`pickup_count` integer,
+	`neck_type_id` integer,
+	`middle_type_id` integer,
+	`bridge_type_id` integer,
+	`control_count` integer,
+	`control1_role` text,
+	`control1_type_id` integer,
+	`control1_function` text,
+	`control2_role` text,
+	`control2_type_id` integer,
+	`control2_function` text,
+	`control3_role` text,
+	`control3_type_id` integer,
+	`control3_function` text,
+	`control4_role` text,
+	`control4_type_id` integer,
+	`control4_function` text,
+	`control5_role` text,
+	`control5_type_id` integer,
+	`control5_function` text,
+	`control6_role` text,
+	`control6_type_id` integer,
+	`control6_function` text,
+	`phase_reversible` integer,
+	`split_coil` integer,
+	`connection` text,
+	`description` text,
+	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+	`updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+	FOREIGN KEY (`manufacturer_id`) REFERENCES `manufacturers`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`neck_type_id`) REFERENCES `wiring_pickup_types`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`middle_type_id`) REFERENCES `wiring_pickup_types`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`bridge_type_id`) REFERENCES `wiring_pickup_types`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`control1_type_id`) REFERENCES `potentiometer_types`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`control2_type_id`) REFERENCES `potentiometer_types`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`control3_type_id`) REFERENCES `potentiometer_types`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`control4_type_id`) REFERENCES `potentiometer_types`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`control5_type_id`) REFERENCES `potentiometer_types`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`control6_type_id`) REFERENCES `potentiometer_types`(`id`) ON UPDATE no action ON DELETE set null
+);
+--> statement-breakpoint
+INSERT INTO `__new_wiring_diagrams`("id", "name", "manufacturer_id", "wiring_type", "pickup_count", "neck_type_id", "middle_type_id", "bridge_type_id", "control_count", "control1_role", "control1_type_id", "control1_function", "control2_role", "control2_type_id", "control2_function", "control3_role", "control3_type_id", "control3_function", "control4_role", "control4_type_id", "control4_function", "control5_role", "control5_type_id", "control5_function", "control6_role", "control6_type_id", "control6_function", "phase_reversible", "split_coil", "connection", "description", "created_at", "updated_at") SELECT "id", "name", "manufacturer_id", "wiring_type", "pickup_count", "neck_type_id", "middle_type_id", "bridge_type_id", COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0), CASE WHEN 1 <= COALESCE("volume_pot_count", 0) THEN 'VOLUME' WHEN 1 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN 'TONE' END, CASE WHEN 1 <= COALESCE("volume_pot_count", 0) THEN "volume_pot1_type_id" WHEN 1 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 0 THEN "tone_pot1_type_id" END END, CASE WHEN 1 <= COALESCE("volume_pot_count", 0) THEN "volume_pot1_function" WHEN 1 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 0 THEN "tone_pot1_function" END END, CASE WHEN 2 <= COALESCE("volume_pot_count", 0) THEN 'VOLUME' WHEN 2 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN 'TONE' END, CASE WHEN 2 <= COALESCE("volume_pot_count", 0) THEN "volume_pot2_type_id" WHEN 2 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 0 THEN "tone_pot2_type_id" WHEN 1 THEN "tone_pot1_type_id" END END, CASE WHEN 2 <= COALESCE("volume_pot_count", 0) THEN "volume_pot2_function" WHEN 2 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 0 THEN "tone_pot2_function" WHEN 1 THEN "tone_pot1_function" END END, CASE WHEN 3 <= COALESCE("volume_pot_count", 0) THEN 'VOLUME' WHEN 3 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN 'TONE' END, CASE WHEN 3 <= COALESCE("volume_pot_count", 0) THEN "volume_pot3_type_id" WHEN 3 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 0 THEN "tone_pot3_type_id" WHEN 1 THEN "tone_pot2_type_id" WHEN 2 THEN "tone_pot1_type_id" END END, CASE WHEN 3 <= COALESCE("volume_pot_count", 0) THEN "volume_pot3_function" WHEN 3 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 0 THEN "tone_pot3_function" WHEN 1 THEN "tone_pot2_function" WHEN 2 THEN "tone_pot1_function" END END, CASE WHEN 4 <= COALESCE("volume_pot_count", 0) THEN 'VOLUME' WHEN 4 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN 'TONE' END, CASE WHEN 4 <= COALESCE("volume_pot_count", 0) THEN NULL WHEN 4 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 1 THEN "tone_pot3_type_id" WHEN 2 THEN "tone_pot2_type_id" WHEN 3 THEN "tone_pot1_type_id" END END, CASE WHEN 4 <= COALESCE("volume_pot_count", 0) THEN NULL WHEN 4 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 1 THEN "tone_pot3_function" WHEN 2 THEN "tone_pot2_function" WHEN 3 THEN "tone_pot1_function" END END, CASE WHEN 5 <= COALESCE("volume_pot_count", 0) THEN 'VOLUME' WHEN 5 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN 'TONE' END, CASE WHEN 5 <= COALESCE("volume_pot_count", 0) THEN NULL WHEN 5 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 2 THEN "tone_pot3_type_id" WHEN 3 THEN "tone_pot2_type_id" END END, CASE WHEN 5 <= COALESCE("volume_pot_count", 0) THEN NULL WHEN 5 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 2 THEN "tone_pot3_function" WHEN 3 THEN "tone_pot2_function" END END, CASE WHEN 6 <= COALESCE("volume_pot_count", 0) THEN 'VOLUME' WHEN 6 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN 'TONE' END, CASE WHEN 6 <= COALESCE("volume_pot_count", 0) THEN NULL WHEN 6 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 3 THEN "tone_pot3_type_id" END END, CASE WHEN 6 <= COALESCE("volume_pot_count", 0) THEN NULL WHEN 6 <= COALESCE("volume_pot_count", 0) + COALESCE("tone_pot_count", 0) THEN CASE COALESCE("volume_pot_count", 0) WHEN 3 THEN "tone_pot3_function" END END, "phase_reversible", "split_coil", "connection", "description", "created_at", "updated_at" FROM `wiring_diagrams`;--> statement-breakpoint
+DROP TABLE `wiring_diagrams`;--> statement-breakpoint
+ALTER TABLE `__new_wiring_diagrams` RENAME TO `wiring_diagrams`;--> statement-breakpoint
+PRAGMA foreign_keys=ON;

@@ -3,6 +3,7 @@ import type {
   CapMaterial,
   CarrierType,
   ConnectionType,
+  ControlRole,
   InformationSource,
   InsulationColor,
   MagneticDirection,
@@ -125,21 +126,26 @@ export interface WiringDiagram extends Timestamps {
   neckTypeId: number | null;
   middleTypeId: number | null;
   bridgeTypeId: number | null;
-  /** How many volume / tone pots the diagram has (1–3); the positional fields below follow. */
-  volumePotCount: number | null;
-  volumePot1TypeId: number | null;
-  volumePot1Function: PotFunction | null;
-  volumePot2TypeId: number | null;
-  volumePot2Function: PotFunction | null;
-  volumePot3TypeId: number | null;
-  volumePot3Function: PotFunction | null;
-  tonePotCount: number | null;
-  tonePot1TypeId: number | null;
-  tonePot1Function: PotFunction | null;
-  tonePot2TypeId: number | null;
-  tonePot2Function: PotFunction | null;
-  tonePot3TypeId: number | null;
-  tonePot3Function: PotFunction | null;
+  /** Number of pot positions (1–6), numbered as on the instrument; the positional fields below follow. */
+  controlCount: number | null;
+  control1Role: ControlRole | null;
+  control1TypeId: number | null;
+  control1Function: PotFunction | null;
+  control2Role: ControlRole | null;
+  control2TypeId: number | null;
+  control2Function: PotFunction | null;
+  control3Role: ControlRole | null;
+  control3TypeId: number | null;
+  control3Function: PotFunction | null;
+  control4Role: ControlRole | null;
+  control4TypeId: number | null;
+  control4Function: PotFunction | null;
+  control5Role: ControlRole | null;
+  control5TypeId: number | null;
+  control5Function: PotFunction | null;
+  control6Role: ControlRole | null;
+  control6TypeId: number | null;
+  control6Function: PotFunction | null;
   /** Switch type ids, in order. */
   switches: number[];
   phaseReversible: boolean | null;
