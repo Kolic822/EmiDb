@@ -327,6 +327,8 @@ export const hr: Dictionary = {
   'Construction & source': 'Konstrukcija i izvor',
   'Diagram': 'Shema',
   'Pots': 'Potenciometri',
+  'No. of pots': 'Broj potenciometara',
+  'No. of pickups': 'Broj pickupa',
   'Layout': 'Raspored',
   'Volume': 'Volume',
   'Tone': 'Tone',

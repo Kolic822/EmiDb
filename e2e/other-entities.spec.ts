@@ -18,7 +18,7 @@ test('wiring diagram shows pots, switches and can be created with components', a
   // Clicking a field's label is how Material opens an (empty) select. A layout preset fills count and roles.
   await page.locator('mat-label', { hasText: /^Layout$/ }).click();
   await page.getByRole('option', { name: 'Volume + tone', exact: true }).click();
-  await expect(page.getByLabel('Pots', { exact: true })).toContainText('2');
+  await expect(page.getByLabel('No. of pots', { exact: true })).toContainText('2');
   await expect(page.getByLabel('Pot 1', { exact: true })).toContainText('Volume');
   await expect(page.getByLabel('Pot 2', { exact: true })).toContainText('Tone');
   await expect(page.getByLabel('Pot 3', { exact: true })).toHaveCount(0);
@@ -48,13 +48,13 @@ test('wiring diagrams filter by the function of a specific pot position', async 
   await page.goto('/wiring-diagrams/filter');
   // Pot positions only appear for as many pots as the Pots filter asks for, and a count has no tolerance.
   await expect(page.locator('mat-label', { hasText: /^Pot 1 function$/ })).toHaveCount(0);
-  const pots = page.locator('app-filter-field', { hasText: /^\s*Pots\s*$/ }).or(page.locator('app-filter-field').filter({ has: page.locator('mat-label', { hasText: /^Pots$/ }) }));
+  const pots = page.locator('app-filter-field', { hasText: /^\s*No. of pots\s*$/ }).or(page.locator('app-filter-field').filter({ has: page.locator('mat-label', { hasText: /^No. of pots$/ }) }));
   await expect(pots.getByLabel('tol.')).toHaveCount(0);
-  await page.getByLabel('Pots', { exact: true }).fill('2');
+  await page.getByLabel('No. of pots', { exact: true }).fill('2');
   await expect(page.locator('mat-label', { hasText: /^Pot 2 function$/ })).toBeVisible();
   await expect(page.locator('mat-label', { hasText: /^Pot 3 function$/ })).toHaveCount(0);
 
-  await page.getByLabel('Pots', { exact: true }).fill('4');
+  await page.getByLabel('No. of pots', { exact: true }).fill('4');
   await expect(page.locator('mat-label', { hasText: /^Pot 4 function$/ })).toBeVisible();
   await expect(page.locator('mat-label', { hasText: /^Pot 5 function$/ })).toHaveCount(0);
   await page.locator('mat-label', { hasText: /^Pot 2 function$/ }).click();
@@ -64,9 +64,9 @@ test('wiring diagrams filter by the function of a specific pot position', async 
   await expect(page.locator('app-data-table tbody')).toContainText('HH coil split push-pull');
 
   // Lowering the count drops the filters of the positions that are gone.
-  await page.getByLabel('Pots', { exact: true }).fill('1');
+  await page.getByLabel('No. of pots', { exact: true }).fill('1');
   await expect(page.locator('mat-label', { hasText: /^Pot 2 function$/ })).toHaveCount(0);
-  await page.getByLabel('Pots', { exact: true }).fill('3');
+  await page.getByLabel('No. of pots', { exact: true }).fill('3');
   await expect(page.locator('mat-label', { hasText: /^Pot 3 function$/ })).toBeVisible();
   await expect(page.locator('.subtitle')).toHaveText(/^[1-9]\d* of \d+ diagrams match$/);
 });
