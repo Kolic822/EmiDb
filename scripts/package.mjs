@@ -32,6 +32,8 @@ copy('packages/shared/dist');
 copy('packages/shared/package.json');
 copy('.npmrc');
 copy('start.bat');
+copy('install-autostart.bat');
+copy('allow-firewall.bat');
 copy('start.command');
 copy('start.sh');
 copy('README.md');

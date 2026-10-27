@@ -58,22 +58,26 @@ The database file and uploaded files are **not** part of the git repository (`ap
 ignored); they live in `DATA_DIR` on whatever machine runs the API, so storage is limited only by
 that disk. Back them up by copying `DATA_DIR`.
 
-## Running it on a workshop computer
+## Workshop setup: one Windows laptop, tablets on the same Wi-Fi
 
-The simplest deployment is a folder and a double-click, with Node.js 22+ installed on that machine:
+The laptop runs emidb; everything else on the Wi-Fi uses it in a browser. Node.js 22+ must be
+installed on the laptop (https://nodejs.org, default options).
 
-```bash
-npm run package          # builds and assembles release/emidb (API, UI, runtime deps, start scripts)
-```
+1. On your development machine run `npm run package` and copy the `release/emidb` folder to the
+   laptop (USB stick, cloud drive, anything). It is a few megabytes.
+2. On the laptop double-click `start.bat`. The first run downloads the runtime dependencies
+   (internet needed once) and then opens the app. Windows asks once whether Node.js may accept
+   connections; allow it on **private** networks. `allow-firewall.bat` (run as administrator)
+   does the same without the prompt.
+3. The black window prints two addresses. On the tablet open the **"On this network"** one,
+   e.g. `http://192.168.1.23:3210`, and use "Add to Home Screen" so it opens like an app.
+   Keep the window open while the app is in use; closing it stops emidb.
+4. Optional: double-click `install-autostart.bat` so emidb starts minimised whenever that
+   Windows user logs in.
 
-Copy `release/emidb` anywhere on the target machine and double-click `start.bat` (Windows) or
-`start.command` (macOS). The first run downloads the runtime dependencies (internet needed once);
-after that it starts the server on port 3210 and opens the app in the browser. Closing the
-window stops it. Data lives in `apps/api/data` inside that folder, so backing up
-means copying the folder. Other devices on the same network can use it at `http://<that-pc>:3210`.
-
-Double-clicking `start.bat` / `start.command` in a plain checkout works too: the first run
-installs and builds (a few minutes), later runs start immediately.
+Data (the SQLite file and uploaded files) lives in `apps/api/data` inside the folder, so a
+backup is a copy of that folder. Give the laptop a fixed IP in the router if the address keeps
+changing. The same scripts work in a plain checkout: the first run installs and builds.
 
 ## Deploying
 

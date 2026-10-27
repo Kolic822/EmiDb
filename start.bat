@@ -21,7 +21,9 @@ if not exist "apps\api\dist\main.js" (
 
 if "%PORT%"=="" set PORT=3210
 echo.
-echo emidb is starting on http://localhost:%PORT%
+echo emidb is starting. The addresses to use are printed below.
+echo On a tablet or another computer on the same Wi-Fi, open the "On this network" address.
+echo If Windows asks whether Node.js may accept connections, allow it on private networks.
 echo Keep this window open while you use the app. Close it to stop.
 echo.
 start "" /b cmd /c "timeout /t 3 >nul && start http://localhost:%PORT%"
