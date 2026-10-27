@@ -11,6 +11,11 @@ async function bootstrap() {
   // Behind Railway/Render every request comes from the proxy; trust it for the real client address.
   if (config.trustProxy) app.set('trust proxy', 1);
   app.setGlobalPrefix('api');
+  // Data must always be fetched fresh. Files set their own long-lived header, which wins over this.
+  app.use('/api', (_req: unknown, res: { setHeader(name: string, value: string): void }, next: () => void) => {
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

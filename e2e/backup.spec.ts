@@ -75,3 +75,15 @@ test('a file address is unique to the file, so a reused id can never show a cach
   const second = await upload();
   expect(second.url).not.toBe(first.url);
 });
+
+test('data responses are never cached, files are cached for good', async ({ request }) => {
+  expect((await request.get('/api/pickups')).headers()['cache-control']).toBe('no-store');
+  expect((await request.get('/api/attachments?owner=pickup&ownerId=1')).headers()['cache-control']).toBe('no-store');
+  const maker = await (await request.post('/api/manufacturers', { data: { name: 'Cache Probe' } })).json();
+  const file = await (
+    await request.post('/api/attachments', {
+      multipart: { owner: 'manufacturer', ownerId: String(maker.id), file: { name: 'c.png', mimeType: 'image/png', buffer: PNG } },
+    })
+  ).json();
+  expect((await request.get(file.url)).headers()['cache-control']).toContain('immutable');
+});
