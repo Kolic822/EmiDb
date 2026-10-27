@@ -118,6 +118,8 @@ export interface PotLayout extends Timestamps {
   /** Role of each position, position 1 first. */
   roles: ControlRole[];
   description: string | null;
+  /** Sketch of the control layout, numbered as the positions. */
+  attachments: Attachment[];
 }
 
 /** Pickup shape/kind used in wiring diagram slots, e.g. "Humbucker", "P90", "Jazz Bass". */
@@ -192,6 +194,6 @@ export type PickupSetInput = Writable<
 export type ComponentTypeInput = Writable<ComponentType, never>;
 export type SwitchTypeInput = Writable<SwitchType, never>;
 export type WiringPickupTypeInput = Writable<WiringPickupType, never>;
-export type PotLayoutInput = Writable<PotLayout, never>;
+export type PotLayoutInput = Writable<PotLayout, 'attachments'>;
 export type WiringDiagramInput = Writable<WiringDiagram, 'manufacturerName' | 'attachments'>;
 export type AttachmentInput = Pick<Attachment, 'caption'>;

@@ -7,7 +7,7 @@ import path from 'node:path';
 import { notFound } from '../common/errors.js';
 import { config } from '../config.js';
 import { DATABASE, type Db } from '../database/database.js';
-import { attachments, pickupSets, pickups, wiringDiagrams } from '../database/schema.js';
+import { attachments, pickupSets, pickups, potLayouts, wiringDiagrams } from '../database/schema.js';
 import type { UpdateAttachmentDto, UploadAttachmentDto } from './attachment.dto.js';
 
 type AttachmentRow = typeof attachments.$inferSelect;
@@ -16,6 +16,7 @@ const OWNER_TABLES = {
   pickup: pickups,
   wiringDiagram: wiringDiagrams,
   pickupSet: pickupSets,
+  potLayout: potLayouts,
 } as const;
 
 @Injectable()

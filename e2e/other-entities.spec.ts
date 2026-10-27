@@ -96,3 +96,29 @@ test('settings switch dark mode and accent, and define default columns', async (
   await page.goto('/pickups');
   await expect(page.locator('app-data-table thead')).toContainText('Position');
 });
+
+test('a pot layout can be created with positions and a sketch', async ({ page }) => {
+  await page.goto('/components');
+  await page.getByRole('tab', { name: 'Pot layouts' }).click();
+  await page.getByRole('button', { name: 'New pot layout' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Name', { exact: true }).fill('Test 1V 1T');
+  await dialog.getByRole('button', { name: 'Add position' }).click();
+  await dialog.locator('.multi-row').nth(0).getByRole('combobox').click();
+  await page.getByRole('option', { name: 'Volume' }).click();
+  await dialog.getByRole('button', { name: 'Add position' }).click();
+  await dialog.locator('.multi-row').nth(1).getByRole('combobox').click();
+  await page.getByRole('option', { name: 'Tone' }).click();
+  await dialog.locator('app-attachments-panel input[type=file]').setInputFiles({
+    name: 'sketch.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+      'base64',
+    ),
+  });
+  await dialog.getByRole('button', { name: 'Create' }).click();
+  const row = page.locator('tbody tr', { hasText: 'Test 1V 1T' });
+  await expect(row).toContainText('Volume, Tone');
+  await expect(row.getByRole('button', { name: 'Open sketch.png' })).toBeVisible();
+});

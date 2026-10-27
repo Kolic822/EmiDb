@@ -30,12 +30,12 @@ export class PotLayoutsController {
   @Delete()
   @HttpCode(204)
   removeMany(@Query('ids') ids: string) {
-    this.service.removeMany(parseIdList(ids));
+    return this.service.removeMany(parseIdList(ids));
   }
 
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id', ParseIntPipe) id: number) {
-    this.service.remove(id);
+    return this.service.remove(id);
   }
 }

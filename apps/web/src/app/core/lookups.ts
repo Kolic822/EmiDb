@@ -41,8 +41,24 @@ export class LookupService {
       wiringPickupType: this.stores.wiringPickupType.byId(),
       potLayout: this.stores.potLayout.byId(),
     };
-    return (field, id) => maps[field.kind as LookupKind]?.get(id)?.name;
+    return (field, id) => {
+      const row = maps[field.kind as LookupKind]?.get(id);
+      return row ? this.displayName(field.kind as LookupKind, row, maps.manufacturer) : undefined;
+    };
   });
+
+  /** Switch types show their manufacturer in brackets: "Five Way Blade (Schaller)". */
+  private displayName(
+    kind: LookupKind,
+    row: { name: string; manufacturerId?: number | null },
+    manufacturers: ReadonlyMap<number, { name: string }>,
+  ): string {
+    if (kind === 'switchType' && row.manufacturerId != null) {
+      const manufacturer = manufacturers.get(row.manufacturerId)?.name;
+      if (manufacturer) return `${row.name} (${manufacturer})`;
+    }
+    return row.name;
+  }
 
   ensureLoaded(): Promise<void> {
     return Promise.all(Object.values(this.stores).map((store) => store.ensureLoaded())).then(() => undefined);
@@ -55,9 +71,10 @@ export class LookupService {
   options(field: FieldDef<any>, record?: Partial<Record<string, unknown>> | null): LookupOption[] {
     const store = this.stores[field.kind as LookupKind];
     if (!store) return [];
-    return (store.rows() as { id: number; name: string; instrument?: any }[])
+    const manufacturers = this.stores.manufacturer.byId();
+    return (store.rows() as { id: number; name: string; instrument?: any; manufacturerId?: number | null }[])
       .filter((row) => lookupMatches(field, row, record))
-      .map((row) => ({ value: row.id, label: row.name }))
+      .map((row) => ({ value: row.id, label: this.displayName(field.kind as LookupKind, row, manufacturers) }))
       .sort((a, b) => a.label.localeCompare(b.label));
   }
 

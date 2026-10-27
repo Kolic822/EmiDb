@@ -155,5 +155,6 @@ export const AttachmentOwner = defineEnum({
   pickup: 'Pickup',
   wiringDiagram: 'Wiring diagram',
   pickupSet: 'Pickup set',
+  potLayout: 'Pot layout',
 });
 export type AttachmentOwner = EnumValue<typeof AttachmentOwner>;

@@ -4,6 +4,7 @@ import { MatIcon } from '@angular/material/icon';
 import {
   COMPONENT_TYPE_FIELDS,
   COMPONENT_TYPE_GROUPS,
+  type AttachmentOwner,
   type ComponentType,
   type ComponentTypeInput,
   type FieldDef,
@@ -39,6 +40,8 @@ abstract class ComponentTypeTableBase<
   protected readonly fields: readonly FieldDef<T>[] = COMPONENT_TYPE_FIELDS as unknown as FieldDef<T>[];
   protected readonly groups: readonly FieldGroup[] = COMPONENT_TYPE_GROUPS;
   protected readonly basePath = '/components';
+  /** Set for lookup entities that can carry files (shown in the dialog and as a column). */
+  protected readonly attachmentOwner: AttachmentOwner | null = null;
   private readonly dialogs = inject(EntityDialogService);
 
   protected override async create(): Promise<void> {
@@ -48,8 +51,11 @@ abstract class ComponentTypeTableBase<
       groups: this.groups,
       submitLabel: 'Create',
       save: (input) => this.store.create(input),
+      attachmentOwner: this.attachmentOwner ?? undefined,
     });
-    if (saved) this.notify.success(t('{noun} created', { noun: capitalise(t(this.noun)) }));
+    if (!saved) return;
+    this.notify.success(t('{noun} created', { noun: capitalise(t(this.noun)) }));
+    if (this.attachmentOwner) void this.store.load();
   }
 
   protected override async open(row: T): Promise<void> {
@@ -59,8 +65,12 @@ abstract class ComponentTypeTableBase<
       groups: this.groups,
       value: row,
       save: (input) => this.store.update(row.id, input),
+      attachmentOwner: this.attachmentOwner ?? undefined,
+      ownerId: row.id,
     });
-    if (saved) this.notify.success(t('{noun} saved', { noun: capitalise(t(this.noun)) }));
+    if (!saved) return;
+    this.notify.success(t('{noun} saved', { noun: capitalise(t(this.noun)) }));
+    if (this.attachmentOwner) void this.store.load();
   }
 }
 
@@ -148,6 +158,8 @@ export class PotLayoutTable extends ComponentTypeTableBase<PotLayout, PotLayoutI
   protected override readonly fields = POT_LAYOUT_FIELDS;
   protected override readonly groups = POT_LAYOUT_GROUPS;
   protected readonly state = new ListState<PotLayout>(POT_LAYOUT_FIELDS, 'pot-layouts', inject(LookupService).resolver);
+  protected override readonly attachmentOwner = 'potLayout' as const;
+  protected override readonly supportsAttachments = true;
   protected readonly noun = 'pot layout';
   protected readonly nounPlural = 'pot layouts';
   protected readonly title = 'Pot layouts';

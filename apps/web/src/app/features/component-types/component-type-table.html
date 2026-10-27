@@ -10,6 +10,7 @@
   [rows]="rows()"
   [totalCount]="store.rows().length"
   [loading]="store.loading() && !store.loaded()"
+  [showAttachments]="supportsAttachments"
   [emptyTitle]="'No {noun}s yet' | t: { noun: noun | t }"
   (rowClick)="open($event)"
 />
