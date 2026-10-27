@@ -26,6 +26,8 @@ export abstract class EntityListBase<T extends { id: number }, TInput> {
   protected readonly supportsCompare: boolean = false;
   /** Entities that can have files attached get a pinned files column. */
   protected readonly supportsAttachments: boolean = false;
+  /** Edit / duplicate buttons on each row (entities with their own pages). */
+  protected readonly supportsRowActions: boolean = false;
 
   protected readonly router = inject(Router);
   protected readonly confirm = inject(ConfirmService);
@@ -60,6 +62,14 @@ export abstract class EntityListBase<T extends { id: number }, TInput> {
 
   protected open(row: T): void {
     void this.router.navigate([this.basePath, row.id]);
+  }
+
+  protected edit(row: T): void {
+    void this.router.navigate([this.basePath, row.id, 'edit']);
+  }
+
+  protected duplicate(row: T): void {
+    void this.router.navigate([this.basePath, 'new'], { queryParams: { from: row.id } });
   }
 
   protected compare(): void {

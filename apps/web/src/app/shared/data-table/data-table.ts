@@ -51,11 +51,19 @@ export class DataTable<T extends { id: number }> {
   readonly emptyMessage = input<string>();
   /** Shows a pinned column with a button that opens the row's attached files. */
   readonly showAttachments = input(false);
+  /** Shows edit / duplicate buttons on hover. */
+  readonly showActions = input(false);
   readonly rowClick = output<T>();
+  readonly edit = output<T>();
+  readonly duplicate = output<T>();
 
   protected readonly hasAttachmentColumn = computed(() => this.showAttachments());
   protected readonly columnCount = computed(
-    () => this.fields().length + (this.selectable() ? 1 : 0) + (this.hasAttachmentColumn() ? 1 : 0),
+    () =>
+      this.fields().length +
+      (this.selectable() ? 1 : 0) +
+      (this.hasAttachmentColumn() ? 1 : 0) +
+      (this.showActions() ? 1 : 0),
   );
 
   protected attachmentsOf(row: T): Attachment[] | undefined {

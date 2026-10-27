@@ -7,6 +7,10 @@
           {{ 'Compare pickups' | t }}
         </a>
       }
+      <a mat-stroked-button routerLink="/sets/new" [queryParams]="{ from: set.id }">
+        <mat-icon>content_copy</mat-icon>
+        {{ 'Duplicate' | t }}
+      </a>
       <a mat-flat-button routerLink="edit">
         <mat-icon>edit</mat-icon>
         {{ 'Edit' | t }}

@@ -194,6 +194,35 @@ td {
   padding: 0 0 0 6px;
 }
 
+.actions {
+  width: 84px;
+  min-width: 84px;
+  padding: 0 4px;
+  text-align: right;
+  white-space: nowrap;
+
+  .mat-mdc-icon-button {
+    --mat-icon-button-state-layer-size: 32px;
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    opacity: 0;
+    transition: opacity 120ms;
+    color: var(--mat-sys-on-surface-variant);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+tbody tr:hover .actions .mat-mdc-icon-button,
+tbody tr:focus-within .actions .mat-mdc-icon-button {
+  opacity: 1;
+}
+
 .files {
   position: sticky;
   right: 0;

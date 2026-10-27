@@ -127,6 +127,8 @@ export const hr: Dictionary = {
 
   // Detail & forms
   'Edit': 'Uredi',
+  'Duplicate': 'Dupliciraj',
+  '{name} (copy)': '{name} (kopija)',
   'Edit {name}': 'Uredi {name}',
   'Delete pickup': 'Obriši pickup',
   'Delete set': 'Obriši set',

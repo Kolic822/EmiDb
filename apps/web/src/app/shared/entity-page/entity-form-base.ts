@@ -30,6 +30,8 @@ export abstract class EntityFormBase<T extends { id: number; name: string }, TIn
 
   /** Route parameter; absent when creating. */
   readonly id = input<string>();
+  /** Query parameter: id of a record to copy into a new one. */
+  readonly from = input<string>();
 
   /** Files picked while creating; uploaded right after the entity exists. */
   protected readonly pendingFiles = signal<File[]>([]);
@@ -41,6 +43,7 @@ export abstract class EntityFormBase<T extends { id: number; name: string }, TIn
   private readonly lookups = inject(LookupService);
 
   protected readonly numericId = computed(() => (this.id() ? Number(this.id()) : null));
+  protected readonly copySourceId = computed(() => (this.from() ? Number(this.from()) : null));
   protected readonly isEdit = computed(() => this.numericId() != null);
   protected readonly existing = computed(() => {
     const id = this.numericId();
@@ -56,11 +59,17 @@ export abstract class EntityFormBase<T extends { id: number; name: string }, TIn
   constructor() {
     effect(() => {
       if (this.form()) return;
-      if (!this.isEdit()) {
+      const sourceId = this.copySourceId();
+      if (!this.isEdit() && sourceId == null) {
         this.createForm(undefined);
         return;
       }
       untracked(() => void this.store.ensureLoaded());
+      if (sourceId != null) {
+        const source = this.store.byId().get(sourceId);
+        if (source) this.createForm({ ...source, name: t('{name} (copy)', { name: source.name }) } as T);
+        return;
+      }
       const row = this.existing();
       if (row) this.createForm(row);
     });

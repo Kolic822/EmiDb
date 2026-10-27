@@ -20,6 +20,7 @@ export class PickupSetList extends EntityListBase<PickupSet, PickupSetInput> {
   protected readonly title = 'Pickup sets';
   protected readonly createLabel = 'New set';
   protected override readonly supportsAttachments = true;
+  protected override readonly supportsRowActions = true;
   protected readonly basePath = '/sets';
 
   constructor() {

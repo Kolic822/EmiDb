@@ -20,6 +20,7 @@ export class PickupList extends EntityListBase<Pickup, PickupInput> {
   protected readonly title = 'Pickups';
   protected readonly createLabel = 'New pickup';
   protected override readonly supportsAttachments = true;
+  protected override readonly supportsRowActions = true;
   protected readonly basePath = '/pickups';
   protected override readonly supportsFilter = true;
   protected override readonly supportsCompare = true;

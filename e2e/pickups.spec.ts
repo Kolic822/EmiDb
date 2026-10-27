@@ -188,3 +188,22 @@ test.describe('Dropdowns', () => {
     await expect(page.locator('tbody tr', { hasText: 'Lace Sensor' })).toBeVisible();
   });
 });
+
+test.describe('Duplicate', () => {
+  test('opens a prefilled copy from the detail page and from the table row', async ({ page }) => {
+    await page.goto('/pickups/1');
+    await page.getByRole('link', { name: 'Duplicate' }).click();
+    await expect(page).toHaveURL(/\/pickups\/new\?from=1$/);
+    await expect(page.getByLabel('Name')).toHaveValue('SH-4 JB (copy)');
+    await expect(page.getByLabel('Resistance')).toHaveValue('16.4');
+    await page.getByRole('button', { name: 'Create pickup' }).click();
+    await expect(page.getByRole('heading', { name: 'SH-4 JB (copy)' })).toBeVisible();
+
+    await page.goto('/pickups');
+    const row = page.locator('app-data-table tbody tr', { hasText: 'SH-2 Jazz' });
+    await row.hover();
+    await row.getByRole('button', { name: 'Duplicate' }).click();
+    await expect(page).toHaveURL(/\/pickups\/new\?from=2$/);
+    await expect(page.getByLabel('Name')).toHaveValue('SH-2 Jazz (copy)');
+  });
+});

@@ -1,6 +1,10 @@
 <div class="page">
   @if (diagram(); as diagram) {
     <app-page-header [title]="diagram.name" [subtitle]="subtitle()" backLink="/wiring-diagrams">
+      <a mat-stroked-button routerLink="/wiring-diagrams/new" [queryParams]="{ from: diagram.id }">
+        <mat-icon>content_copy</mat-icon>
+        {{ 'Duplicate' | t }}
+      </a>
       <a mat-flat-button routerLink="edit">
         <mat-icon>edit</mat-icon>
         {{ 'Edit' | t }}

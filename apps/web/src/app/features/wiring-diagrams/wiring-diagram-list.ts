@@ -20,6 +20,7 @@ export class WiringDiagramList extends EntityListBase<WiringDiagram, WiringDiagr
   protected readonly title = 'Wiring diagrams';
   protected readonly createLabel = 'New wiring diagram';
   protected override readonly supportsAttachments = true;
+  protected override readonly supportsRowActions = true;
   protected readonly basePath = '/wiring-diagrams';
   protected override readonly supportsFilter = true;
 
