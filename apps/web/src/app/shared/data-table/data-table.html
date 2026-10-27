@@ -44,6 +44,9 @@
               </div>
             </th>
           }
+          @if (hasAttachmentColumn()) {
+            <th class="files" aria-label="Files"></th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -87,10 +90,15 @@
                 }
               </td>
             }
+            @if (hasAttachmentColumn()) {
+              <td class="files">
+                <app-attachment-button [attachments]="attachmentsOf(row)" />
+              </td>
+            }
           </tr>
         } @empty {
           <tr class="empty-row">
-            <td [attr.colspan]="fields().length + (selectable() ? 1 : 0)">
+            <td [attr.colspan]="columnCount()">
               @if (!loading()) {
                 <app-empty-state icon="search_off" [title]="emptyTitle()" [message]="emptyMessage()" />
               }

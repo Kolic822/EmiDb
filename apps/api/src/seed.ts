@@ -14,7 +14,6 @@ import {
   pickups,
   potentiometerTypes,
   switchTypes,
-  wiringDiagramPots,
   wiringDiagrams,
   wiringDiagramSwitches,
 } from './database/schema.js';
@@ -188,14 +187,30 @@ const pot = (name: string) => pots.find((p) => p.name === name)!.id;
 
 const sws = db
   .insert(switchTypes)
-  .values([
-    { name: '3-way toggle', description: 'Gibson style' },
-    { name: '3-way blade', description: 'Telecaster style' },
-    { name: '5-way blade', description: 'Stratocaster style' },
-    { name: 'Mini toggle on-on', description: 'DPDT' },
-    { name: 'Mini toggle on-off-on' },
-    { name: '4-way blade' },
-  ])
+  .values(
+    [
+      'S One',
+      'Three Way Blade',
+      'Three Way Super Switch',
+      'Three Way Blade Schaller',
+      'Three Way Toggle',
+      'Three Way Two Pole Slide',
+      'Four Way Blade',
+      'Four Way Blade Super Switch',
+      'Four Pdt On On On',
+      'Five Way Blade',
+      'Five Way Blade Super Switch',
+      'Five Way Blade Schaller',
+      'Five Way Rotary',
+      'Two Pole Five Way Rotary',
+      'DPDT On On',
+      'DPDT On Off On',
+      'DPDT On On On',
+      'SPDT On On',
+      'SPDT On Off On',
+      'SPDT On On On',
+    ].map((name) => ({ name })),
+  )
   .returning({ id: switchTypes.id, name: switchTypes.name })
   .all();
 const sw = (name: string) => sws.find((s) => s.name === name)!.id;
@@ -206,26 +221,42 @@ const diagrams = db
     {
       name: 'Les Paul standard', manufacturerId: maker('Gibson'), wiringType: 'GUITAR_WIRING', pickupCount: 2,
       neck: 'HUMBUCKER', bridge: 'HUMBUCKER', phaseReversible: false, splitCoil: false, serial: false, parallel: false,
+      volumePotCount: 2, volumePot1TypeId: pot('500k audio'), volumePot1Function: 'NORMAL',
+      volumePot2TypeId: pot('500k audio'), volumePot2Function: 'NORMAL',
+      tonePotCount: 2, tonePot1TypeId: pot('500k audio'), tonePot1Function: 'NORMAL',
+      tonePot2TypeId: pot('500k audio'), tonePot2Function: 'NORMAL',
       description: 'Two volumes, two tones, 3-way toggle. Modern wiring (tone after volume).',
     },
     {
       name: 'Stratocaster SSS', manufacturerId: maker('Fender'), wiringType: 'GUITAR_WIRING', pickupCount: 3,
       neck: 'SINGLE_COIL', middle: 'SINGLE_COIL', bridge: 'SINGLE_COIL', phaseReversible: false, splitCoil: false,
-      serial: false, parallel: true, description: 'Master volume, neck tone, middle tone, 5-way blade.',
+      serial: false, parallel: true,
+      volumePotCount: 1, volumePot1TypeId: pot('250k audio'), volumePot1Function: 'NORMAL',
+      tonePotCount: 2, tonePot1TypeId: pot('250k audio'), tonePot1Function: 'NORMAL',
+      tonePot2TypeId: pot('250k audio'), tonePot2Function: 'NORMAL',
+      description: 'Master volume, neck tone, middle tone, 5-way blade.',
     },
     {
       name: 'Telecaster 4-way', manufacturerId: maker('Fender'), wiringType: 'GUITAR_WIRING', pickupCount: 2,
       neck: 'SINGLE_COIL', bridge: 'SINGLE_COIL', phaseReversible: false, splitCoil: false, serial: true, parallel: true,
+      volumePotCount: 1, volumePot1TypeId: pot('250k audio'), volumePot1Function: 'NORMAL',
+      tonePotCount: 1, tonePot1TypeId: pot('250k audio'), tonePot1Function: 'NORMAL',
       description: 'Adds a series position to the standard Tele wiring.',
     },
     {
       name: 'HH coil split push-pull', wiringType: 'GUITAR_WIRING', pickupCount: 2, neck: 'HUMBUCKER', bridge: 'HUMBUCKER',
       phaseReversible: false, splitCoil: true, serial: true, parallel: false,
-      description: 'Both tone pots are push-pull and split their humbucker to the slug coil.',
+      volumePotCount: 2, volumePot1TypeId: pot('500k audio'), volumePot1Function: 'NORMAL',
+      volumePot2TypeId: pot('500k push-pull'), volumePot2Function: 'PUSH_PULL',
+      tonePotCount: 2, tonePot1TypeId: pot('500k push-pull'), tonePot1Function: 'PUSH_PULL',
+      tonePot2TypeId: pot('500k push-pull'), tonePot2Function: 'PUSH_PULL',
+      description: 'Push-pull pots split the humbuckers to their slug coils.',
     },
     {
       name: 'Precision Bass', manufacturerId: maker('Fender'), wiringType: 'BASS_WIRING', pickupCount: 1,
       middle: 'HUMBUCKER', phaseReversible: false, splitCoil: false, serial: true, parallel: false,
+      volumePotCount: 1, volumePot1TypeId: pot('250k audio'), volumePot1Function: 'NORMAL',
+      tonePotCount: 1, tonePot1TypeId: pot('250k audio'), tonePot1Function: 'NORMAL',
       description: 'Volume and tone only.',
     },
   ])
@@ -233,32 +264,12 @@ const diagrams = db
   .all();
 const diagram = (name: string) => diagrams.find((d) => d.name === name)!.id;
 
-db.insert(wiringDiagramPots)
-  .values([
-    { diagramId: diagram('Les Paul standard'), potTypeId: pot('500k audio'), role: 'volume', position: 0 },
-    { diagramId: diagram('Les Paul standard'), potTypeId: pot('500k audio'), role: 'volume', position: 1 },
-    { diagramId: diagram('Les Paul standard'), potTypeId: pot('500k audio'), role: 'tone', position: 0 },
-    { diagramId: diagram('Les Paul standard'), potTypeId: pot('500k audio'), role: 'tone', position: 1 },
-    { diagramId: diagram('Stratocaster SSS'), potTypeId: pot('250k audio'), role: 'volume', position: 0 },
-    { diagramId: diagram('Stratocaster SSS'), potTypeId: pot('250k audio'), role: 'tone', position: 0 },
-    { diagramId: diagram('Stratocaster SSS'), potTypeId: pot('250k audio'), role: 'tone', position: 1 },
-    { diagramId: diagram('Telecaster 4-way'), potTypeId: pot('250k audio'), role: 'volume', position: 0 },
-    { diagramId: diagram('Telecaster 4-way'), potTypeId: pot('250k audio'), role: 'tone', position: 0 },
-    { diagramId: diagram('HH coil split push-pull'), potTypeId: pot('500k audio'), role: 'volume', position: 0 },
-    { diagramId: diagram('HH coil split push-pull'), potTypeId: pot('500k audio'), role: 'volume', position: 1 },
-    { diagramId: diagram('HH coil split push-pull'), potTypeId: pot('500k push-pull'), role: 'tone', position: 0 },
-    { diagramId: diagram('HH coil split push-pull'), potTypeId: pot('500k push-pull'), role: 'tone', position: 1 },
-    { diagramId: diagram('Precision Bass'), potTypeId: pot('250k audio'), role: 'volume', position: 0 },
-    { diagramId: diagram('Precision Bass'), potTypeId: pot('250k audio'), role: 'tone', position: 0 },
-  ])
-  .run();
-
 db.insert(wiringDiagramSwitches)
   .values([
-    { diagramId: diagram('Les Paul standard'), switchTypeId: sw('3-way toggle'), position: 0 },
-    { diagramId: diagram('Stratocaster SSS'), switchTypeId: sw('5-way blade'), position: 0 },
-    { diagramId: diagram('Telecaster 4-way'), switchTypeId: sw('4-way blade'), position: 0 },
-    { diagramId: diagram('HH coil split push-pull'), switchTypeId: sw('3-way toggle'), position: 0 },
+    { diagramId: diagram('Les Paul standard'), switchTypeId: sw('Three Way Toggle'), position: 0 },
+    { diagramId: diagram('Stratocaster SSS'), switchTypeId: sw('Five Way Blade'), position: 0 },
+    { diagramId: diagram('Telecaster 4-way'), switchTypeId: sw('Four Way Blade'), position: 0 },
+    { diagramId: diagram('HH coil split push-pull'), switchTypeId: sw('Three Way Toggle'), position: 0 },
   ])
   .run();
 

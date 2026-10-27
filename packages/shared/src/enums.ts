@@ -134,6 +134,18 @@ export const WiringPickupType = defineEnum({
 });
 export type WiringPickupType = EnumValue<typeof WiringPickupType>;
 
+/** What a potentiometer does besides turning: pull-up switch, blend, … */
+export const PotFunction = defineEnum({
+  NORMAL: 'Normal',
+  PUSH_PULL: 'Push-pull',
+  PUSH_PUSH: 'Push-push',
+  BLEND: 'Blend',
+  STACKED: 'Stacked / concentric',
+  NO_LOAD: 'No-load',
+  SWITCHED: 'With switch',
+});
+export type PotFunction = EnumValue<typeof PotFunction>;
+
 /** Which entity an attachment belongs to. */
 export const AttachmentOwner = defineEnum({
   pickup: 'Pickup',

@@ -28,20 +28,22 @@ export class PickupSetsService {
   ) {}
 
   findAll(): PickupSet[] {
-    return this.query().orderBy(asc(pickupSets.name)).all();
+    return this.attachments.withAttachments('pickupSet', this.query().orderBy(asc(pickupSets.name)).all());
   }
 
   findOne(id: number): PickupSet {
-    return this.query().where(eq(pickupSets.id, id)).get() ?? notFound('Pickup set', id);
+    const row = this.query().where(eq(pickupSets.id, id)).get() ?? notFound('Pickup set', id);
+    return this.attachments.withAttachments('pickupSet', [row])[0];
   }
 
   findByPickup(pickupId: number): PickupSet[] {
-    return this.query()
+    const rows = this.query()
       .where(
         or(eq(pickupSets.neckId, pickupId), eq(pickupSets.middleId, pickupId), eq(pickupSets.bridgeId, pickupId)),
       )
       .orderBy(asc(pickupSets.name))
       .all();
+    return this.attachments.withAttachments('pickupSet', rows);
   }
 
   create(dto: PickupSetDto): PickupSet {

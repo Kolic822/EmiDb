@@ -10,6 +10,9 @@ import { LookupService } from '../../core/lookups';
 
 type Control = 'text' | 'textarea' | 'number' | 'select' | 'select-multi' | 'boolean';
 
+/** Small bounded integers (1–3 pickups, 0–3 pots) are easier to pick from a list. */
+const SELECT_MAX_RANGE = 6;
+
 /** Renders the right Material control for a field definition bound to a FormControl. */
 @Component({
   selector: 'app-entity-field',
@@ -30,6 +33,7 @@ export class EntityField {
     if (field.multiple) return 'select-multi';
     if (field.kind === 'textarea') return 'textarea';
     if (field.kind === 'boolean') return 'boolean';
+    if (isSmallRange(field)) return 'select';
     if (isNumericField(field)) return 'number';
     if (field.kind === 'enum' || this.lookups.isLookup(field)) return 'select';
     return 'text';
@@ -38,6 +42,9 @@ export class EntityField {
   protected readonly options = computed<readonly { value: string | number; label: string }[]>(() => {
     const field = this.field();
     if (field.kind === 'enum') return field.enumDef?.options ?? [];
+    if (isSmallRange(field)) {
+      return Array.from({ length: field.max! - field.min! + 1 }, (_, i) => ({ value: field.min! + i, label: String(field.min! + i) }));
+    }
     return this.lookups.options(field);
   });
 
@@ -79,6 +86,10 @@ export class EntityField {
     if (errors['max']) return `Maximum ${errors['max'].max}`;
     return 'Invalid value';
   }
+}
+
+function isSmallRange(field: FieldDef<any>): boolean {
+  return field.kind === 'integer' && field.min != null && field.max != null && field.max - field.min < SELECT_MAX_RANGE;
 }
 
 function singularise(plural: string): string {

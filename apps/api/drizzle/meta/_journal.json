@@ -8,6 +8,13 @@
       "when": 1793089416032,
       "tag": "0000_right_flatman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793092274545,
+      "tag": "0001_tired_rocket_racer",
+      "breakpoints": true
     }
   ]
 }

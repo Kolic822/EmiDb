@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, type Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import type { FormControl } from '@angular/forms';
-import type { FieldDef, FieldGroup } from '@emidb/shared';
+import { type FieldDef, type FieldGroup, isFieldRelevant } from '@emidb/shared';
+import { map, startWith, switchMap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { EntityField } from '../entity-field/entity-field';
 import type { EntityFormGroup } from './form-builder';
 
@@ -50,11 +53,23 @@ export class EntityForm {
   readonly groups = input.required<readonly FieldGroup[]>();
   readonly form = input.required<EntityFormGroup>();
 
-  protected readonly sections = computed(() =>
-    this.groups()
-      .map((group) => ({ ...group, fields: this.fields().filter((field) => field.group === group.id) }))
-      .filter((group) => group.fields.length),
+  /** Current raw form value, so conditional fields (`showWhen`) appear and disappear as the user types. */
+  private readonly value: Signal<Record<string, unknown>> = toSignal(
+    toObservable(this.form).pipe(
+      switchMap((form) => form.valueChanges.pipe(startWith(form.getRawValue()), map(() => form.getRawValue()))),
+    ),
+    { initialValue: {} },
   );
+
+  protected readonly sections = computed(() => {
+    const value = this.value();
+    return this.groups()
+      .map((group) => ({
+        ...group,
+        fields: this.fields().filter((field) => field.group === group.id && isFieldRelevant(field, value)),
+      }))
+      .filter((group) => group.fields.length);
+  });
 
   protected controlFor(key: string): FormControl<unknown> {
     return this.form().controls[key];

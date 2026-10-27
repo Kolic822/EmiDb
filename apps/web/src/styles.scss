@@ -74,6 +74,53 @@ html {
     )
   );
 
+  // Softer controls: tinted fields without a hard outline at rest, a clear
+  // primary focus ring, and rounded dropdown / menu panels.
+  @include mat.form-field-overrides(
+    (
+      outlined-container-shape: 10px,
+      outlined-outline-color: transparent,
+      outlined-hover-outline-color: var(--mat-sys-outline-variant),
+      outlined-focus-outline-color: var(--mat-sys-primary),
+      outlined-focus-outline-width: 2px,
+      outlined-label-text-color: var(--mat-sys-on-surface-variant),
+      outlined-hover-label-text-color: var(--mat-sys-on-surface-variant),
+      outlined-input-text-placeholder-color: var(--mat-sys-outline),
+      container-text-size: 14px,
+    )
+  );
+  @include mat.select-overrides(
+    (
+      panel-background-color: var(--mat-sys-surface-container-lowest),
+      container-elevation-shadow: (0 10px 30px -10px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.08)),
+      enabled-arrow-color: var(--mat-sys-on-surface-variant),
+    )
+  );
+  @include mat.autocomplete-overrides(
+    (
+      background-color: var(--mat-sys-surface-container-lowest),
+      container-elevation-shadow: (0 10px 30px -10px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.08)),
+    )
+  );
+  @include mat.menu-overrides(
+    (
+      container-color: var(--mat-sys-surface-container-lowest),
+      container-shape: 12px,
+      container-elevation-shadow: (0 10px 30px -10px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.08)),
+    )
+  );
+  @include mat.dialog-overrides(
+    (
+      container-color: var(--mat-sys-surface-container-lowest),
+      container-shape: 16px,
+    )
+  );
+  @include mat.checkbox-overrides(
+    (
+      selected-checkmark-color: var(--mat-sys-on-primary),
+    )
+  );
+
   &[data-theme='dark'] {
     color-scheme: dark;
   }
@@ -200,6 +247,62 @@ mat-icon.material-symbols-outlined {
 // Slightly tighter form fields everywhere.
 .mat-mdc-form-field {
   width: 100%;
+}
+
+// Tinted field background; the outline only shows on hover / focus.
+.mat-mdc-form-field-appearance-outline .mdc-text-field--outlined {
+  background: var(--mat-sys-surface-container-low);
+  border-radius: 10px;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--mat-sys-surface-container);
+  }
+
+  &.mdc-text-field--focused {
+    background: var(--mat-sys-surface-container-lowest);
+  }
+}
+
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline__notch,
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline__trailing {
+  transition: border-color 120ms;
+}
+
+// Dropdown, autocomplete and menu panels: rounded cards with soft option hover.
+.mat-mdc-select-panel,
+.mat-mdc-autocomplete-panel,
+.mat-mdc-menu-panel {
+  border-radius: 12px !important;
+  border: var(--app-border);
+  padding: 6px !important;
+}
+
+.mat-mdc-option,
+.mat-mdc-menu-item {
+  border-radius: 8px;
+  min-height: 40px !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background: var(--app-tint);
+}
+
+.mat-mdc-option .mdc-list-item__primary-text,
+.mat-mdc-menu-item .mat-mdc-menu-item-text {
+  font-size: 14px;
+}
+
+// Keyboard-only focus rings for text-style buttons.
+.link-btn:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.link-btn:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .mat-mdc-form-field-subscript-wrapper:empty {

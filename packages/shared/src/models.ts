@@ -10,6 +10,7 @@ import type {
   PickupOutput,
   PickupPosition,
   PickupType,
+  PotFunction,
   PottingType,
   StringInstrument,
   WindingDirection,
@@ -79,6 +80,7 @@ export interface Pickup extends Timestamps {
   webLink: string | null;
   autocadLink: string | null;
   description: string | null;
+  attachments: Attachment[];
 }
 
 export interface PickupSet extends Timestamps {
@@ -93,6 +95,7 @@ export interface PickupSet extends Timestamps {
   bridgeId: number | null;
   bridgeName: string | null;
   description: string | null;
+  attachments: Attachment[];
 }
 
 /** A lookup value such as "500k audio taper" or "5-way blade". */
@@ -114,9 +117,21 @@ export interface WiringDiagram extends Timestamps {
   neck: WiringPickupType | null;
   middle: WiringPickupType | null;
   bridge: WiringPickupType | null;
-  /** Potentiometer type ids, in order. */
-  volumePots: number[];
-  tonePots: number[];
+  /** How many volume / tone pots the diagram has (1–3); the positional fields below follow. */
+  volumePotCount: number | null;
+  volumePot1TypeId: number | null;
+  volumePot1Function: PotFunction | null;
+  volumePot2TypeId: number | null;
+  volumePot2Function: PotFunction | null;
+  volumePot3TypeId: number | null;
+  volumePot3Function: PotFunction | null;
+  tonePotCount: number | null;
+  tonePot1TypeId: number | null;
+  tonePot1Function: PotFunction | null;
+  tonePot2TypeId: number | null;
+  tonePot2Function: PotFunction | null;
+  tonePot3TypeId: number | null;
+  tonePot3Function: PotFunction | null;
   /** Switch type ids, in order. */
   switches: number[];
   phaseReversible: boolean | null;
@@ -124,6 +139,7 @@ export interface WiringDiagram extends Timestamps {
   serial: boolean | null;
   parallel: boolean | null;
   description: string | null;
+  attachments: Attachment[];
 }
 
 export interface Attachment {
@@ -142,11 +158,11 @@ export interface Attachment {
 type Writable<T, Derived extends keyof T> = Omit<T, 'id' | 'createdAt' | 'updatedAt' | Derived>;
 
 export type ManufacturerInput = Writable<Manufacturer, never>;
-export type PickupInput = Writable<Pickup, 'manufacturerName'>;
+export type PickupInput = Writable<Pickup, 'manufacturerName' | 'attachments'>;
 export type PickupSetInput = Writable<
   PickupSet,
-  'manufacturerName' | 'neckName' | 'middleName' | 'bridgeName'
+  'manufacturerName' | 'neckName' | 'middleName' | 'bridgeName' | 'attachments'
 >;
 export type ComponentTypeInput = Writable<ComponentType, never>;
-export type WiringDiagramInput = Writable<WiringDiagram, 'manufacturerName'>;
+export type WiringDiagramInput = Writable<WiringDiagram, 'manufacturerName' | 'attachments'>;
 export type AttachmentInput = Pick<Attachment, 'caption'>;

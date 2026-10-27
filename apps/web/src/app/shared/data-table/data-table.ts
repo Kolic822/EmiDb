@@ -5,8 +5,9 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatTooltip } from '@angular/material/tooltip';
-import { type Criterion, type FieldDef, isEmptyCriterion, isNumericField } from '@emidb/shared';
+import { type Attachment, type Criterion, type FieldDef, isEmptyCriterion, isNumericField } from '@emidb/shared';
 import { LookupService } from '../../core/lookups';
+import { AttachmentButton } from '../attachments/attachment-button';
 import { EmptyState } from '../empty-state/empty-state';
 import { FilterField } from '../filter-field/filter-field';
 import { ListState } from '../list-state/list-state';
@@ -30,6 +31,7 @@ import { FieldValuePipe } from '../pipes/field-value.pipe';
     FilterField,
     FieldValuePipe,
     EmptyState,
+    AttachmentButton,
   ],
   templateUrl: './data-table.html',
   styleUrl: './data-table.scss',
@@ -45,7 +47,20 @@ export class DataTable<T extends { id: number }> {
   readonly selectable = input(true);
   readonly emptyTitle = input('Nothing here yet');
   readonly emptyMessage = input<string>();
+  /** Shows a column with a button that opens the row's attached files. */
+  readonly showAttachments = input(true);
   readonly rowClick = output<T>();
+
+  protected readonly hasAttachmentColumn = computed(
+    () => this.showAttachments() && this.rows().some((row) => 'attachments' in row),
+  );
+  protected readonly columnCount = computed(
+    () => this.fields().length + (this.selectable() ? 1 : 0) + (this.hasAttachmentColumn() ? 1 : 0),
+  );
+
+  protected attachmentsOf(row: T): Attachment[] | undefined {
+    return (row as { attachments?: Attachment[] }).attachments;
+  }
 
   protected readonly fields = computed(() => this.state().visibleFields());
   protected readonly selection = computed(() => this.state().selection());

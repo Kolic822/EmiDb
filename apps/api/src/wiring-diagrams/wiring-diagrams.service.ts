@@ -1,15 +1,10 @@
-import type { WiringDiagram } from '@emidb/shared';
+import { isFieldRelevant, WIRING_DIAGRAM_FIELDS, type WiringDiagram } from '@emidb/shared';
 import { Inject, Injectable } from '@nestjs/common';
 import { asc, eq, getTableColumns, inArray } from 'drizzle-orm';
 import { AttachmentsService } from '../attachments/attachments.service.js';
 import { notFound } from '../common/errors.js';
 import { DATABASE, type Db, now } from '../database/database.js';
-import {
-  manufacturers,
-  wiringDiagramPots,
-  wiringDiagrams,
-  wiringDiagramSwitches,
-} from '../database/schema.js';
+import { manufacturers, wiringDiagrams, wiringDiagramSwitches } from '../database/schema.js';
 import type { WiringDiagramDto } from './wiring-diagram.dto.js';
 
 type DiagramRow = typeof wiringDiagrams.$inferSelect & { manufacturerName: string | null };
@@ -36,7 +31,7 @@ export class WiringDiagramsService {
   create(dto: WiringDiagramDto): WiringDiagram {
     const id = this.db.transaction((tx) => {
       const { id } = tx.insert(wiringDiagrams).values(toRow(dto)).returning({ id: wiringDiagrams.id }).get();
-      this.writeComponents(tx, id, dto);
+      this.writeSwitches(tx, id, dto);
       return id;
     });
     return this.findOne(id);
@@ -49,9 +44,8 @@ export class WiringDiagramsService {
         .set({ ...toRow(dto), updatedAt: now() })
         .where(eq(wiringDiagrams.id, id))
         .run();
-      tx.delete(wiringDiagramPots).where(eq(wiringDiagramPots.diagramId, id)).run();
       tx.delete(wiringDiagramSwitches).where(eq(wiringDiagramSwitches.diagramId, id)).run();
-      this.writeComponents(tx, id, dto);
+      this.writeSwitches(tx, id, dto);
     });
     return this.findOne(id);
   }
@@ -75,55 +69,38 @@ export class WiringDiagramsService {
       .leftJoin(manufacturers, eq(wiringDiagrams.manufacturerId, manufacturers.id));
   }
 
-  private writeComponents(tx: Db, diagramId: number, dto: WiringDiagramDto): void {
-    const pots = [
-      ...dto.volumePots.map((potTypeId, position) => ({ diagramId, potTypeId, role: 'volume' as const, position })),
-      ...dto.tonePots.map((potTypeId, position) => ({ diagramId, potTypeId, role: 'tone' as const, position })),
-    ];
-    if (pots.length) tx.insert(wiringDiagramPots).values(pots).run();
+  private writeSwitches(tx: Db, diagramId: number, dto: WiringDiagramDto): void {
     const switches = dto.switches.map((switchTypeId, position) => ({ diagramId, switchTypeId, position }));
     if (switches.length) tx.insert(wiringDiagramSwitches).values(switches).run();
   }
 
-  /** Attaches ordered pot and switch ids to each diagram row. */
+  /** Attaches ordered switch ids to each diagram row. */
   private withComponents(rows: DiagramRow[]): WiringDiagram[] {
     if (!rows.length) return [];
-    const ids = rows.map((row) => row.id);
-    const pots = this.db
-      .select()
-      .from(wiringDiagramPots)
-      .where(inArray(wiringDiagramPots.diagramId, ids))
-      .orderBy(asc(wiringDiagramPots.position))
-      .all();
     const switches = this.db
       .select()
       .from(wiringDiagramSwitches)
-      .where(inArray(wiringDiagramSwitches.diagramId, ids))
+      .where(inArray(wiringDiagramSwitches.diagramId, rows.map((row) => row.id)))
       .orderBy(asc(wiringDiagramSwitches.position))
       .all();
-
-    return rows.map((row) => ({
-      ...(row as WiringDiagram),
-      volumePots: pots.filter((p) => p.diagramId === row.id && p.role === 'volume').map((p) => p.potTypeId),
-      tonePots: pots.filter((p) => p.diagramId === row.id && p.role === 'tone').map((p) => p.potTypeId),
+    const withSwitches = rows.map((row) => ({
+      ...row,
       switches: switches.filter((s) => s.diagramId === row.id).map((s) => s.switchTypeId),
     }));
+    return this.attachments.withAttachments('wiringDiagram', withSwitches) as WiringDiagram[];
   }
 }
 
+/**
+ * Every scalar field, with missing values as NULL. Pot positions beyond the
+ * chosen count are cleared so stale values never leak into filters.
+ */
 function toRow(dto: WiringDiagramDto): typeof wiringDiagrams.$inferInsert {
-  return {
-    name: dto.name,
-    manufacturerId: dto.manufacturerId ?? null,
-    wiringType: dto.wiringType ?? null,
-    pickupCount: dto.pickupCount ?? null,
-    neck: dto.neck ?? null,
-    middle: dto.middle ?? null,
-    bridge: dto.bridge ?? null,
-    phaseReversible: dto.phaseReversible ?? null,
-    splitCoil: dto.splitCoil ?? null,
-    serial: dto.serial ?? null,
-    parallel: dto.parallel ?? null,
-    description: dto.description ?? null,
-  };
+  const row: Record<string, unknown> = {};
+  for (const field of WIRING_DIAGRAM_FIELDS) {
+    if (field.key === 'switches') continue;
+    const value = dto[field.key as keyof WiringDiagramDto] ?? null;
+    row[field.key] = isFieldRelevant(field, dto as Partial<WiringDiagram>) ? value : null;
+  }
+  return row as typeof wiringDiagrams.$inferInsert;
 }

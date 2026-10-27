@@ -104,6 +104,20 @@ export const wiringDiagrams = sqliteTable('wiring_diagrams', {
   neck: text(),
   middle: text(),
   bridge: text(),
+  volumePotCount: integer(),
+  volumePot1TypeId: integer().references(() => potentiometerTypes.id, { onDelete: 'set null' }),
+  volumePot1Function: text(),
+  volumePot2TypeId: integer().references(() => potentiometerTypes.id, { onDelete: 'set null' }),
+  volumePot2Function: text(),
+  volumePot3TypeId: integer().references(() => potentiometerTypes.id, { onDelete: 'set null' }),
+  volumePot3Function: text(),
+  tonePotCount: integer(),
+  tonePot1TypeId: integer().references(() => potentiometerTypes.id, { onDelete: 'set null' }),
+  tonePot1Function: text(),
+  tonePot2TypeId: integer().references(() => potentiometerTypes.id, { onDelete: 'set null' }),
+  tonePot2Function: text(),
+  tonePot3TypeId: integer().references(() => potentiometerTypes.id, { onDelete: 'set null' }),
+  tonePot3Function: text(),
   phaseReversible: bool(),
   splitCoil: bool(),
   serial: bool(),
@@ -111,22 +125,6 @@ export const wiringDiagrams = sqliteTable('wiring_diagrams', {
   description: text(),
   ...timestamps,
 });
-
-export const wiringDiagramPots = sqliteTable(
-  'wiring_diagram_pots',
-  {
-    id: id(),
-    diagramId: integer()
-      .notNull()
-      .references(() => wiringDiagrams.id, { onDelete: 'cascade' }),
-    potTypeId: integer()
-      .notNull()
-      .references(() => potentiometerTypes.id, { onDelete: 'cascade' }),
-    role: text({ enum: ['volume', 'tone'] }).notNull(),
-    position: integer().notNull(),
-  },
-  (table) => [index('wiring_diagram_pots_diagram_idx').on(table.diagramId)],
-);
 
 export const wiringDiagramSwitches = sqliteTable(
   'wiring_diagram_switches',

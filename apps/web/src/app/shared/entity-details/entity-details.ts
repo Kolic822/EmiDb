@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import type { FieldDef, FieldGroup } from '@emidb/shared';
+import { type FieldDef, type FieldGroup, isFieldRelevant } from '@emidb/shared';
 import { LookupService } from '../../core/lookups';
 import { FieldValuePipe } from '../pipes/field-value.pipe';
 
@@ -102,9 +102,13 @@ export class EntityDetails {
   readonly row = input.required<Record<string, any>>();
 
   protected readonly resolver = computed(() => this.lookups.resolver());
-  protected readonly sections = computed(() =>
-    this.groups()
-      .map((group) => ({ ...group, fields: this.fields().filter((field) => field.group === group.id) }))
-      .filter((group) => group.fields.length),
-  );
+  protected readonly sections = computed(() => {
+    const row = this.row();
+    return this.groups()
+      .map((group) => ({
+        ...group,
+        fields: this.fields().filter((field) => field.group === group.id && isFieldRelevant(field, row)),
+      }))
+      .filter((group) => group.fields.length);
+  });
 }

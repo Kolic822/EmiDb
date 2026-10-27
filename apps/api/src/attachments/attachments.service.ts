@@ -1,6 +1,6 @@
 import type { Attachment, AttachmentOwner } from '@emidb/shared';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { createReadStream, existsSync } from 'node:fs';
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
@@ -36,6 +36,21 @@ export class AttachmentsService {
 
   findOne(id: number): Attachment {
     return toModel(this.row(id));
+  }
+
+  /** Adds each row's attachments (one query for the whole list). */
+  withAttachments<T extends { id: number }>(owner: AttachmentOwner, rows: T[]): (T & { attachments: Attachment[] })[] {
+    if (!rows.length) return [];
+    const all = this.db
+      .select()
+      .from(attachments)
+      .where(and(eq(attachments.owner, owner), inArray(attachments.ownerId, rows.map((row) => row.id))))
+      .orderBy(desc(attachments.createdAt))
+      .all();
+    return rows.map((row) => ({
+      ...row,
+      attachments: all.filter((a) => a.ownerId === row.id).map(toModel),
+    }));
   }
 
   create(dto: UploadAttachmentDto, file: Express.Multer.File): Attachment {

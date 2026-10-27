@@ -5,24 +5,42 @@ test('wiring diagram shows pots, switches and can be created with components', a
   await expect(page.getByText('5 wiring diagrams')).toBeVisible();
   await page.locator('tbody tr', { hasText: 'Les Paul standard' }).click();
   await expect(page.getByRole('heading', { name: 'Les Paul standard' })).toBeVisible();
-  await expect(page.getByText('500k audio, 500k audio').first()).toBeVisible();
-  await expect(page.getByText('3-way toggle', { exact: true })).toBeVisible();
+  await expect(page.locator('app-entity-details')).toContainText('Volume pot 2');
+  await expect(page.locator('app-entity-details')).not.toContainText('Volume pot 3');
+  await expect(page.getByText('Three Way Toggle', { exact: true })).toBeVisible();
 
   await page.goto('/wiring-diagrams/new');
   await page.getByLabel('Name').fill('Test HSS');
   await page.getByLabel('Wiring type').click();
   await page.getByRole('option', { name: 'Guitar wiring' }).click();
-  await page.getByRole('button', { name: 'Add volume pot' }).click();
-  await page.locator('.multi', { hasText: 'Volume pots' }).getByRole('combobox').click();
+  await expect(page.getByLabel('Volume pot 1', { exact: true })).toHaveCount(0);
+  // Clicking a field's label is how Material opens an (empty) select.
+  await page.getByText('Volume pots', { exact: true }).click();
+  await page.getByRole('option', { name: '2', exact: true }).click();
+  await expect(page.getByLabel('Volume pot 2', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('Volume pot 3', { exact: true })).toHaveCount(0);
+  await page.getByText('Volume pot 1', { exact: true }).click();
   await page.getByRole('option', { name: '250k audio' }).click();
+  await page.getByText('Volume pot 2 function', { exact: true }).click();
+  await page.getByRole('option', { name: 'Push-push' }).click();
   await page.getByRole('button', { name: 'Add switch' }).click();
   await page.locator('.multi', { hasText: 'Switches' }).getByRole('combobox').click();
-  await page.getByRole('option', { name: '5-way blade' }).click();
+  await page.getByRole('option', { name: 'Five Way Blade', exact: true }).click();
   await page.getByRole('button', { name: 'Create wiring diagram' }).click();
 
   await expect(page.getByRole('heading', { name: 'Test HSS' })).toBeVisible();
   await expect(page.locator('app-entity-details')).toContainText('250k audio');
-  await expect(page.locator('app-entity-details')).toContainText('5-way blade');
+  await expect(page.locator('app-entity-details')).toContainText('Push-push');
+  await expect(page.locator('app-entity-details')).toContainText('Five Way Blade');
+});
+
+test('wiring diagrams filter by the function of a specific pot position', async ({ page }) => {
+  await page.goto('/wiring-diagrams/filter');
+  await page.getByText('Volume pot 2 function', { exact: true }).click();
+  await page.getByRole('option', { name: 'Push-pull' }).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByText(/^1 of \d+ diagrams match$/)).toBeVisible();
+  await expect(page.locator('app-data-table tbody')).toContainText('HH coil split push-pull');
 });
 
 test('set detail shows its pickups side by side', async ({ page }) => {

@@ -17,11 +17,12 @@ export class PickupsService {
   ) {}
 
   findAll(): Pickup[] {
-    return this.query().orderBy(asc(pickups.name)).all() as Pickup[];
+    return this.attachments.withAttachments('pickup', this.query().orderBy(asc(pickups.name)).all()) as Pickup[];
   }
 
   findOne(id: number): Pickup {
-    return (this.query().where(eq(pickups.id, id)).get() as Pickup | undefined) ?? notFound('Pickup', id);
+    const row = this.query().where(eq(pickups.id, id)).get() ?? notFound('Pickup', id);
+    return this.attachments.withAttachments('pickup', [row])[0] as Pickup;
   }
 
   create(dto: PickupDto): Pickup {

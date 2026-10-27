@@ -10,6 +10,7 @@ import {
   PickupOutput,
   PickupPosition,
   PickupType,
+  PotFunction,
   PottingType,
   StringInstrument,
   WindingDirection,
@@ -60,6 +61,8 @@ export interface FieldDef<T = Record<string, unknown>> {
   column?: boolean;
   /** Offered in the filter view. */
   filterable?: boolean;
+  /** Only relevant (shown in forms and details) while another field is at least `min`. */
+  showWhen?: { key: keyof T & string; min: number };
 }
 
 export const PICKUP_GROUPS: FieldGroup[] = [
@@ -130,6 +133,31 @@ export const PICKUP_SET_FIELDS: FieldDef<PickupSet>[] = [
   { key: 'description', label: 'Description', group: 'identity', kind: 'textarea', column: false, filterable: false },
 ];
 
+/** Type + function fields for pot positions 1–3, shown while the count covers the position. */
+function potFields(
+  prefix: 'volumePot' | 'tonePot',
+  label: string,
+  countKey: 'volumePotCount' | 'tonePotCount',
+): FieldDef<WiringDiagram>[] {
+  return [1, 2, 3].flatMap((n): FieldDef<WiringDiagram>[] => [
+    {
+      key: `${prefix}${n}TypeId` as keyof WiringDiagram & string,
+      label: `${label} ${n}`,
+      group: 'controls',
+      kind: 'potentiometerType',
+      showWhen: { key: countKey, min: n },
+    },
+    {
+      key: `${prefix}${n}Function` as keyof WiringDiagram & string,
+      label: `${label} ${n} function`,
+      group: 'controls',
+      kind: 'enum',
+      enumDef: PotFunction,
+      showWhen: { key: countKey, min: n },
+    },
+  ]);
+}
+
 export const WIRING_DIAGRAM_GROUPS: FieldGroup[] = [
   { id: 'identity', label: 'Diagram' },
   { id: 'pickups', label: 'Pickups' },
@@ -145,8 +173,10 @@ export const WIRING_DIAGRAM_FIELDS: FieldDef<WiringDiagram>[] = [
   { key: 'neck', label: 'Neck', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
   { key: 'middle', label: 'Middle', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
   { key: 'bridge', label: 'Bridge', group: 'pickups', kind: 'enum', enumDef: WiringPickupType, defaultColumn: true },
-  { key: 'volumePots', label: 'Volume pots', group: 'controls', kind: 'potentiometerType', multiple: true, defaultColumn: true },
-  { key: 'tonePots', label: 'Tone pots', group: 'controls', kind: 'potentiometerType', multiple: true, defaultColumn: true },
+  { key: 'volumePotCount', label: 'Volume pots', group: 'controls', kind: 'integer', min: 0, max: 3, defaultColumn: true },
+  ...potFields('volumePot', 'Volume pot', 'volumePotCount'),
+  { key: 'tonePotCount', label: 'Tone pots', group: 'controls', kind: 'integer', min: 0, max: 3, defaultColumn: true },
+  ...potFields('tonePot', 'Tone pot', 'tonePotCount'),
   { key: 'switches', label: 'Switches', group: 'controls', kind: 'switchType', multiple: true, defaultColumn: true },
   { key: 'phaseReversible', label: 'Phase reversible', group: 'options', kind: 'boolean' },
   { key: 'splitCoil', label: 'Split coil', group: 'options', kind: 'boolean' },
@@ -170,6 +200,13 @@ export const COMPONENT_TYPE_FIELDS: FieldDef<ComponentType>[] = [
   { key: 'name', label: 'Name', group: 'main', kind: 'text', required: true, defaultColumn: true },
   { key: 'description', label: 'Description', group: 'main', kind: 'text', defaultColumn: true },
 ];
+
+/** Whether a field applies to this row (see `FieldDef.showWhen`). */
+export function isFieldRelevant<T extends object>(field: FieldDef<T>, row: Partial<T> | null | undefined): boolean {
+  if (!field.showWhen) return true;
+  const value = row?.[field.showWhen.key];
+  return typeof value === 'number' && value >= field.showWhen.min;
+}
 
 export function isNumericField(field: FieldDef<any>): boolean {
   return field.kind === 'number' || field.kind === 'integer';
