@@ -86,6 +86,13 @@ export class FilterField {
     this.criterion.set(values.length ? { kind: 'in', values } : undefined);
   }
 
+  protected readonly single = computed(() => !!this.field().filterSingle);
+  protected readonly selectedOne = computed(() => this.selected()[0] ?? null);
+
+  protected setSelectedOne(value: string | number | null): void {
+    this.setSelected(value == null ? [] : [value]);
+  }
+
   protected setNear(value: number | null, tolerance: number | null): void {
     if (value == null || Number.isNaN(value)) {
       this.criterion.set(undefined);

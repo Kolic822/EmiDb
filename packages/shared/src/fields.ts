@@ -74,6 +74,8 @@ export interface FieldDef<T = Record<string, unknown>> {
   fullWidth?: boolean;
   /** Lookup that offers "Add new…" directly in the dropdown. */
   creatable?: boolean;
+  /** Filter by one value instead of "any of" (e.g. the type at one pot position). */
+  filterSingle?: boolean;
 }
 
 export const PICKUP_GROUPS: FieldGroup[] = [
@@ -159,6 +161,7 @@ function potFields(
       group,
       kind: 'potentiometerType',
       creatable: true,
+      filterSingle: true,
       showWhen: { key: countKey, min: n },
     },
     {
@@ -168,6 +171,7 @@ function potFields(
       group,
       kind: 'enum',
       enumDef: PotFunction,
+      filterSingle: true,
       showWhen: { key: countKey, min: n },
     },
   ]);
