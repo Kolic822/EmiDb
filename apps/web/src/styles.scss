@@ -290,6 +290,22 @@ mat-icon.material-symbols-outlined {
   font-size: 14px;
 }
 
+// Text-style action button (used inside overlays too, so it lives here).
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 4px 6px;
+  margin: -4px -6px;
+  border-radius: 6px;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-label-large);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--app-tint);
+  }
+}
+
 // Keyboard-only focus rings for text-style buttons.
 .link-btn:focus-visible {
   outline: 2px solid var(--mat-sys-primary);
