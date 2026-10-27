@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { type FieldDef, type FieldGroup, groupLabel, isEmptyCriterion } from '@emidb/shared';
+import { type Criterion, type FieldDef, type FieldGroup, groupLabel, isEmptyCriterion } from '@emidb/shared';
 import { TranslatePipe } from '../../core/i18n';
 import { FilterField } from '../filter-field/filter-field';
 import { ListState } from '../list-state/list-state';
@@ -41,8 +41,8 @@ interface Section {
             @for (field of section.fields; track field.key) {
               <app-filter-field
                 [field]="field"
-                [criterion]="state().criteria()[field.key]"
-                (criterionChange)="state().setCriterion(field.key, $event)"
+                [criterion]="criterionFor(field)"
+                (criterionChange)="setCriterion(field, $event)"
               />
             }
           </div>
@@ -127,9 +127,17 @@ export class FilterPanel<T extends { id: number }> {
   readonly state = input.required<ListState<T>>();
   readonly groups = input.required<readonly FieldGroup[]>();
 
+  protected criterionFor(field: FieldDef<any>): Criterion | undefined {
+    return (this.state().criteria() as Record<string, Criterion | undefined>)[field.key];
+  }
+
+  protected setCriterion(field: FieldDef<any>, criterion: Criterion | undefined): void {
+    this.state().setCriterion(field.key as keyof T & string, criterion);
+  }
+
   protected readonly sections = computed<Section[]>(() => {
     const state = this.state();
-    const criteria = state.criteria();
+    const criteria = state.criteria() as Record<string, Criterion | undefined>;
     const collapsed = new Set(state.collapsedFilterGroups());
     return this.groups()
       .map((group) => {
